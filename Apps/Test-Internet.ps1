@@ -1,12 +1,38 @@
-$output_file_name = "Internet Stress Test.log"
-$ping_destination = "google.com"
+<#
+.SYNOPSIS
+Placeholder
+.DESCRIPTION
+Placeholder
+.PARAMETER PingDestination
+Placeholder
+.PARAMETER OutputFile
+Placeholder
+.PARAMETER LoopRounds
+Placeholder
+.EXAMPLE
+Placeholder
+.EXAMPLE
+Placeholder
+.NOTES
+Placeholder
+.LINK
+https://github.com/elliot-labs/Powershell-Doodads
+#>
+
+# Allow command line automation.
+param([string]$PingDestination = "google.com", [string]$OutputFile = "Internet Stress Test.log", [int]$LoopRounds = 0)
+
+# Set the loop counter to 0.
 $loop_counter = 0
 
-do {
-
-Test-Connection $ping_destination | Out-File $output_file_name -Append
-$loop_counter ++
-write-host "Number of ping batches: $loop_counter" | Out-File $output_file_name -Append
-Start-Sleep -Seconds 60
-
-} while ($true)
+# Loop the same code untill the loop counter hist the specified rounds.
+while ($loop_counter -lt $LoopRounds) {
+    # Ping the specified server and write the results to a file.
+    Test-Connection $PingDestination | Out-File $OutputFile -Append
+    # Add one to the loop counter.
+    $loop_counter ++
+    # Write to the command line and pipe to an external file specified by the parameter.
+    Write-Host "Number of ping batches: $loop_counter" | Out-File $OutputFile -Append
+    # Stop processing script for 60 seconds.
+    Start-Sleep -Seconds 60
+}
