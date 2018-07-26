@@ -19,7 +19,7 @@ This will run the converter in full GUI mode.
 .NOTES
 This tool is not needed for general use and should only be used when you know you need to change a powershell file into a self contained batch script.
 .LINK
-https://elliot-labs.com
+https://github.com/elliot-labs/Powershell-Doodads
 #>
 
 # Add command line switch/flag support
