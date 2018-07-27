@@ -139,7 +139,7 @@ Function Show-MainUI {
 
 # Get the user's log in credentials and return a secure string.
 Function Get-UserLogin() {
-    $SecureCredentials = Get-Credential -UserName $UserName -Message "Please provide your alias@microsoft.com and its password:"
+    $SecureCredentials = Get-Credential -UserName $UserName -Message "Please provide your UserName@company.com and its password:"
     if ($null -eq $SecureCredentials) {
         [System.Windows.Forms.MessageBox]::Show("Login canceled, canceling operation.", "Stopping operations", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
         return $false
