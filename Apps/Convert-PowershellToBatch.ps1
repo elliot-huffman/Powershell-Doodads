@@ -6,26 +6,41 @@ This script takes the input PowerShell script and exports it as a batch script t
 This script can be run on the CLI mode or as a GUI mode.
 .PARAMETER LegacyVisuals
 When this flag is specified, the user interface will render with the Windows 98 reminiscent visual styles of the classic theme.
+This parameter is only useable when the UI is used.
+This flag does nothing if used with the CLIMode flag.
 .PARAMETER CLIMode
 When this flag is set, the GUI will not be displayed and the other CLI arguments will be used for the required information.
-.PARAMETER AdminMode
-When this flag is specified a header will be added to the batch boot-strapper that checks to see fi the script is being run as admin.
-.PARAMETER SelfDelete
-When this flag is specified a line of code will be added to the end of the boot-strapper that will self delete the batch script.
-.PARAMETER HideTerminal
-When this flag is specified The launch parameter fo the PowerShell script is modified to include a parameter that disabled the terminal from being displayed.
-.PARAMETER CLIArgument
-Arguments to be included in the execution of the PowerShell code.
 .PARAMETER InputFile
 The path to the file that will be used as the source for the outputted batch script.
+Only used with the CLIMode flag. This parameter is required.
 .PARAMETER OutputFile
 The destination and file name that will be used when the source file has finished processing.
-.EXAMPLE
-Convert-PowerShellToBatch.ps1 -CLIMode -InputFile "C:\Show-AgentToolkit.ps1" -OutputFile "C:\AgentTools.bat"
-This will disable GUI mode and take the inputted file and export it as a batch script.
+If this parameter is not specified, the same file path to the input file is used and the ".bat" file extension is added to the file.
+This parameter is only used with the CLIMode flag.
+.PARAMETER AdminMode
+When this flag is specified a header will be added to the batch boot-strapper that checks to see fi the script is being run as admin.
+This parameter is only used with the CLIMode flag.
+.PARAMETER SelfDelete
+When this flag is specified a line of code will be added to the end of the boot-strapper that will self delete the batch script.
+This parameter is only used with the CLIMode flag.
+.PARAMETER HideTerminal
+When this flag is specified The launch parameter fo the PowerShell script is modified to include a parameter that disabled the terminal from being displayed.
+This parameter is only used with the CLIMode flag.
+.PARAMETER CLIArgument
+Arguments to be included in the execution of the PowerShell code.
+This parameter is only used with the CLIMode flag.
 .EXAMPLE
 Convert-PowerShellToBatch.ps1
 This will run the converter in full GUI mode.
+
+OUTPUT:
+User interface with graphical options to configure the operation of this script.
+.EXAMPLE
+Convert-PowerShellToBatch.ps1 -CLIMode -InputFile "C:\Get-UserNAP.ps1"
+This will disable GUI mode and take the inputted file and export it as a batch script with the same path and file name with ".bat" appended to it.
+.EXAMPLE
+Convert-PowerShellToBatch.ps1 -CLIMode -InputFile "C:\Get-UserNAP.ps1" -OutputFile "C:\Get-UserNAP.bat" -SelfDelete
+This will disable GUI mode and take the inputted file and export it as a batch script that will self delete after execution has completed.
 .NOTES
 This tool is not needed for general use and should only be used when you know you need to change a PowerShell file into a self contained batch script.
 .LINK
@@ -36,14 +51,14 @@ https://github.com/elliot-labs/PowerShell-Doodads
 # Each parameter is detailed in the above help documentation.
 param(
     # Parameters for GUI.
-    [Parameter(ParameterSetName='GUI', Mandatory=$false)] [switch]$LegacyVisuals = $false,
+    [Parameter(ParameterSetName='GUI', Mandatory=$false)] [switch]$LegacyVisuals = $False,
 
     # Parameters for CLI.
-    [Parameter(ParameterSetName='CLI', Position = 0, Mandatory=$true)] [switch]$CLIMode = $false,
+    [Parameter(ParameterSetName='CLI', Position = 0, Mandatory=$true)] [switch]$CLIMode = $False,
     [Parameter(ParameterSetName='CLI', Position = 1, Mandatory=$true)] [string]$InputFile,
-    [Parameter(ParameterSetName='CLI', Position = 2, Mandatory=$true)] [string]$OutputFile,
-    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [switch]$AdminMode = $false,
-    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [switch]$SelfDelete = $false,
+    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [string]$OutputFile,
+    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [switch]$AdminMode = $False,
+    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [switch]$SelfDelete = $False,
     [Parameter(ParameterSetName='CLI', Mandatory=$false)] [switch]$HideTerminal = $False,
     [Parameter(ParameterSetName='CLI', Mandatory=$false)] [string]$CLIArgument = ""
 )
@@ -58,6 +73,10 @@ if (!$LegacyVisuals) {[System.Windows.Forms.Application]::EnableVisualStyles()}
 
 # Command Line interface mode logic starts here.
 Function Convert-File () {
+    # Process the input path and update it to be the output path with modifications.
+    if ($Script:OutputFile -eq "") {$Script:OutputFile = $Script:InputFile + ".bat"}
+
+    # Set the Administrative permission header of the batch script.
     if ($AdminMode) {
         $AdminSubHeader = 'net session >nul 2>&1
 if NOT %errorLevel% == 0 (
