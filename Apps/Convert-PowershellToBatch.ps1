@@ -1,34 +1,52 @@
 <#
 .SYNOPSIS
-This script converts powershell scripts to batch scripts to execute directly on systems.
+This script converts PowerShell scripts to batch scripts to execute directly on systems.
 .DESCRIPTION
-This script takes the input powershell script and exports it as a batch script that can be directly run on the system.
+This script takes the input PowerShell script and exports it as a batch script that can be directly run on the system.
 This script can be run on the CLI mode or as a GUI mode.
+.PARAMETER LegacyVisuals
+When this flag is specified, the user interface will render with the Windows 98 reminiscent visual styles of the classic theme.
 .PARAMETER CLIMode
-When set to true the GUI will not be displayed and the other CLI arguments will be used for the required information.
+When this flag is set, the GUI will not be displayed and the other CLI arguments will be used for the required information.
+.PARAMETER AdminMode
+When this flag is specified a header will be added to the batch boot-strapper that checks to see fi the script is being run as admin.
+.PARAMETER SelfDelete
+When this flag is specified a line of code will be added to the end of the boot-strapper that will self delete the batch script.
+.PARAMETER HideTerminal
+When this flag is specified The launch parameter fo the PowerShell script is modified to include a parameter that disabled the terminal from being displayed.
+.PARAMETER CLIArgument
+Arguments to be included in the execution of the PowerShell code.
 .PARAMETER InputFile
 The path to the file that will be used as the source for the outputted batch script.
 .PARAMETER OutputFile
 The destination and file name that will be used when the source file has finished processing.
 .EXAMPLE
-Convert-PowershellToBatch.ps1 -CLIMode true -InputFile "C:\Show-AgentToolkit.ps1" -OutputFile "C:\AgentTools.bat"
+Convert-PowerShellToBatch.ps1 -CLIMode -InputFile "C:\Show-AgentToolkit.ps1" -OutputFile "C:\AgentTools.bat"
 This will disable GUI mode and take the inputted file and export it as a batch script.
 .EXAMPLE
-Convert-PowershellToBatch.ps1
+Convert-PowerShellToBatch.ps1
 This will run the converter in full GUI mode.
 .NOTES
-This tool is not needed for general use and should only be used when you know you need to change a powershell file into a self contained batch script.
+This tool is not needed for general use and should only be used when you know you need to change a PowerShell file into a self contained batch script.
 .LINK
-https://github.com/elliot-labs/Powershell-Doodads
+https://github.com/elliot-labs/PowerShell-Doodads
 #>
 
-# Add command line switch/flag support
-# Legacy visuals are for people who like the old visual styles.
-# by using the switch, the variable becomes true, bypassing the enable modern visuals step.
-# CLIMode is used for people who like to use CLI to do everything.
-# InputFile is the path to the PowerShell file that needs converted to a batch file.
-# OutputFile is the path to the file that will be created after the powershell file has finished processing.
-param([switch]$LegacyVisuals = $false, [switch]$CLIMode = $false, [switch]$AdminMode = $false, [string]$InputFile="C:\temp\test.ps1", [string]$OutputFile="C:\temp\test.bat")
+# Add command line switch/flag support.
+# Each parameter is detailed in the above help documentation.
+param(
+    # Parameters for GUI.
+    [Parameter(ParameterSetName='GUI', Mandatory=$false)] [switch]$LegacyVisuals = $false,
+
+    # Parameters for CLI.
+    [Parameter(ParameterSetName='CLI', Position = 0, Mandatory=$true)] [switch]$CLIMode = $false,
+    [Parameter(ParameterSetName='CLI', Position = 1, Mandatory=$true)] [string]$InputFile,
+    [Parameter(ParameterSetName='CLI', Position = 2, Mandatory=$true)] [string]$OutputFile,
+    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [switch]$AdminMode = $false,
+    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [switch]$SelfDelete = $false,
+    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [switch]$HideTerminal = $False,
+    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [string]$CLIArgument = ""
+)
 
 # Import required libraries
 Add-Type -AssemblyName System.Windows.Forms
@@ -36,40 +54,37 @@ Add-Type -AssemblyName System.Drawing
 
 # Enable pretty interface controls (by default)
 # Windows 98 styles are ugly compared to today's standards
-if (!$LegacyVisuals) {
-    [System.Windows.Forms.Application]::EnableVisualStyles()
-}
+if (!$LegacyVisuals) {[System.Windows.Forms.Application]::EnableVisualStyles()}
 
 # Command Line interface mode logic starts here.
-Function Convert-File ($InputFile, $OutputFile, [string]$CLIArgument="", $AdminModeRadio=$false, $DisplayTerminal=$false) {
-    if (($AdminMode) -or ($AdminModeRadio)) {
+Function Convert-File () {
+    if ($AdminMode) {
         $AdminSubHeader = 'net session >nul 2>&1
 if NOT %errorLevel% == 0 (
     echo Please run this script as an administrator.
     pause
     exit
 )'
-    } else {
-        $AdminSubHeader = ''
-    }
-    if ($DisplayTerminal) {
-        $DisplayTerminalCLI = ' -WindowStyle Hidden'
-    }
+    } else {$AdminSubHeader = ''}
+
+    # If the hide terminal option is specified, append the hide terminal option.
+    if ($Script:HideTerminal) {$DisplayTerminalCLI = ' -WindowStyle Hidden'}
+
     # Code that will be added to the top of the converted script.
     $BatchHeader = "@echo off
 color 0A
 cls
 cd /d %~dp0
-set Script=`"%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.ps1`"
+set Script=`"%Temp%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.ps1`"
 $($AdminSubHeader)
 ("
 
     # Code that will be added at the bottom of the converted script.
-    $BatchFooter = ") > %script%
-powershell -ExecutionPolicy Unrestricted$DisplayTerminalCLI -File %Script% $CLIArgument
-del %script%"
+    $BatchFooter = ") > %Script%
+PowerShell -ExecutionPolicy Unrestricted$DisplayTerminalCLI -File %Script% $Script:CLIArgument
+del %Script%"
 
-    # Code that will be added
+    # Code that will be added for admin permissions checker.
     $AdminSubHeader = ':CheckAdmin
 net session >nul 2>&1
 if %errorLevel% == 0 (
@@ -82,10 +97,10 @@ if %errorLevel% == 0 (
 '
 
     # Create the top of the outputted script.
-    $BatchHeader | Out-File -FilePath $OutputFile -Encoding ASCII
+    $BatchHeader | Out-File -FilePath $Script:OutputFile -Encoding ASCII
     
     # Open the script to be converted and run a sequence of commands upon each line in order from top to bottom.
-    Get-Content -Path $InputFile | ForEach-Object {
+    Get-Content -Path $Script:InputFile | ForEach-Object {
 
         # Automatically comments out pipe characters in the current line.
         $fileLine = $_ -replace "\^", "^^"
@@ -100,22 +115,27 @@ if %errorLevel% == 0 (
         
         # If the line is blank then a blank line is generated for the batch file.
         if ($fileLine -match "^\s*$") {
-            "echo." | Out-File -FilePath $OutputFile -Append -Encoding ASCII
+            "echo." | Out-File -FilePath $Script:OutputFile -Append -Encoding ASCII
 
         # If the line is not blank then the below applies.
         } else {
 
             # Otherwise just convert the string to a batch export.
-            "echo $fileLine" | Out-File -FilePath $OutputFile -Append -Encoding ASCII            
+            "echo $fileLine" | Out-File -FilePath $Script:OutputFile -Append -Encoding ASCII            
         }
     }
 
     # Add the footer to the outputted batch file.
-    $BatchFooter | Out-File -FilePath $OutputFile -Append -Encoding ASCII
+    $BatchFooter | Out-File -FilePath $Script:OutputFile -Append -Encoding ASCII
 
-    [System.Windows.Forms.MessageBox]::Show("Recompile completed!", "Finished!")     
+    # Add the self deleting module to the batch script.
+    if ($Script:SelfDelete) {Out-File -FilePath $Script:OutputFile -InputObject "(goto) 2>nul & del `"%~f0`"" -Append -Encoding ASCII}
+
+    # Only show the completed dialog if the script is not in CLI mode.
+    if (!$Script:CLIMode) {[System.Windows.Forms.MessageBox]::Show("Recompile completed!", "Finished!")}
 }
 
+# Create a open file dialog that only accepts powershell scripts and set the script level variable to the results.
 Function Show-ChangeInput {
     $InputFileGUI = New-Object System.Windows.Forms.OpenFileDialog
     $InputFileGUI.Filter = "PowerShell Script (*.ps1)|*.ps1"
@@ -139,7 +159,7 @@ Function Show-ChangeOutput {
 }
 
 # Starts the main interface
-Function Show-MainUI ($Icon) {
+Function Show-MainUI () {
     # Initialize font setting
     $Label_Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Regular)
     $Argument_Label_Font = New-Object System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Regular)
@@ -147,12 +167,12 @@ Function Show-MainUI ($Icon) {
 
     # Create main form (window)
     $Form = New-Object System.Windows.Forms.Form 
-    $Form.Text = "Powershell 2 Batch"
+    $Form.Text = "PowerShell 2 Batch"
     $Form.MaximizeBox = $false
     $Form.MinimizeBox = $false
     $Form.FormBorderStyle = "FixedSingle"
     $Form.Icon = [System.Drawing.SystemIcons]::Information
-    $Form.Size = New-Object System.Drawing.Size(300, 360)
+    $Form.Size = New-Object System.Drawing.Size(300, 380)
     $Form.StartPosition = "CenterScreen"
     $Form.Font = $Form_Font
     $Form.Topmost = $True
@@ -214,27 +234,43 @@ Function Show-MainUI ($Icon) {
     $HideWindow_CheckBox.size = New-Object System.Drawing.Size(160, 20)
     $HideWindow_CheckBox.Checked = $false
     $HideWindow_CheckBox.Text = "Hide Console"
+
+    # Yes Radio Button, checked by default
+    $SelfDelete_CheckBox = New-Object System.Windows.Forms.CheckBox
+    $SelfDelete_CheckBox.Location = New-Object System.Drawing.Point(5, 258)
+    $SelfDelete_CheckBox.size = New-Object System.Drawing.Size(140, 20)
+    $SelfDelete_CheckBox.Checked = $false 
+    $SelfDelete_CheckBox.Text = "Self Delete"
     
     # Add Convert Button
     $Convert_Button = New-Object System.Windows.Forms.Button
-    $Convert_Button.Location = New-Object System.Drawing.Point(0, 261)
+    $Convert_Button.Location = New-Object System.Drawing.Point(0, 281)
     $Convert_Button.Size = New-Object System.Drawing.Size(284, 60)
-    $Convert_Button.Text = "Convert Powershell 2 Batch"
+    $Convert_Button.Text = "Convert PowerShell 2 Batch"
 
     # Add Button onClick event listener and logic
     $Convert_Button.Add_Click({
-            Convert-File -InputFile $Script:InputFile -OutputFile $Script:OutputFile -CLIArgument $Argument_TextBox.Text -AdminModeRadio $Admin_CheckBox.Checked -DisplayTerminal $HideWindow_CheckBox.Checked
-        })
-    $Input_Button.Add_Click({Show-ChangeInput
-    $InputFile_Label.Text = "$Script:InputFile"})
-    $Output_Button.Add_Click({Show-ChangeOutput
-    $OutputFile_Label.Text = "$Script:OutputFile"})
+        $Script:CLIArgument = $Argument_TextBox.Text
+        $Script:AdminMode = $Admin_CheckBox.Checked
+        $Script:HideTerminal = $HideWindow_CheckBox.Checked
+        $Script:SelfDelete = $SelfDelete_CheckBox.Checked
+        Convert-File
+    })
+    $Input_Button.Add_Click({
+        Show-ChangeInput
+        $InputFile_Label.Text = "$Script:InputFile"
+    })
+    $Output_Button.Add_Click({
+        Show-ChangeOutput
+        $OutputFile_Label.Text = "$Script:OutputFile"
+    })
 
     # Add the controls to the form for rendering
     $Form.Controls.Add($Input_Button)
     $Form.Controls.Add($Output_Button)
     $Form.Controls.Add($Argument_TextBox)
     $Form.Controls.Add($Admin_CheckBox)
+    $Form.Controls.Add($SelfDelete_CheckBox)
     $Form.Controls.Add($HideWindow_CheckBox)
     $Form.Controls.Add($Convert_Button)
     $Form.Controls.Add($InputFile_Label)
@@ -246,7 +282,7 @@ Function Show-MainUI ($Icon) {
 }
 
 if ($CLIMode) {
-    Convert-File -InputFile $InputFile -OutputFile $OutputFile
+    Convert-File
 } else {
     Show-MainUI
 }
