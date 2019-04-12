@@ -30,6 +30,7 @@
 #>
 
 # Accept command line parameters.
+[OutputType([String])]
 param(
     # Specifies a path to a location.
     [Parameter(Mandatory = $true,
@@ -40,8 +41,7 @@ param(
         HelpMessage = "Path to source CSV file.")]
     [Alias("PSPath","Source")]
     [ValidateNotNullOrEmpty()]
-    [string]
-    $SourceCSVPath,
+    [string]$SourceCSVPath,
     # Specifies a path to one or more locations.
     [Parameter(Mandatory = $true,
         Position = 1,
@@ -51,8 +51,7 @@ param(
         HelpMessage = "Path to destination CSV file.")]
     [Alias("Destination")]
     [ValidateNotNullOrEmpty()]
-    [string]
-    $DestinationCSVPath,
+    [string]$DestinationCSVPath,
     # Column name to copy to destination CSV file.
     [Parameter(Mandatory = $true,
         Position = 3,
@@ -60,9 +59,9 @@ param(
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true,
         HelpMessage = "Name of the column that will be copied over")]
-    [Alias("Property")]
-    [string]
-    $ColumnName
+    [Alias("Property","Name")]
+    [ValidateNotNullOrEmpty()]
+    [string]$ColumnName
 )
 
 # If the source or destination path is not valid, write an error and return false.
