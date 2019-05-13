@@ -68,3 +68,82 @@ Write-Host $User
 # connect to the current domain
 # $domainConnection = [adsi]""
 # msds-userpasswordexpireytimecomputed
+function Connect-ADSIDomain {
+    <#
+    .SYNOPSIS
+        Creates an Active Directory Domain Connection using .Net
+    .DESCRIPTION
+        Creates an active directory domain connection.
+        By default it uses the current user and computer's context to establish this connection.
+        This can be overridden by the "Server" parameter. 
+    .EXAMPLE
+        PS C:\> <example usage>
+        blah
+    .INPUTS
+        String
+    .OUTPUTS
+        System.DirectoryServices.DirectoryEntry
+    .NOTES
+        Uses native .Net ADSI to connect to create the directory connection.
+    #>
+    param (
+    # Domain Controller/Domain option
+    [Parameter(Mandatory = $false,
+        Position = 0,
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true,
+        HelpMessage = "ADSI Domain Connection (.Net)")]
+    [Alias("Domain, ComputerName")]
+    [String]$Server = ""
+    )
+    
+    # ToDo: Auto convert dot style DN to LDAP style DN
+    # https://stackoverflow.com/questions/4620717/convert-domain-name-to-ldap-style-in-net
+    
+    # Create and populate the connection string
+    $ConnectionString = ""
+
+    # connect to the current domain
+    $DomainConnectionInstance = [ADSI]$ConnectionString
+    return $DomainConnectionInstance
+}
+
+# Define the search function
+function Search-DomainUser {
+    <#
+    .SYNOPSIS
+        blah
+    .DESCRIPTION
+        blah
+    .EXAMPLE
+        PS C:\> <example usage>
+        blah
+    .INPUTS
+        blah
+    .OUTPUTS
+        blah
+    .NOTES
+        blah
+    #>
+    param (
+    # Domain Connection
+    [Parameter(Mandatory = $false,
+        Position = 0,
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true,
+        HelpMessage = "ADSI Domain Connection (.Net)")]
+    [Alias("Domain, Server")]
+    [System.DirectoryServices.DirectoryEntry]$DomainConnection = [ADSI]""
+    )
+
+    # Create a directory searcher
+    $DirectorySearcher = [ADSISearcher]$DomainConnection
+
+    # Configure the searcher filter (search parameters)
+    $DirectorySearcher.Filter = ""
+
+    # Run the search query and store the results
+    $SearchResults = $DirectorySearcher.FindAll()
+
+    Write-Host $SearchResults
+}
