@@ -1,18 +1,29 @@
 <#
 .SYNOPSIS
-    blah
+    Retrieves the computed user password expatriation time.
 .DESCRIPTION
-    blah
+    This library will retrieve the specified users current password expiration time, computed by AD DS.
+    If no parameters are specified, it will automatically take the current user's domain and user account as the context.
+    This script does not need to have the RSAT AD module installed and relies on the .net framework's ADSI and ADSISearcher namespaces.
 .PARAMETER User
-    blah
+    This parameter is used to query a specific user account, the default is the current user context that is executing this library.
+.PARAMETER Server
+    The server parameter allows you to specify a target domain controller, by default it uses the current domain.
+    You can use this to target an alternative domain, e.g. you are in fabricam and you need to target contoso.
+    This may be useful if you need targeted debugging however it is inadvisable in most cases.
+.PARAMETER GlobalCatalog
+    This switch parameter will target a global catalog instead of a standard domain controller.
+    This may be useful if you need targeted debugging however it is inadvisable in most cases.
 .EXAMPLE
-    blah
+    Todo:
+    Fill out examples after script logic is built.
 .INPUTS
-    blah
+    Todo:
+    Fill out examples after script logic is built.
 .OUTPUTS
-    blah
+    System.DateTime
 .NOTES
-    blah
+    This script is able to operate without the RSAT Active Directory Powershell modules.
 .LINK
     https://github.com/elliot-labs/PowerShell-Doodads
 #>
