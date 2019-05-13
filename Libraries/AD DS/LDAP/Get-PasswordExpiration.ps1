@@ -30,7 +30,7 @@
 
 # Add command line switch/flag support.
 # Each parameter is detailed in the above help documentation.
-[OutputType([String])]
+[OutputType([System.DateTime])]
 param(
     # Specifies a path to a location.
     [Parameter(Mandatory = $false,
