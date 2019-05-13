@@ -62,12 +62,10 @@ param(
     [switch]$GlobalCatalog
 )
 
-# Build search string
-# $searchString = "(&(objectClass=user)(objectCategory=person)(SAMAccountName=$user))"
-Write-Host $User
-# connect to the current domain
-# $domainConnection = [adsi]""
-# msds-userpasswordexpireytimecomputed
+# Temporary code storage
+# Build search string: $searchString = "(&(objectClass=user)(objectCategory=person)(SAMAccountName=$user))"
+# AD user property to retrieve and compare against: MSDS-UserPasswordExpireyTimeComputed
+
 function Connect-ADSIDomain {
     <#
     .SYNOPSIS
