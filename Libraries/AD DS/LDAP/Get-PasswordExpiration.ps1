@@ -49,7 +49,7 @@ param(
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true,
         HelpMessage = "Domain controller to connect to")]
-    [Alias("ComputerName")]
+    [Alias("ComputerName","MachineName")]
     [ValidateNotNullOrEmpty()]
     [string]$Server,
     # Column name to copy to destination CSV file.
@@ -91,7 +91,7 @@ function Connect-ADSIDomain {
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true,
         HelpMessage = "ADSI Domain Connection (.Net)")]
-    [Alias("Domain, ComputerName")]
+    [Alias("Domain", "ComputerName")]
     [String]$Server = ""
     )
     
@@ -130,7 +130,7 @@ function Search-DomainUser {
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true,
         HelpMessage = "ADSI Domain Connection (.Net)")]
-    [Alias("Domain, Server")]
+    [Alias("Domain", "Server")]
     [System.DirectoryServices.DirectoryEntry]$DomainConnection = [ADSI]""
     )
 
