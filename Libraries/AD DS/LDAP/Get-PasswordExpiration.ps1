@@ -145,3 +145,41 @@ function Search-DomainUser {
 
     Write-Host $SearchResults
 }
+
+# Create the LDAP domain conversion function
+function ConvertTo-LDAPDomain {
+    <#
+    .SYNOPSIS
+        Converts DNS FQDN notation to LDAP FQDN notation.
+    .DESCRIPTION
+        Converts DNS FQDN notation to LDAP FQDN notation by using the .net Active Directory DirectoryContext class to dynamically convert syntax strategies.
+        This works by creating a connection with the domain and using the context from the domain connection session to retrieve the new syntax.
+    .EXAMPLE
+        PS C:\> ConvertTo-LDAPDomain -DotDomain "corp.contoso.com"
+        This function converts the DNS dot syntax to LDAP style "DC=corp,DC=contoso,DC=com"
+    .INPUTS
+        String
+    .OUTPUTS
+        String
+    .NOTES
+        Uses the .Net directory context for conversion.
+        This requires a connection to the domain that you want to convert DNS to LDAP syntax.
+    #>
+    # Define the DNS FQDN parameter to be converted to LDAP FQDN
+    [Parameter(
+        Mandatory = $false,
+        Position = 0,
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true,
+        HelpMessage = "DNS style FQDN to be converted to LDAP style FQDN"
+    )]
+    [Alias("Name","Server")]
+    [String]$DotDomain
+
+    # Instantiate a directory context 
+    $DirectoryContext = [System.DirectoryServices.ActiveDirectory.DirectoryContext]::new([System.DirectoryServices.ActiveDirectory.DirectoryContextType]::Domain, $DotDomain)
+    $Domain = [System.DirectoryServices.ActiveDirectory.Domain]::GetDomain($DirectoryContext)
+    $DirectoryEntry = $Domain.GetDirectoryEntry()
+    $Results = $DirectoryEntry.distinguishedName
+    return $Results
+}
