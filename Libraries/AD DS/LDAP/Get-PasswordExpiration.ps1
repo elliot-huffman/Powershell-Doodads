@@ -142,13 +142,20 @@ function Search-DomainUser {
     # Create a directory searcher
     $DirectorySearcher = [ADSISearcher]$DomainConnection
 
+    # Specify the property that needs retrieved from AD
+    $DirectorySearcher.PropertiesToLoad.Add('msDS-UserPasswordExpiryTimeComputed')
+    
+    # Build a search string and store it into a variable
+    $SearchString = "(&(objectClass=user)(objectCategory=person)(SAMAccountName=$user))"
+
     # Configure the searcher filter (search parameters)
-    $DirectorySearcher.Filter = ""
+    $DirectorySearcher.Filter = $SearchString
 
-    # Run the search query and store the results
-    $SearchResults = $DirectorySearcher.FindAll()
+    # Search the Directory for a single user
+    $UserInstance = $searcher.FindOne()
 
-    Write-Host $SearchResults
+    # Return the single user instance
+    return $UserInstance
 }
 
 # Create the LDAP domain conversion function
