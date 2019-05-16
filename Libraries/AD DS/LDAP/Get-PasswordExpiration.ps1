@@ -179,7 +179,7 @@ function ConvertTo-LDAPDomain {
     #>
     # Define the DNS FQDN parameter to be converted to LDAP FQDN
     [Parameter(
-        Mandatory = $false,
+        Mandatory = $true,
         Position = 0,
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true,
