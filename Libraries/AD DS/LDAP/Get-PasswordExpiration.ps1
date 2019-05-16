@@ -98,6 +98,13 @@ function Connect-ADSIDomain {
     [String]$Server = ""
     )
 
+    # Check to see if the Server is not provided, and if it is provided with dot syntax, convert it to the proper syntax.
+    if (("" -ne $Server) -and ($Server -like "*.*")) {
+        $ConnectionString = ConvertTo-LDAPDomain -DotDomain $Server
+    } else {
+        # Create and populate the connection string
+        $ConnectionString = ""
+    }
 
     # connect to the current domain
     $DomainConnectionInstance = [ADSI]$ConnectionString
