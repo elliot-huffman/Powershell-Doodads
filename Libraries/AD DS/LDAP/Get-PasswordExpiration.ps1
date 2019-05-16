@@ -42,7 +42,7 @@ param(
     [Alias("Name")]
     [ValidateNotNullOrEmpty()]
     [string]$User = $env:USERNAME,
-    # Specifies a path to one or more locations.
+    # Specifies a path to one or more locations
     [Parameter(Mandatory = $false,
         Position = 1,
         ParameterSetName = "CLI",
@@ -52,7 +52,7 @@ param(
     [Alias("ComputerName","MachineName")]
     [ValidateNotNullOrEmpty()]
     [string]$Server,
-    # Column name to copy to destination CSV file.
+    # Column name to copy to destination CSV file
     [Parameter(Mandatory = $false,
         Position = 2,
         ParameterSetName = "CLI",
@@ -61,10 +61,6 @@ param(
         HelpMessage = "Connect to a global catalog domain controller")]
     [switch]$GlobalCatalog
 )
-
-# Temporary code storage
-# Build search string: $searchString = "(&(objectClass=user)(objectCategory=person)(SAMAccountName=$user))"
-# AD user property to retrieve and compare against: MSDS-UserPasswordExpireyTimeComputed
 
 function Connect-ADSIDomain {
     <#
@@ -94,12 +90,7 @@ function Connect-ADSIDomain {
     [Alias("Domain", "ComputerName")]
     [String]$Server = ""
     )
-    
-    # ToDo: Auto convert dot style DN to LDAP style DN
-    # https://stackoverflow.com/questions/4620717/convert-domain-name-to-ldap-style-in-net
-    
-    # Create and populate the connection string
-    $ConnectionString = ""
+
 
     # connect to the current domain
     $DomainConnectionInstance = [ADSI]$ConnectionString
@@ -117,9 +108,9 @@ function Search-DomainUser {
         PS C:\> <example usage>
         blah
     .INPUTS
-        blah
+        System.DirectoryServices.DirectoryEntry
     .OUTPUTS
-        blah
+        System.DirectoryServices.SearchResult
     .NOTES
         blah
     #>
@@ -176,10 +167,18 @@ function ConvertTo-LDAPDomain {
     [Alias("Name","Server")]
     [String]$DotDomain
 
-    # Instantiate a directory context 
+    # Instantiate a directory context that is prepped with the dot syntax the user passed
     $DirectoryContext = [System.DirectoryServices.ActiveDirectory.DirectoryContext]::new([System.DirectoryServices.ActiveDirectory.DirectoryContextType]::Domain, $DotDomain)
+
+    # Connect into the domain and store the domain instance
     $Domain = [System.DirectoryServices.ActiveDirectory.Domain]::GetDomain($DirectoryContext)
+
+    # Store the object instance of the directory meta data
     $DirectoryEntry = $Domain.GetDirectoryEntry()
+
+    # Extract the LDAP FQDN into the results variable
     $Results = $DirectoryEntry.distinguishedName
+
+    # Return the results variable
     return $Results
 }
