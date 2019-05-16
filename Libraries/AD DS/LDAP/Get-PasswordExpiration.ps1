@@ -49,7 +49,7 @@ param(
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true,
         HelpMessage = "Domain controller to connect to")]
-    [Alias("ComputerName","MachineName")]
+    [Alias("ComputerName", "MachineName")]
     [ValidateNotNullOrEmpty()]
     [string]$Server,
     # Column name to copy to destination CSV file
@@ -88,14 +88,14 @@ function Connect-ADSIDomain {
         Uses native .Net ADSI to connect to create the directory connection.
     #>
     param (
-    # Domain Controller/Domain option
-    [Parameter(Mandatory = $false,
-        Position = 0,
-        ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "ADSI Domain Connection (.Net)")]
-    [Alias("Domain", "ComputerName")]
-    [String]$Server = ""
+        # Domain Controller/Domain option
+        [Parameter(Mandatory = $false,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "ADSI Domain Connection (.Net)")]
+        [Alias("Domain", "ComputerName")]
+        [String]$Domain = ""
     )
 
     # Check to see if the Server is not provided, and if it is provided with dot syntax, convert it to the proper syntax.
@@ -129,14 +129,14 @@ function Search-DomainUser {
         blah
     #>
     param (
-    # Domain Connection
-    [Parameter(Mandatory = $false,
-        Position = 0,
-        ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "ADSI Domain Connection (.Net)")]
-    [Alias("Domain", "Server")]
-    [System.DirectoryServices.DirectoryEntry]$DomainConnection = [ADSI]""
+        # Domain Connection
+        [Parameter(Mandatory = $false,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "ADSI Domain Connection (.Net)")]
+        [Alias("Domain", "Server")]
+        [System.DirectoryServices.DirectoryEntry]$DomainConnection = [ADSI]""
     )
 
     # Create a directory searcher
@@ -185,7 +185,7 @@ function ConvertTo-LDAPDomain {
         ValueFromPipelineByPropertyName = $true,
         HelpMessage = "DNS style FQDN to be converted to LDAP style FQDN"
     )]
-    [Alias("Name","Server")]
+    [Alias("Name", "Server")]
     [String]$DotDomain
 
     # Instantiate a directory context that is prepped with the dot syntax the user passed
