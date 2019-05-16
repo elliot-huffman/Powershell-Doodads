@@ -182,3 +182,44 @@ function ConvertTo-LDAPDomain {
     # Return the results variable
     return $Results
 }
+
+
+function Get-PwdExpirationTime {
+    <#
+    .SYNOPSIS
+        Get the user instance and extract the password expiration time
+    .DESCRIPTION
+        Long description
+    .EXAMPLE
+        PS C:\> Get-PwdExpirationTime -UserInstance $ADSearcherResult
+        Explanation of what the example does
+    .INPUTS
+        System.DirectoryServices.SearchResult
+    .OUTPUTS
+        System.DateTime
+    .NOTES
+        Requires .Net framework
+    #>
+    param (
+        # User search result from active directory, single user only
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "ADSI search result with a single user in the results")]
+        [Alias("User")]
+        [System.DirectoryServices.SearchResult]$UserInstance
+    )
+    # Isolate a single user, the first instance in the results
+    $SingleUser = $UserInstance[0]
+
+    # Extract the password expiration time from the single user
+    $SearchTime = $SingleUser.Properties['msDS-UserPasswordExpiryTimeComputed']
+
+    # Convert the SearchResult's time to a string and cast that into a standard DateTime format.
+    $Time = [DateTime]::FromFileTime([string]$SearchTime)
+
+    # Return the value to the calling application
+    Return $Time
+}
+
