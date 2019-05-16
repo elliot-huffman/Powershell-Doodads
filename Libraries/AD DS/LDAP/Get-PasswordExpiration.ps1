@@ -59,7 +59,14 @@ param(
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true,
         HelpMessage = "Connect to a global catalog domain controller")]
-    [switch]$GlobalCatalog
+    [switch]$GlobalCatalog,
+    # Allow the library to be used as a standalone command line application
+    [Parameter(Mandatory = $false,
+        Position = 3,
+        ParameterSetName = "CLI",
+        ValueFromPipeline = $false,
+        HelpMessage = "Use this library standalone on the command line")]
+    [switch]$CLIMode
 )
 
 function Connect-ADSIDomain {
@@ -223,3 +230,9 @@ function Get-PwdExpirationTime {
     Return $Time
 }
 
+# Allow this library to be used in a standalone mode as a command line application
+if ($CLIMode) {
+    $DomainInstance = Connect-ADSIDomain
+    $UserResult = Search-DomainUser -DomainConnection $DomainInstance
+    Return Get-PwdExpirationTime -UserInstance $UserResult
+}
