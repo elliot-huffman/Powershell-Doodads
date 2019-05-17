@@ -376,8 +376,11 @@ Function Merge-ConnectionString {
 
 # Allow this library to be used in a standalone mode as a command line application
 if ($CLIMode) {
+    # Build the connection string
+    $ConnectionString = Merge-ConnectionString -ComputerName $ComputerName -Domain $Domain -GlobalCatalog:$GlobalCatalog
+    
     # Connect to the domain and store the connection instance
-    $DomainInstance = Connect-ADSIDomain
+    $DomainInstance = Connect-ADSIDomain -ConnectionString $ConnectionString
 
     # Use the connection instance to retrieve the current user's password expiration time
     Return Get-PwdExpirationTime -DomainConnection $DomainInstance
