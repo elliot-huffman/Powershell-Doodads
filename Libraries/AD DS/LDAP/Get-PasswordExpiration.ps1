@@ -35,40 +35,59 @@
 [OutputType([System.DateTime])]
 param(
     # Specifies a path to a location.
-    [Parameter(Mandatory = $false,
+    [Parameter(
+        Mandatory = $false,
         Position = 0,
         ParameterSetName = "CLI",
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Username to search")]
+        HelpMessage = "Username to search"
+    )]
     [Alias("Name")]
     [ValidateNotNullOrEmpty()]
     [string]$User = $env:USERNAME,
     # Specifies a path to one or more locations
-    [Parameter(Mandatory = $false,
+    [Parameter(
+        Mandatory = $false,
         Position = 1,
         ParameterSetName = "CLI",
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Domain controller to connect to")]
-    [Alias("ComputerName", "MachineName", "Domain")]
+        HelpMessage = "Domain to run the search against"
+    )]
+    [Alias("LDAPDomain","DNSDomain")]
     [ValidateNotNullOrEmpty()]
-    [string]$Server,
-    # Column name to copy to destination CSV file
-    [Parameter(Mandatory = $false,
+    [string]$Domain = "",
+    # Specifies a path to one or more locations
+    [Parameter(
+        Mandatory = $false,
         Position = 2,
         ParameterSetName = "CLI",
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Connect to a global catalog domain controller")]
-    [switch]$GlobalCatalog,
-    # Allow the library to be used as a standalone command line application
-    [Parameter(Mandatory = $false,
+        HelpMessage = "Domain controller to connect to"
+    )]
+    [Alias("Server", "MachineName", "DomainController")]
+    [ValidateNotNullOrEmpty()]
+    [string]$ComputerName,
+    # Column name to copy to destination CSV file
+    [Parameter(
+        Mandatory = $false,
         Position = 3,
         ParameterSetName = "CLI",
         ValueFromPipeline = $false,
-        HelpMessage = "Use this library standalone on the command line")]
-    [switch]$CLIMode
+        HelpMessage = "Connect to a global catalog domain controller"
+    )]
+    [switch]$GlobalCatalog,
+    # Allow the library to be used as a standalone command line application
+    [Parameter(
+        Mandatory = $false,
+        Position = 4,
+        ParameterSetName = "CLI",
+        ValueFromPipeline = $false,
+        HelpMessage = "Use this library standalone on the command line"
+    )]
+    [switch]$CLIMode = $false
 )
 
 # Define a function that will connect to the domain
@@ -98,14 +117,16 @@ Function Connect-ADSIDomain {
         .Net Core is not supported.
     #>
     param (
-        # Domain Controller/Domain option
-        [Parameter(Mandatory = $false,
+        # Use the specified connection string or default to the current system's config
+        [Parameter(
+            Mandatory = $false,
             Position = 0,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = "ADSI Domain Connection (.Net)")]
-        [Alias("Server", "ComputerName")]
-        [String]$Domain = ""
+            HelpMessage = "LDAP domain connection string"
+        )]
+        [Alias("LDAPString")]
+        [String]$ConnectionString = ""
     )
 
     # connect to the current domain
@@ -136,13 +157,25 @@ Function Get-PwdExpirationTime {
     #>
     param (
         # Domain Connection
-        [Parameter(Mandatory = $false,
+        [Parameter(
+            Mandatory = $false,
             Position = 0,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = "ADSI Domain Connection (.Net)")]
+            HelpMessage = "ADSI Domain Connection (.Net)"
+        )]
         [Alias("Domain", "Server")]
-        [System.DirectoryServices.DirectoryEntry]$DomainConnection = [ADSI]""
+        [System.DirectoryServices.DirectoryEntry]$DomainConnection = [ADSI]"",
+        # User account to search in Active Directory
+        [Parameter(
+            Mandatory = $false,
+            Position = 1,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "User to search in AD for"
+        )]
+        [Alias("UserName","SAMAccountName")]
+        [String]$User = $env:USERNAME
     )
 
     # Create a directory searcher
@@ -272,7 +305,6 @@ Function Merge-ConnectionString {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = "Server name to connect to in the domain (specific DC or GC)"
         )]
-        [ValidateNotNullOrEmpty()]
         [string]$ComputerName = "",
         # Domain to connect to
         [Parameter(
@@ -282,7 +314,6 @@ Function Merge-ConnectionString {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = "Domain to connect to"
         )]
-        [ValidateNotNullOrEmpty()]
         [string]$Domain = "",
         # Option to connect to the global catalog if necessary
 
