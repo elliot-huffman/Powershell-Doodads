@@ -297,8 +297,6 @@ Function Merge-ConnectionString {
         Read https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.directoryentry for more info on the strings required for connectivity.
     #>
 
-    # ToDo:
-    # Add parameter sets to avoid parameter issues where some params are used and others are not.
     param(
         # Specific domain controller/global catalog to connect to in the domain
         [Parameter(
@@ -385,3 +383,8 @@ if ($CLIMode) {
     # Use the connection instance to retrieve the current user's password expiration time
     Return Get-PwdExpirationTime -DomainConnection $DomainInstance
 }
+
+# ToDo:
+# Add parameter sets to avoid parameter issues where some params are used and others are not.
+# After parameter sets are set up properly, update all the help docs and comments.
+# Add cmdlet binding
