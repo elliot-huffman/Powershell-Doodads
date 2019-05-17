@@ -108,16 +108,6 @@ Function Connect-ADSIDomain {
         [String]$Domain = ""
     )
 
-    # Check to see if the Server is not provided, and if it is provided with dot syntax, convert it to the proper syntax.
-    if (("" -ne $Domain) -and ($Domain -like "*.*")) {
-        $ConnectionString = ConvertTo-LDAPDomain -DotDomain $Domain
-    } elseif ("" -eq $Domain) {
-        $ConnectionString = ""
-    } else {
-        # Create and populate the connection string
-        $ConnectionString = "LDAP://$Domain"
-    }
-
     # connect to the current domain
     $DomainConnectionInstance = [ADSI]$ConnectionString
     Return $DomainConnectionInstance
@@ -228,6 +218,103 @@ Function ConvertTo-LDAPDomain {
 
     # Return the results variable
     return $Results
+}
+
+# Create the function that builds the connection string
+Function Merge-ConnectionString {
+    <#
+    .SYNOPSIS
+        Builds an LDAP connection string from the specified parameters
+    .DESCRIPTION
+        Intelligently builds an LDAP connection string from the specified parameters. Uses the LDAP provider for the directory entry object.
+    .EXAMPLE
+        PS C:\> Merge-ConnectionString
+        Explanation of what the example does
+    .INPUTS
+        String
+    .OUTPUTS
+        String
+    .NOTES
+        Just string manipulation, nothing special here :-P
+        Read https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.directoryentry for more info on the strings required for connectivity.
+    #>
+    # ToDo:
+    # Add parameter sets to avoid parameter issues where some params are used and others are not.
+    param(
+        # Specific domain controller/global catalog to connect to in the domain
+        [Parameter(
+            Mandatory = $false,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "Server name to connect to in the domain (specific DC or GC)"
+        )]
+        [ValidateNotNullOrEmpty()]
+        [string]$ComputerName = "",
+        # Domain to connect to
+        [Parameter(
+            Mandatory = $false,
+            Position = 1,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "Domain to connect to"
+        )]
+        [ValidateNotNullOrEmpty()]
+        [string]$Domain = "",
+        # Option to connect to the global catalog if necessary
+
+        # Temp storage for parameter set options
+        # [Parameter(
+        #     Mandatory = $false,
+        #     Position = 2,
+        #     ValueFromPipeline = $true,
+        #     ValueFromPipelineByPropertyName = $true,
+        #     ParameterSetName='ID',
+        #     HelpMessage = "Specifies that a global catalog should be connected to"
+        # )]
+        [Parameter(
+            Mandatory = $false,
+            Position = 2,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "Specifies that a global catalog should be connected to"
+        )]
+        [switch]$GlobalCatalog = $false
+    )
+
+    # Build the base search string
+    if ($GlobalCatalog) {
+        $BaseSearchString = "GC://"
+    } else {
+        $BaseSearchString = "LDAP://"
+    }
+
+    # If there is data present on the server string, build the server string to include the appropriate syntax
+    if ($ComputerName -ne "") {
+        $ServerString = $ComputerName + "/"
+    } else {
+        $ServerString = ""
+    }
+
+    # Check to see if the Server is not provided, and if it is provided with dot syntax, convert it to the proper syntax
+    if (($Domain -ne "") -and ($Domain -like "*.*")) {
+        $DomainString = ConvertTo-LDAPDomain -DotDomain $Domain
+    } elseif ("" -eq $Domain) {
+        $DomainString = ""
+    } else {
+        $DomainString = $Domain
+    }
+
+    # If both the Server and the Domain strings are empty, set the base search string to be empty too to avoid connection issues
+    if (($ServerString -eq "") -and ($DomainString -eq "")) {
+        $BaseSearchString = ""
+    }
+
+    # Build the final connection string
+    $FinalConnectionString = $BaseSearchString + $ServerString + $DomainString
+
+    # Return the connection string
+    Return $FinalConnectionString
 }
 
 # Allow this library to be used in a standalone mode as a command line application
