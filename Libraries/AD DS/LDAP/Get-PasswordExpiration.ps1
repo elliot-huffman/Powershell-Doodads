@@ -152,7 +152,7 @@ Function Get-PwdExpirationTime {
     $DirectorySearcher.PropertiesToLoad.Add('msDS-UserPasswordExpiryTimeComputed') | Out-Null
     
     # Build a search string and store it into a variable
-    $SearchString = "(&(objectClass=user)(objectCategory=person)(SAMAccountName=$user))"
+    $SearchString = "(&(objectClass=user)(objectCategory=person)(SAMAccountName=$User))"
 
     # Configure the searcher filter (search parameters)
     $DirectorySearcher.Filter = $SearchString
