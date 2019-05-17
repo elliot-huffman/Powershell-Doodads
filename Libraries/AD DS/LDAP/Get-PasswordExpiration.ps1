@@ -25,7 +25,7 @@
 .NOTES
     This script is able to operate without the RSAT Active Directory Powershell modules.
     This script requires .Net with the ADSI libraries to be available.
-    Thsi script is not compatible with .Net Core.
+    This script is not compatible with .Net Core.
 .LINK
     https://github.com/elliot-labs/PowerShell-Doodads
 #>
