@@ -192,17 +192,18 @@ Function ConvertTo-LDAPDomain {
         Uses the .Net directory context for conversion.
         This requires a connection to the domain that you want to convert DNS to LDAP syntax.
     #>
-    
-    # Define the DNS FQDN parameter to be converted to LDAP FQDN
-    [Parameter(
-        Mandatory = $true,
-        Position = 0,
-        ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "DNS style FQDN to be converted to LDAP style FQDN"
-    )]
-    [Alias("Name", "Server")]
-    [String]$DotDomain
+    param(
+        # Define the DNS FQDN parameter to be converted to LDAP FQDN
+        [Parameter(
+            Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "DNS style FQDN to be converted to LDAP style FQDN"
+        )]
+        [Alias("Name", "Server","Domain")]
+        [String]$DotDomain
+    )
 
     # Instantiate a directory context that is prepped with the dot syntax the user passed
     $DirectoryContext = [System.DirectoryServices.ActiveDirectory.DirectoryContext]::new([System.DirectoryServices.ActiveDirectory.DirectoryContextType]::Domain, $DotDomain)
