@@ -129,8 +129,10 @@ Function Connect-ADSIDomain {
         [String]$ConnectionString = ""
     )
 
-    # connect to the current domain
+    # Connect to the current domain
     $DomainConnectionInstance = [ADSI]$ConnectionString
+
+    # Return the ADSI domain connection
     Return $DomainConnectionInstance
 }
 
@@ -150,6 +152,7 @@ Function Get-PwdExpirationTime {
         E.G. 9/19/2018 9:19:29 AM
     .INPUTS
         Optional: System.DirectoryServices.DirectoryEntry
+        Optional: String
     .OUTPUTS
         System.DateTime
     .NOTES
