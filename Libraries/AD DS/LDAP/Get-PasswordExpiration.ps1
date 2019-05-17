@@ -229,16 +229,38 @@ Function Merge-ConnectionString {
     .DESCRIPTION
         Intelligently builds an LDAP connection string from the specified parameters. Uses the LDAP provider for the directory entry object.
     .EXAMPLE
-        PS C:\> Merge-ConnectionString
-        Explanation of what the example does
+        PS C:\> Merge-ConnectionString -ComputerName "SomeServer" -Domain "DC=something,DC=com" -GlobalCatalog
+        Returns the string "GC://SomeServer/DC=something,DC=com"
+    .EXAMPLE
+        PS C:\> Merge-ConnectionString -ComputerName "SomeServer" -Domain "DC=something,DC=com"
+        Returns the string "LDAP://SomeServer/DC=something,DC=com"
+    .EXAMPLE
+        PS C:\> Merge-ConnectionString -Domain "contoso.com"
+        Returns the string "LDAP://DC=contoso,DC=com"
+    .EXAMPLE
+        PS C:\> Merge-ConnectionString -Domain "contoso.com" -GlobalCatalog
+        Returns the string "GC://DC=contoso,DC=com"
+    .PARAMETER ComputerName
+        This string parameter will insert a server name to connect to after the server type specifier.
+        E.G. <type>://<ServerNameHere>/
+        This parameter requires the use of the Domain name parameter.
+        This parameter can accept NetBIOS names, IP Addresses and DNS dot style FQDNs.
+    .PARAMETER Domain
+        This string parameter add the domain to connect to at the end of the connection string.
+        E.G. LDAP://DC=contoso,DC=com
+        If the ComputerName or GlobalCatalog parameters are used, this parameter is required otherwise a malformed connection string will be built.
+    .PARAMETER GlobalCatalog
+        This switch parameter will build the connection string with a GC:// instead of an LDAP://.
     .INPUTS
         String
     .OUTPUTS
         String
     .NOTES
         Just string manipulation, nothing special here :-P
+        If a DNS dot style FQDN is passed to this function, it will call the ConvertTo-LDAPDomain function to convert it to the appropriate format.
         Read https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.directoryentry for more info on the strings required for connectivity.
     #>
+
     # ToDo:
     # Add parameter sets to avoid parameter issues where some params are used and others are not.
     param(
