@@ -120,7 +120,7 @@ function Connect-ADSIDomain {
 
     # connect to the current domain
     $DomainConnectionInstance = [ADSI]$ConnectionString
-    return $DomainConnectionInstance
+    Return $DomainConnectionInstance
 }
 
 # Define the search function
