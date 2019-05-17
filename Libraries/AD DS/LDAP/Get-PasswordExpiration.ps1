@@ -233,6 +233,7 @@ function ConvertTo-LDAPDomain {
 if ($CLIMode) {
     # Connect to the domain and store the connection instance
     $DomainInstance = Connect-ADSIDomain
-    $UserResult = Search-DomainUser -DomainConnection $DomainInstance
-    Return Get-PwdExpirationTime -UserInstance $UserResult
+
+    # Use the connection instance to retrieve the current user's password expiration time
+    Return Get-PwdExpirationTime -DomainConnection $DomainInstance
 }
