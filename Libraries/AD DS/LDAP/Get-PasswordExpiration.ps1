@@ -51,9 +51,9 @@ param(
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true,
         HelpMessage = "Domain controller to connect to")]
-    [Alias("ComputerName", "MachineName", "Server")]
+    [Alias("ComputerName", "MachineName", "Domain")]
     [ValidateNotNullOrEmpty()]
-    [string]$Domain,
+    [string]$Server,
     # Column name to copy to destination CSV file
     [Parameter(Mandatory = $false,
         Position = 2,
@@ -104,17 +104,18 @@ function Connect-ADSIDomain {
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = "ADSI Domain Connection (.Net)")]
-        [Alias("Domain", "ComputerName")]
+        [Alias("Server", "ComputerName")]
         [String]$Domain = ""
     )
 
     # Check to see if the Server is not provided, and if it is provided with dot syntax, convert it to the proper syntax.
     if (("" -ne $Domain) -and ($Domain -like "*.*")) {
         $ConnectionString = ConvertTo-LDAPDomain -DotDomain $Domain
-    }
-    else {
-        # Create and populate the connection string
+    } elseif ("" -eq $Domain) {
         $ConnectionString = ""
+    } else {
+        # Create and populate the connection string
+        $ConnectionString = "LDAP://$Domain"
     }
 
     # connect to the current domain
