@@ -72,7 +72,7 @@ param(
 )
 
 # Define a function that will connect to the domain
-function Connect-ADSIDomain {
+Function Connect-ADSIDomain {
     <#
     .SYNOPSIS
         Creates an Active Directory Domain Connection using .Net
@@ -124,7 +124,7 @@ function Connect-ADSIDomain {
 }
 
 # Define the search function
-function Get-PwdExpirationTime {
+Function Get-PwdExpirationTime {
     <#
     .SYNOPSIS
         Retrieves a single user instance from Active Directory
@@ -184,7 +184,7 @@ function Get-PwdExpirationTime {
 }
 
 # Create the LDAP domain conversion function
-function ConvertTo-LDAPDomain {
+Function ConvertTo-LDAPDomain {
     <#
     .SYNOPSIS
         Converts DNS FQDN notation to LDAP FQDN notation.
