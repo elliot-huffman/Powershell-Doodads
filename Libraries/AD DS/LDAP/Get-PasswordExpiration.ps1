@@ -71,6 +71,53 @@ param(
     [switch]$CLIMode
 )
 
+# Create the LDAP domain conversion function
+function ConvertTo-LDAPDomain {
+    <#
+    .SYNOPSIS
+        Converts DNS FQDN notation to LDAP FQDN notation.
+    .DESCRIPTION
+        Converts DNS FQDN notation to LDAP FQDN notation by using the .net Active Directory DirectoryContext class to dynamically convert syntax strategies.
+        This works by creating a connection with the domain and using the context from the domain connection session to retrieve the new syntax.
+    .EXAMPLE
+        PS C:\> ConvertTo-LDAPDomain -DotDomain "corp.contoso.com"
+        This function converts the DNS dot syntax to LDAP style "DC=corp,DC=contoso,DC=com"
+    .INPUTS
+        String
+    .OUTPUTS
+        String
+    .NOTES
+        Uses the .Net directory context for conversion.
+        This requires a connection to the domain that you want to convert DNS to LDAP syntax.
+    #>
+    
+    # Define the DNS FQDN parameter to be converted to LDAP FQDN
+    [Parameter(
+        Mandatory = $true,
+        Position = 0,
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true,
+        HelpMessage = "DNS style FQDN to be converted to LDAP style FQDN"
+    )]
+    [Alias("Name", "Server")]
+    [String]$DotDomain
+
+    # Instantiate a directory context that is prepped with the dot syntax the user passed
+    $DirectoryContext = [System.DirectoryServices.ActiveDirectory.DirectoryContext]::new([System.DirectoryServices.ActiveDirectory.DirectoryContextType]::Domain, $DotDomain)
+
+    # Connect into the domain and store the domain instance
+    $Domain = [System.DirectoryServices.ActiveDirectory.Domain]::GetDomain($DirectoryContext)
+
+    # Store the object instance of the directory meta data
+    $DirectoryEntry = $Domain.GetDirectoryEntry()
+
+    # Extract the LDAP FQDN into the results variable
+    $Results = $DirectoryEntry.distinguishedName
+
+    # Return the results variable
+    return $Results
+}
+
 # Define a function that will connect to the domain
 function Connect-ADSIDomain {
     <#
@@ -181,53 +228,6 @@ function Get-PwdExpirationTime {
 
     # Return the time results
     Return $Time
-}
-
-# Create the LDAP domain conversion function
-function ConvertTo-LDAPDomain {
-    <#
-    .SYNOPSIS
-        Converts DNS FQDN notation to LDAP FQDN notation.
-    .DESCRIPTION
-        Converts DNS FQDN notation to LDAP FQDN notation by using the .net Active Directory DirectoryContext class to dynamically convert syntax strategies.
-        This works by creating a connection with the domain and using the context from the domain connection session to retrieve the new syntax.
-    .EXAMPLE
-        PS C:\> ConvertTo-LDAPDomain -DotDomain "corp.contoso.com"
-        This function converts the DNS dot syntax to LDAP style "DC=corp,DC=contoso,DC=com"
-    .INPUTS
-        String
-    .OUTPUTS
-        String
-    .NOTES
-        Uses the .Net directory context for conversion.
-        This requires a connection to the domain that you want to convert DNS to LDAP syntax.
-    #>
-    
-    # Define the DNS FQDN parameter to be converted to LDAP FQDN
-    [Parameter(
-        Mandatory = $true,
-        Position = 0,
-        ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "DNS style FQDN to be converted to LDAP style FQDN"
-    )]
-    [Alias("Name", "Server")]
-    [String]$DotDomain
-
-    # Instantiate a directory context that is prepped with the dot syntax the user passed
-    $DirectoryContext = [System.DirectoryServices.ActiveDirectory.DirectoryContext]::new([System.DirectoryServices.ActiveDirectory.DirectoryContextType]::Domain, $DotDomain)
-
-    # Connect into the domain and store the domain instance
-    $Domain = [System.DirectoryServices.ActiveDirectory.Domain]::GetDomain($DirectoryContext)
-
-    # Store the object instance of the directory meta data
-    $DirectoryEntry = $Domain.GetDirectoryEntry()
-
-    # Extract the LDAP FQDN into the results variable
-    $Results = $DirectoryEntry.distinguishedName
-
-    # Return the results variable
-    return $Results
 }
 
 # Allow this library to be used in a standalone mode as a command line application
