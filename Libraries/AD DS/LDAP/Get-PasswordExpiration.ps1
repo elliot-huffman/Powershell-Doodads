@@ -9,7 +9,7 @@
     This parameter is used to query a specific user account, the default is the current user context that is executing this library.
 .PARAMETER Server
     The server parameter allows you to specify a target domain controller, by default it uses the current domain.
-    You can use this to target an alternative domain, e.g. you are in fabricam and you need to target contoso.
+    You can use this to target an alternative domain, e.g. you are in Fabricam and you need to target Contoso.
     This may be useful if you need targeted debugging however it is inadvisable in most cases.
 .PARAMETER GlobalCatalog
     This switch parameter will target a global catalog instead of a standard domain controller.
@@ -24,6 +24,8 @@
     System.DateTime
 .NOTES
     This script is able to operate without the RSAT Active Directory Powershell modules.
+    This script requires .Net with the ADSI libraries to be available.
+    Thsi script is not compatible with .Net Core.
 .LINK
     https://github.com/elliot-labs/PowerShell-Doodads
 #>
@@ -69,6 +71,7 @@ param(
     [switch]$CLIMode
 )
 
+# Define a function that will connect to the domain
 function Connect-ADSIDomain {
     <#
     .SYNOPSIS
@@ -78,14 +81,21 @@ function Connect-ADSIDomain {
         By default it uses the current user and computer's context to establish this connection.
         This can be overridden by the "Server" parameter. 
     .EXAMPLE
-        PS C:\> <example usage>
-        blah
+        PS C:\> Connect-ADSIDomain
+        Connects to the current domain and return an instance of the connection.
+    .EXAMPLE
+        PS C:\> Connect-ADSIDomain -Domain "contoso.com"
+        Converts the DNS FQDN into an LDAP FQDN and uses that as the connection string for the custom domain and returns a domain connection instance.
+    .EXAMPLE
+        PS C:\> Connect-ADSIDomain -Domain "DC=contoso,DC=com"
+        Connects to the specified domain and returns a connection instance.
     .INPUTS
         String
     .OUTPUTS
         System.DirectoryServices.DirectoryEntry
     .NOTES
         Uses native .Net ADSI to connect to create the directory connection.
+        .Net Core is not supported.
     #>
     param (
         # Domain Controller/Domain option
@@ -116,18 +126,22 @@ function Connect-ADSIDomain {
 function Search-DomainUser {
     <#
     .SYNOPSIS
-        blah
+        Retrieves a single user instance from Active Directory
     .DESCRIPTION
-        blah
+        Runs a search on active directory for a user person with a specific SAM account name.
+        The msDS-UserPasswordExpiryTimeComputed property is added to the query for retrieval and is returned with the search result.
+        Only the first results is retrieved and returned.
+        The password expiration time is then extracted from the search result and converted into a standard System.DateTime and returned.
     .EXAMPLE
-        PS C:\> <example usage>
-        blah
+        PS C:\> Get-PwdExpirationTime -DomainConnection $DomainConnectionInstance
+        Retrieves the current user's password expiration time and returns it as a DateTime object.
+        E.G. 9/19/2018 9:19:29 AM
     .INPUTS
-        System.DirectoryServices.DirectoryEntry
+        Optional: System.DirectoryServices.DirectoryEntry
     .OUTPUTS
-        System.DirectoryServices.SearchResult
+        System.DateTime
     .NOTES
-        blah
+        .Net framework is required, .Net Core is not supported.
     #>
     param (
         # Domain Connection
@@ -178,6 +192,7 @@ function ConvertTo-LDAPDomain {
         Uses the .Net directory context for conversion.
         This requires a connection to the domain that you want to convert DNS to LDAP syntax.
     #>
+    
     # Define the DNS FQDN parameter to be converted to LDAP FQDN
     [Parameter(
         Mandatory = $true,
@@ -247,6 +262,7 @@ function Get-PwdExpirationTime {
 
 # Allow this library to be used in a standalone mode as a command line application
 if ($CLIMode) {
+    # Connect to the domain and store the connection instance
     $DomainInstance = Connect-ADSIDomain
     $UserResult = Search-DomainUser -DomainConnection $DomainInstance
     Return Get-PwdExpirationTime -UserInstance $UserResult
