@@ -25,7 +25,7 @@ param(
         HelpMessage = "Days before expiration to display the popup"
     )]
     [ValidateNotNullOrEmpty()]
-    [int]$PopupDaysBeforeCount = 14,
+    [System.Int32]$PopupDaysBeforeCount = 14,
     # Text to display in the form body
     [Parameter(
         Mandatory = $false,
@@ -33,7 +33,7 @@ param(
         HelpMessage = "Text to display in the form body"
     )]
     [ValidateNotNullOrEmpty()]
-    [string]$MessageBody = "Your password is about to expire.`nPlease consider changing it.",
+    [String]$MessageBody = "Your password is about to expire.`nPlease consider changing it.",
     # Title Bar text to display
     [Parameter(
         Mandatory = $false,
@@ -41,7 +41,7 @@ param(
         HelpMessage = "Title Bar text to display"
     )]
     [ValidateNotNullOrEmpty()]
-    [string]$TitleBarText = "Title Bar Text",
+    [String]$TitleBarText = "Title Bar Text",
     # Select the icon to be displayed by the message box
     [Parameter(
         Mandatory = $false,
