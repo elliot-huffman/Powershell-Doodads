@@ -52,11 +52,32 @@ param(
     [string]$MessageBoxIcon = "Information"
 )
 
-# Import the Windows forms assembly
-Add-Type -AssemblyName System.Windows.Forms
+# Define the popup function
+Function Show-Popup {
+    <#
+    .SYNOPSIS
+        Displays a popup with the specified text and icon
+    .DESCRIPTION
+        Takes data created with the user's specified data and displays it on a popup.
+        The icon is configurable, the title text is configurable, and the message body is configurable.
+        The return of this function is void.
+    .EXAMPLE
+        PS C:\> Show-Popup
+        Will display a Windows Form MessageBox to the user with the specified text and icon.
+    .INPUTS
+        None
+    .OUTPUTS
+        None
+    .NOTES
+        $MessageBody, $TitleBarText and $IconObject have to be defined previous to executing this function.
+    #>
 
-# Retrieve the expiration date of the current user
-$ExpirationDate = &"..\Libraries\AD DS\LDAP\Get-PasswordExpiration.ps1" -CLIMode
+    # Import the Windows forms assembly
+    Add-Type -AssemblyName System.Windows.Forms
+
+    # Display the message box with the specified text and icon
+    [System.Windows.Forms.MessageBox]::Show($MessageBody, $TitleBarText, [System.Windows.Forms.MessageBoxButtons]::OK, $IconObject) | Out-Null
+}
 
 # Set the message box icon variable to the appropriate value based upon the input
 switch ($MessageBoxIcon) {
