@@ -7,6 +7,8 @@
     PS C:\> <example usage>
     Explanation of what the example does
 .INPUTS
+    System.Int32
+    System.String
     System.DateTime
 .OUTPUTS
     Output (if any)
