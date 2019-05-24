@@ -111,6 +111,3 @@ if ((Get-Date) -gt $PasswordExpirationDate.AddDays(-$PopupDaysBeforeCount)) {
         Show-Popup
     }
 }
-
-# Temporary for testing
-[System.Windows.Forms.MessageBox]::Show($MessageBody, $TitleBarText, [System.Windows.Forms.MessageBoxButtons]::OK, $IconObject) | Out-Null
