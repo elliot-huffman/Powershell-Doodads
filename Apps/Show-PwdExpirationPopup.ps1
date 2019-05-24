@@ -49,7 +49,15 @@ param(
         HelpMessage = "Select the icon to be displayed by the message box"
     )]
     [ValidateSet("Information","Question","Warning","Error")]
-    [string]$MessageBoxIcon = "Information"
+    [String]$MessageBoxIcon = "Information",
+    # Manual input of the expiration date
+    [Parameter(
+        Mandatory = $false,
+        Position = 4,
+        HelpMessage = "Specify the expiration date of the password"
+    )]
+    [ValidateNotNullOrEmpty()]
+    [System.DateTime]$PasswordExpirationDate = (&"..\Libraries\AD DS\LDAP\Get-PasswordExpiration.ps1" -CLIMode)
 )
 
 # Define the popup function
