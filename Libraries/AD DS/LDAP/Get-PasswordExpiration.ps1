@@ -30,7 +30,7 @@
     https://github.com/elliot-labs/PowerShell-Doodads
 #>
 
-# Add command line switch/flag support.
+# Add command line parameter/argument support.
 # Each parameter is detailed in the above help documentation.
 [OutputType([System.DateTime])]
 param(
