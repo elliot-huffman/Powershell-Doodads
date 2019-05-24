@@ -96,16 +96,17 @@ switch ($MessageBoxIcon) {
     Default { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Information }
 }
 
-if ((Get-Date) -gt $ExpirationDate.AddDays(-$PopupDaysBeforeCount)) {
+# Check if the password has passed the specified expiration prompting period
+if ((Get-Date) -gt $PasswordExpirationDate.AddDays(-$PopupDaysBeforeCount)) {
     # Check if the password expired
-    if ((Get-Date) -gt $ExpirationDate) {
+    if ((Get-Date) -gt $PasswordExpirationDate) {
         # Run this code if the password expired
-        # Display a popup with a pre-configured title bar text, message body and icon
-        [System.Windows.Forms.MessageBox]::Show($MessageBody, $TitleBarText, [System.Windows.Forms.MessageBoxButtons]::OK, $IconObject) | Out-Null
+        # Execute the popup function
+        Show-Popup
     } else {
         # Otherwise run this code if the password is within the specified notification period
-        # Display a popup with a pre-configured title bar text, message body and icon
-        [System.Windows.Forms.MessageBox]::Show($MessageBody, $TitleBarText, [System.Windows.Forms.MessageBoxButtons]::OK, $IconObject) | Out-Null
+        # Execute the popup function
+        Show-Popup
     }
 }
 
