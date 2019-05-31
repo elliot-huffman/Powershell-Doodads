@@ -76,7 +76,27 @@ param(
 )
 
 # Verbose status output
+Write-Verbose -Message "Checking account context"
+
+# Check if the $Account context is populated
+if ($Account -eq $null) {
+    # Verbose status output
+    Write-Verbose -Message "Logging into the Azure account and storing the context"
+
+    # Catch authentication errors and if there are any, exit the script
+    try {
+        # If the account parameter is not populated with data, log in and store the login context
+        $Account = Connect-AzAccount
+    }
+    catch {
+        Write-Error "Log in failed, exiting script"
+        exit 1
+    }    
+}
+
+# Verbose status output
 Write-Verbose -Message "Checking tenant ID"
+
 # If the Tenant ID has not been specified, calculate it
 if ($TenantID -eq $null) {
     # Verbose status output
