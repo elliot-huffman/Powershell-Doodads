@@ -1,3 +1,20 @@
+<#
+.SYNOPSIS
+    Retrieves the access token for the Azure REST API.
+.DESCRIPTION
+    Grabs the Access Token for the Azure REST API.
+    This library can accept a subscription ID for tenant identification.
+    Otherwise, it takes the first subscription and uses the associated tenant ID.
+.EXAMPLE
+    PS C:\> <example usage>
+    Explanation of what the example does
+.INPUTS
+    Inputs (if any)
+.OUTPUTS
+    Output (if any)
+.NOTES
+    This script requires the Az.Accounts module to be installed.
+#>
 #Requires -Modules Az.Accounts
 
 $Account = Connect-AzAccount
