@@ -98,7 +98,7 @@ if ($Account -eq $null) {
 Write-Verbose -Message "Checking tenant ID"
 
 # If the Tenant ID has not been specified, calculate it
-if ($TenantID -eq $null) {
+if ($null -eq $TenantID) {
     # Verbose status output
     Write-Verbose -Message "Extracting Tenant ID from current subscription context"
 
@@ -131,4 +131,4 @@ $AccessToken = $FilteredTokens[0].AccessToken
 Write-Verbose -Message "Returning access token"
 
 # Return the access token
-return $AccessToken
+Return $AccessToken
