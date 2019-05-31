@@ -63,6 +63,11 @@ if ($TenantID -eq $null) {
     # Retrieve the Tenant ID by using the subscription's id to identify the subscription context
     $TenantID = (Get-AzSubscription -SubscriptionId $SubscriptionID).TenantId
 }
+# Use the current account context to retrieve all the tokens currently available
+$Tokens = $Account.Context.TokenCache.ReadItems()
+
+
+# Filter the listed tokens to only the ones that apply to the current tenant and list them in descending order based upon expiration date
 $FilteredTokens = $Tokens | Where-Object -FilterScript {$_.TenantId -eq $TenantID} | Sort-Object -Property ExpiresOn -Descending
 
 
