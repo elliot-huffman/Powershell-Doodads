@@ -6,15 +6,36 @@
     This library can accept a subscription ID for tenant identification.
     Otherwise, it takes the first subscription and uses the associated tenant ID.
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
+    PS C:\> Get-AzAccessToken
+    Prompts the user for their Azure credentials and uses the context to retrieve a list of all subscriptions.
+    Takes the top subscription and uses that to calculate the tenant id.
+    It then uses the tenant id in a filter search of the current azure session's token cache to get the access token.
+    The access token is returned as a string.
+.EXAMPLE
+    PS C:\> Get-AzAccessToken -Account (Connect-AzAccount)
+    The script takes the output of the Connect-AzAccount cmdlet.
+    Because of this, the script does not prompt for credential itself, it uses the credentials and context provided by the input.
+.EXAMPLE
+    PS C:\> Get-AzAccessToken -TenantID "fa5f4980-7932-44eb-b464-18de66c616ad"
+    Prompts the user for their Azure credentials and stores the context.
+    The script uses the tenant id specified to find the appropriate access token.
+    This executes faster than letting the system identify a subscription to use as context.
+.EXAMPLE
+    PS C:\> Get-AzAccessToken -SubscriptionID "5823e060-075d-4447-aa2d-3472e41ed362"
+    Prompts the user for their Azure credentials and stores the context.
+    The script uses the subscription id specified to find the tenant that houses the subscription.
+    The script then uses the tenant id in a filter search of the tokens and returns the appropriate access token as a string.
 .INPUTS
-    Inputs (if any)
+    Microsoft.Azure.Commands.Profile.Models.Core.PSAzureProfile
+    System.Guid
 .OUTPUTS
-    Output (if any)
+    System.String
 .NOTES
     This script requires the Az.Accounts module to be installed.
+.LINK
+    https://github.com/elliot-labs/Powershell-Doodads/
 #>
+
 #Requires -Modules Az.Accounts
 
 [OutputType([System.String])]
