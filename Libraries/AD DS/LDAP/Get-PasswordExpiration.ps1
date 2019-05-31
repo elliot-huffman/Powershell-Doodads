@@ -34,7 +34,7 @@
 # Each parameter is detailed in the above help documentation.
 [OutputType([System.DateTime])]
 param(
-    # Specifies a path to a location.
+    # Accepts a username
     [Parameter(
         Mandatory = $false,
         Position = 0,
@@ -46,7 +46,7 @@ param(
     [Alias("Name")]
     [ValidateNotNullOrEmpty()]
     [string]$User = $env:USERNAME,
-    # Specifies a path to one or more locations
+    # Accepts a domain name, LDAP or DNS
     [Parameter(
         Mandatory = $false,
         Position = 1,
@@ -58,7 +58,7 @@ param(
     [Alias("LDAPDomain","DNSDomain")]
     [ValidateNotNullOrEmpty()]
     [string]$Domain = "",
-    # Specifies a path to one or more locations
+    # Accepts a domain controller to connect to
     [Parameter(
         Mandatory = $false,
         Position = 2,
@@ -70,7 +70,7 @@ param(
     [Alias("Server", "MachineName", "DomainController")]
     [ValidateNotNullOrEmpty()]
     [string]$ComputerName,
-    # Column name to copy to destination CSV file
+    # If specified, connect to to a global catalog
     [Parameter(
         Mandatory = $false,
         Position = 3,
