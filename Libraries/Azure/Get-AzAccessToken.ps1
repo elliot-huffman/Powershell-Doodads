@@ -55,6 +55,14 @@ param(
     [ValidateNotNullOrEmpty()]
     [System.Guid]$SubscriptionID = (Get-AzSubscription)[0].Id
 )
+# If the Tenant ID has not been specified, calculate it
+if ($TenantID -eq $null) {
+    # Verbose status output
+    Write-Verbose -Message "Extracting Tenant ID from current subscription context"
+
+    # Retrieve the Tenant ID by using the subscription's id to identify the subscription context
+    $TenantID = (Get-AzSubscription -SubscriptionId $SubscriptionID).TenantId
+}
 $FilteredTokens = $Tokens | Where-Object -FilterScript {$_.TenantId -eq $TenantID} | Sort-Object -Property ExpiresOn -Descending
 
 
