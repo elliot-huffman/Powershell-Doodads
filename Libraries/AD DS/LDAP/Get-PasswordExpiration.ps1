@@ -389,3 +389,4 @@ if ($CLIMode) {
 # Add parameter sets to avoid parameter issues where some params are used and others are not.
 # After parameter sets are set up properly, update all the help docs and comments.
 # Add cmdlet binding
+# Add parameter info to functions
