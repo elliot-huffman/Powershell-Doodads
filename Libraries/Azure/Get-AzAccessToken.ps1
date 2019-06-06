@@ -79,7 +79,7 @@ param(
 Write-Verbose -Message "Checking account context"
 
 # Check if the $Account context is populated
-if ($Account -eq $null) {
+if ($null -eq $Account) {
     # Verbose status output
     Write-Verbose -Message "Logging into the Azure account and storing the context"
 
