@@ -35,49 +35,46 @@
 # Each parameter is detailed in the above help documentation.
 [OutputType([System.DateTime])]
 param(
-    # Accepts a username
+    # Accepts a username to query in Active Directory
     [Parameter(
         Mandatory = $false,
         Position = 0,
         ParameterSetName = "CLI",
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Username to search"
+        ValueFromPipelineByPropertyName = $true
     )]
     [Alias("Name")]
     [ValidateNotNullOrEmpty()]
     [string]$User = $env:USERNAME,
+    # Domain to run the search against
     # Accepts a domain name, LDAP or DNS
     [Parameter(
         Mandatory = $false,
         Position = 1,
         ParameterSetName = "CLI",
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Domain to run the search against"
+        ValueFromPipelineByPropertyName = $true
     )]
     [Alias("LDAPDomain","DNSDomain")]
     [ValidateNotNullOrEmpty()]
     [string]$Domain = "",
-    # Accepts a domain controller to connect to
+    # Accepts custom input for a domain controller to connect to
     [Parameter(
         Mandatory = $false,
         Position = 2,
         ParameterSetName = "CLI",
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Domain controller to connect to"
+        ValueFromPipelineByPropertyName = $true
     )]
     [Alias("Server", "MachineName", "DomainController")]
     [ValidateNotNullOrEmpty()]
     [string]$ComputerName,
-    # If specified, connect to to a global catalog
+    # Connect to a global catalog domain controller if specified
     [Parameter(
         Mandatory = $false,
         Position = 3,
         ParameterSetName = "CLI",
-        ValueFromPipeline = $false,
-        HelpMessage = "Connect to a global catalog domain controller"
+        ValueFromPipeline = $false
     )]
     [switch]$GlobalCatalog,
     # Allow the library to be used as a standalone command line application
@@ -85,8 +82,7 @@ param(
         Mandatory = $false,
         Position = 4,
         ParameterSetName = "CLI",
-        ValueFromPipeline = $false,
-        HelpMessage = "Use this library standalone on the command line"
+        ValueFromPipeline = $false
     )]
     [switch]$CLIMode = $false
 )

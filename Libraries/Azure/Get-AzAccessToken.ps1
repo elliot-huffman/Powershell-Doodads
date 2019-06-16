@@ -46,8 +46,7 @@ param(
         Mandatory = $false,
         Position = 0,
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Account context"
+        ValueFromPipelineByPropertyName = $true
     )]
     [ValidateNotNullOrEmpty()]
     [Microsoft.Azure.Commands.Profile.Models.Core.PSAzureProfile]$Account = (Connect-AzAccount),
@@ -57,8 +56,7 @@ param(
         Position = 1,
         ParameterSetName = "TenantID",
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Tenant ID to get access token for"
+        ValueFromPipelineByPropertyName = $true
     )]
     [ValidateNotNullOrEmpty()]
     [System.Guid]$TenantID,
@@ -68,8 +66,7 @@ param(
         Position = 1,
         ParameterSetName = "SubscriptionID",
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Subscription ID to get tenant ID for tenant id extraction"
+        ValueFromPipelineByPropertyName = $true
     )]
     [ValidateNotNullOrEmpty()]
     [System.Guid]$SubscriptionID = (Get-AzSubscription)[0].Id
