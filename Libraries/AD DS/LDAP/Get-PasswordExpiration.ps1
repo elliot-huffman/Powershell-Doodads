@@ -21,7 +21,6 @@
     Todo:
     Fill out examples after script logic is built.
 .OUTPUTS
-    System.Boolean
     System.DateTime
 .NOTES
     This script is able to operate without the RSAT Active Directory Powershell modules.
