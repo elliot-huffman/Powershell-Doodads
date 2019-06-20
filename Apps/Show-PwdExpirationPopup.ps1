@@ -85,17 +85,19 @@ Function Show-Popup {
     # Import the Windows forms assembly
     Add-Type -AssemblyName System.Windows.Forms
 
+    # Set the message box icon variable to the appropriate value based upon the input
+    switch ($MessageBoxIcon) {
+        "Information" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Information }
+        "Question" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Question }
+        "Warning" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Warning }
+        "Error" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Error }
+        Default { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Information }
+    }
+
     # Display the message box with the specified text and icon
     [System.Windows.Forms.MessageBox]::Show($MessageBody, $TitleBarText, [System.Windows.Forms.MessageBoxButtons]::OK, $IconObject) | Out-Null
 }
 
-# Set the message box icon variable to the appropriate value based upon the input
-switch ($MessageBoxIcon) {
-    "Information" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Information }
-    "Question" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Question }
-    "Warning" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Warning }
-    "Error" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Error }
-    Default { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Information }
 }
 
 # Check if the password has passed the specified expiration prompting period
