@@ -200,10 +200,10 @@ Function Get-PwdExpirationTime {
     # Extract the password expiration time from the single user
     $SearchTime = $SingleUser.Properties['msDS-UserPasswordExpiryTimeComputed']
 
-    # If the password does not expire, return false. Otherwise, return the expiration time.
+    # If the password does not expire, return a zero date. Otherwise, return the expiration time.
     if ($SearchTime -eq 9223372036854775807) {
-        # Return false
-        return $false
+        # return a 0 date (Monday, January 1, 0001 12:00:00 AM)
+        Return 0 | Get-Date
     } else {
         # Convert the SearchResult's time to a string and cast that into a standard DateTime format.
         $Time = [DateTime]::FromFileTime([string]$SearchTime)
