@@ -98,6 +98,9 @@ Function Show-Popup {
     [System.Windows.Forms.MessageBox]::Show($MessageBody, $TitleBarText, [System.Windows.Forms.MessageBoxButtons]::OK, $IconObject) | Out-Null
 }
 
+# If the password does not expire, exit the script
+if ($PasswordExpirationDate -eq (0 | Get-Date)) {
+    exit
 }
 
 # Check if the password has passed the specified expiration prompting period
