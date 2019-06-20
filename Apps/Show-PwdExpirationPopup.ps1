@@ -50,7 +50,7 @@ param(
         Position = 3,
         HelpMessage = "Select the icon to be displayed by the message box"
     )]
-    [ValidateSet("Information","Question","Warning","Error")]
+    [ValidateSet("Information", "Question", "Warning", "Error")]
     [String]$MessageBoxIcon = "Information",
     # Manual input of the expiration date
     [Parameter(
