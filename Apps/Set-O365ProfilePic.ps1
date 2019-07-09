@@ -54,7 +54,7 @@ Function Show-MainUI {
     $Email_Indicator.Size = New-Object System.Drawing.Size(283, 40)
     $Email_Indicator.TextAlign = "MiddleCenter"
     $Email_Indicator.Font = $Credit_Font
-    $Email_Indicator.Text = "Created by v-elhuff@microsoft.com"
+    $Email_Indicator.Text = "Created by elliot.huffman@microsoft.com"
 
     # Add a change button to the bottom of the form.
     $Change_Button = New-Object System.Windows.Forms.Button
