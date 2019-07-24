@@ -56,7 +56,7 @@ Function Send-Email {
 
         # Force a send and receive
         $Outlook.GetNameSpace("MAPI").SendAndReceive(1)
-        Write-Host "Sent!"
+        Write-Verbose "Sent!"
 
         # Clean up the objects that were created
         [System.Runtime.InteropServices.Marshal]::ReleaseComObject($Outlook) | Out-Null
