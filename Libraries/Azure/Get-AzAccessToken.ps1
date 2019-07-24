@@ -72,60 +72,64 @@ param(
     [System.Guid]$SubscriptionID = (Get-AzSubscription)[0].Id
 )
 
-# Verbose status output
-Write-Verbose -Message "Checking account context"
-
-# Check if the $Account context is populated
-if ($null -eq $Account) {
+begin {
     # Verbose status output
-    Write-Verbose -Message "Logging into the Azure account and storing the context"
+    Write-Verbose -Message "Checking account context"
 
-    # Catch authentication errors and if there are any, exit the script
-    try {
-        # If the account parameter is not populated with data, log in and store the login context
-        $Account = Connect-AzAccount
+    # Check if the $Account context is populated
+    if ($Account -IsNot [Microsoft.Azure.Commands.Profile.Models.Core.PSAzureProfile]) {
+        # Verbose status output
+        Write-Verbose -Message "Logging into the Azure account and storing the context"
+
+        # Catch authentication errors and if there are any, exit the script
+        try {
+            # If the account parameter is not populated with data, log in and store the login context
+            $Account = Connect-AzAccount
+        }
+        catch {
+            Write-Error "Log in failed, exiting script"
+            exit 1
+        }    
     }
-    catch {
-        Write-Error "Log in failed, exiting script"
-        exit 1
-    }    
 }
 
-# Verbose status output
-Write-Verbose -Message "Checking tenant ID"
-
-# If the Tenant ID has not been specified, calculate it
-if ($null -eq $TenantID) {
+process {
     # Verbose status output
-    Write-Verbose -Message "Extracting Tenant ID from current subscription context"
+    Write-Verbose -Message "Checking tenant ID"
 
-    # Retrieve the Tenant ID by using the subscription's id to identify the subscription context
-    $TenantID = (Get-AzSubscription -SubscriptionId $SubscriptionID).TenantId
+    # If the Tenant ID has not been specified, calculate it
+    if ($null -eq $TenantID) {
+        # Verbose status output
+        Write-Verbose -Message "Extracting Tenant ID from current subscription context"
+
+        # Retrieve the Tenant ID by using the subscription's id to identify the subscription context
+        $TenantID = (Get-AzSubscription -SubscriptionId $SubscriptionID).TenantId
+    }
+
+    # Verbose status output
+    Write-Verbose -Message "Tenant ID is ready"
+
+    # Verbose status output
+    Write-Verbose -Message "Extracting tokens from context"
+
+    # Use the current account context to retrieve all the tokens currently available
+    [Microsoft.IdentityModel.Clients.ActiveDirectory.TokenCacheItem[]]$Tokens = $Account.Context.TokenCache.ReadItems()
+
+    # Verbose status output
+    Write-Verbose -Message "Filtering and sorting tokens"
+
+    # Filter the listed tokens to only the ones that apply to the current tenant and list them in descending order based upon expiration date
+    $FilteredTokens = $Tokens | Where-Object -FilterScript { $_.TenantId -eq $TenantID } | Sort-Object -Property ExpiresOn -Descending
+
+    # Verbose status output
+    Write-Verbose -Message "Extracting access token"
+
+    # Extract the access token
+    $AccessToken = $FilteredTokens[0].AccessToken
+
+    # Verbose status output
+    Write-Verbose -Message "Returning access token"
+
+    # Return the access token
+    Return $AccessToken
 }
-
-# Verbose status output
-Write-Verbose -Message "Tenant ID is ready"
-
-# Verbose status output
-Write-Verbose -Message "Extracting tokens from context"
-
-# Use the current account context to retrieve all the tokens currently available
-$Tokens = $Account.Context.TokenCache.ReadItems()
-
-# Verbose status output
-Write-Verbose -Message "Filtering and sorting tokens"
-
-# Filter the listed tokens to only the ones that apply to the current tenant and list them in descending order based upon expiration date
-$FilteredTokens = $Tokens | Where-Object -FilterScript {$_.TenantId -eq $TenantID} | Sort-Object -Property ExpiresOn -Descending
-
-# Verbose status output
-Write-Verbose -Message "Extracting access token"
-
-# Extract the access token
-$AccessToken = $FilteredTokens[0].AccessToken
-
-# Verbose status output
-Write-Verbose -Message "Returning access token"
-
-# Return the access token
-Return $AccessToken
