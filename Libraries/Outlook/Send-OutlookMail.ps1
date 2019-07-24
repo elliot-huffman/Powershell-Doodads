@@ -27,10 +27,18 @@ https://microsoft-my.sharepoint.com/:f:/r/personal/v-elhuff_microsoft_com/_layou
 #>
 
 # Allow the script to be run as part of another script or on the CLI
-param([String]$To="v-elhuff@microsoft.com", [String]$Subject="Subject goes here",[String]$Body="Your message here")
+param(
+    [String]$To = "Elliot.Huffman@microsoft.com",
+    [String]$Subject = "Subject goes here",
+    [String]$Body = "Your message here")
 
 # Create a function that sends emails
-Function Send-Email ([String]$To, [String]$Subject, [String]$Body) {
+Function Send-Email {
+    param (
+        [String]$To,
+        [String]$Subject,
+        [String]$Body
+    )
 
     # Initialize outlook
     $Outlook = New-Object -ComObject Outlook.Application
@@ -51,11 +59,11 @@ Function Send-Email ([String]$To, [String]$Subject, [String]$Body) {
         Write-Host "Sent!"
 
         # Clean up the objects that were created
-        [System.Runtime.Interopservices.Marshal]::ReleaseComObject($Outlook) | Out-Null
+        [System.Runtime.InteropServices.Marshal]::ReleaseComObject($Outlook) | Out-Null
         $Outlook = $null
     }
     else {
-        [System.Windows.Forms.MessageBox]::Show("Outlook is required to be installed for this application to work properly!","Dependency Required!",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        [System.Windows.Forms.MessageBox]::Show("Outlook is required to be installed for this application to work properly!", "Dependency Required!", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
     }
 }
 
