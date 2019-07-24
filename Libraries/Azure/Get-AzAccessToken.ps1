@@ -100,8 +100,8 @@ param(
     [System.Guid]$SubscriptionID = (Get-AzSubscription)[0].Id
 )
 
-begin {
 # Set up the environment
+Begin {
     # Verbose status output
     Write-Verbose -Message "Checking account context"
 
@@ -112,8 +112,8 @@ begin {
     }
 }
 
-process {
 # Execute the token retrieval process
+Process {
     # Verbose status output
     Write-Verbose -Message "Checking tenant ID"
 
