@@ -85,7 +85,7 @@ param(
         ParameterSetName = "CLI",
         ValueFromPipeline = $false
     )]
-    [switch]$CLIMode = $false
+    [switch]$CLIMode
 )
 
 # Define a function that will connect to the domain
