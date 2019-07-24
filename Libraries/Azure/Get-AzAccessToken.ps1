@@ -39,7 +39,7 @@
 #Requires -Modules Az.Accounts
 
 [OutputType([System.String])]
-[CmdletBinding(DefaultParameterSetName='TenantID')]
+[CmdletBinding(DefaultParameterSetName = 'TenantID')]
 param(
     # Accepts a user account context session, otherwise establishes its own session
     [Parameter(
