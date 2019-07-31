@@ -1,29 +1,27 @@
 <#
 .SYNOPSIS
-This script sends emails using outlook.
+    Sends and email using outlook
 .DESCRIPTION
-This script sends emails using outlook and the logged in user's email account. The operator of this script can specify who receives the email,
-what the subject is and what the body of the email contains.
-.PARAMETER To
-When set to true the GUI will not be displayed and the other CLI arguments will be used for the required information.
+    Long description
+.EXAMPLE
+    PS C:\> Send-OutlookMail.ps1
+    Sends an email message to ehuffman@elliot-labs.com with the subject of "subject", and a body of "Your message here<br>HTML Capable!"
+.PARAMETER ToAddress
+    pass
 .PARAMETER Subject
-The path to the file that will be used as the source for the outputted batch script.
+    pass
 .PARAMETER Body
-The destination and file name that will be used when the source file has finished processing. This field accepts HTML tags for formatting.
-.EXAMPLE
-Send-Email.ps1 -To "v-elhuff@microsoft.com" -Subject "Outbound Call Report" -Body "Outbound call report:<br><br>Start time: 12:34<br>Stop time: 16:56"
-This will send an email to v-elhuff@microsoft.com with a subject line of "Outbound call report" and a content of:
-Outbound Call report:
-
-Start Time: 12:34
-Stop Time: 15:45
-.EXAMPLE
-Send-Email.ps1 -To "user@example.com"
-this will send a message to user@example.com with the subject of Subject goes here and the content of Your message here.
-.NOTES
-This tool is not needed for general use and should only be used when you need to add email functionality to a powershell script.
+    pass
+.INPUTS
+    System.String
+.OUTPUTS
+    Void
 .LINK
-https://microsoft-my.sharepoint.com/:f:/r/personal/v-elhuff_microsoft_com/_layouts/15/guestaccess.aspx?share=Evxz8UfsAppDmnOYjI-7YXoBLd9ngWVAObpBOfOBF98jFQ
+    https://github.com/elliot-labs/Powershell-Doodads
+.NOTES
+    Outlook is required to be installed for this script to work.
+    Exit codes:
+    1 - Outlook has not been initialized properly, check to ensure it has been installed.
 #>
 
 # Allow the script to be run as part of another script or on the CLI
