@@ -338,7 +338,7 @@ Function Merge-ConnectionString {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = "Specifies that a global catalog should be connected to"
         )]
-        [switch]$GlobalCatalog = $false
+        [switch]$GlobalCatalog
     )
 
     # Build the base search string
