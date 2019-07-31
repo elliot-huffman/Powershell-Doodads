@@ -26,9 +26,10 @@
 
 # Allow the script to be run as part of another script or on the CLI
 param(
-    [String]$To = "Elliot.Huffman@microsoft.com",
-    [String]$Subject = "Subject goes here",
-    [String]$Body = "Your message here")
+    [String]$ToAddress = "ehuffman@elliot-labs.com",
+    [String]$Subject = "Subject",
+    [String]$Body = "Your message here<br>HTML Capable!"
+)
 
 # Create a function that sends emails
 Function Send-Email {
