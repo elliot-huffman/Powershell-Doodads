@@ -20,13 +20,13 @@
     You can pipe all parameters. On the back end the system looks for Source, Destination and Name parameters in addition to the parameters that are documented.
 .OUTPUTS
     Copy-CSVColumn returns $true if execution is successful, and $false if it is unsuccessful.
+.LINK
+    https://github.com/elliot-labs/PowerShell-Doodads
 .NOTES
     You must ensure that the destination file has an equal amount or more rows than the source file.
     The script also checks if the column name in the source exists. If it doesn't it will write an error and return false.
     If the column already exists in the destination, it will write an error and return false.
     Otherwise the script will halt and return $false.
-.LINK
-    https://github.com/elliot-labs/PowerShell-Doodads
 #>
 
 # Accept command line parameters.
