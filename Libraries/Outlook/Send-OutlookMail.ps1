@@ -24,6 +24,7 @@
     1 - Outlook has not been initialized properly, check to ensure it has been installed.
 #>
 
+[CmdletBinding(SupportsShouldProcess = $true)]
 # Allow the script to be run as part of another script or on the CLI
 param(
     [String]$ToAddress = "ehuffman@elliot-labs.com",
