@@ -4,6 +4,7 @@
         "Interop",
         "MAPI",
         "WESL",
-        "dism"
+        "dism",
+        "ehuffman"
     ]
 }
