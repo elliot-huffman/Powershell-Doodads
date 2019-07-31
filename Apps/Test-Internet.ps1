@@ -1,22 +1,22 @@
 <#
 .SYNOPSIS
-Placeholder
+    Placeholder
 .DESCRIPTION
-Placeholder
+    Placeholder
 .PARAMETER PingDestination
-Placeholder
+    Placeholder
 .PARAMETER OutputFile
-Placeholder
+    Placeholder
 .PARAMETER LoopRounds
-Placeholder
+    Placeholder
 .EXAMPLE
-Placeholder
+    Placeholder
 .EXAMPLE
-Placeholder
-.NOTES
-Placeholder
+    Placeholder
 .LINK
-https://github.com/elliot-labs/Powershell-Doodads
+    https://github.com/elliot-labs/PowerShell-Doodads
+.NOTES
+    Placeholder
 #>
 
 # Allow command line automation.
