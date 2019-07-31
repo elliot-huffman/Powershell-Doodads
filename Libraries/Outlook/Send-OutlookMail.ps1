@@ -32,40 +32,71 @@ param(
     [String]$Body = "Your message here<br>HTML Capable!"
 )
 
-# Create a function that sends emails
-Function Send-Email {
-    param (
-        [String]$To,
-        [String]$Subject,
-        [String]$Body
-    )
+Begin {
+    # Capture the common parameter overrides to inherit the values to all cmdlets
+    if (-not $PSBoundParameters.ContainsKey('Verbose')) {
+        $VerbosePreference = $PSCmdlet.SessionState.PSVariable.GetValue('VerbosePreference')
+    }
+    if (-not $PSBoundParameters.ContainsKey('Confirm')) {
+        $ConfirmPreference = $PSCmdlet.SessionState.PSVariable.GetValue('ConfirmPreference')
+    }
+    if (-not $PSBoundParameters.ContainsKey('WhatIf')) {
+        $WhatIfPreference = $PSCmdlet.SessionState.PSVariable.GetValue('WhatIfPreference')
+    }
+
+    # Initialize the email counter
+    [int]$EmailsSent = 0
+    Write-Verbose -Message "Instantiating outlook object"
 
     # Initialize outlook
     $Outlook = New-Object -ComObject Outlook.Application
 
-    # Check if the outlook object could be initialized in the first place.
-    if ($Outlook -ne $null) {
-        # Create the email
-        $Mail = $Outlook.CreateItem(0)
-        $Mail.To = $To
-        $Mail.Subject = $Subject
-        $Mail.HTMLBody = $Body
-        
-        # Put the email in the outbox
-        $Mail.Send()
-
-        # Force a send and receive
-        $Outlook.GetNameSpace("MAPI").SendAndReceive(1)
-        Write-Verbose "Sent!"
-
-        # Clean up the objects that were created
-        [System.Runtime.InteropServices.Marshal]::ReleaseComObject($Outlook) | Out-Null
-        $Outlook = $null
-    }
-    else {
-        [System.Windows.Forms.MessageBox]::Show("Outlook is required to be installed for this application to work properly!", "Dependency Required!", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+    # Check to see if the object has been created properly
+    if ($Outlook -IsNot [Microsoft.Office.Interop.Outlook.ApplicationClass]) {
+        Write-Error "Outlook has not been initialized properly. Check to make sure it is installed."
+        Exit 1
     }
 }
 
-# Execute mail function if used as a standalone script.
-Send-Email -To $To -Subject $Subject -Body $Body
+Process {
+    Write-Verbose -Message "Incrementing email sent counter"
+    $EmailsSent++
+
+    # Check for WhatIf common parameter
+    if ($PSCmdlet.ShouldProcess("Memory", "Create eMail")) {
+        Write-Verbose -Message "Composing message to $ToAddress"
+
+        # Create the email
+        $Mail = $Outlook.CreateItem(0)
+        $Mail.To = $ToAddress
+        $Mail.Subject = $Subject
+        $Mail.HTMLBody = $Body
+
+        Write-Verbose -Message "Placing email in outbox"
+    }
+
+    # Check for WhatIf common parameter
+    if ($PSCmdlet.ShouldProcess("Outbox", "Write eMail")) {
+        # Put the email in the outbox
+        $Mail.Send()
+    }
+}
+
+End {
+    if ($PSCmdlet.ShouldProcess("Outlook", "Send and Receive")) {
+        Write-Verbose -Message "Forcing a send and receive to process emails in outbox"
+
+        # Force a send and receive
+        $Outlook.GetNameSpace("MAPI").SendAndReceive(1)   
+    }
+    
+    Write-Verbose -Message "Releasing outlook instance from memory"
+
+    # Clean up the objects that were created
+    [System.Runtime.InteropServices.Marshal]::ReleaseComObject($Outlook) | Out-Null
+    $Outlook = $null
+
+    if ($PSCmdlet.ShouldProcess("$EmailsSent eMails", "Simulated send")) {
+        Write-Verbose -Message "Sent $EmailsSent emails"
+    }
+}
