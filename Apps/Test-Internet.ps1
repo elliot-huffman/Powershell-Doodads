@@ -20,7 +20,11 @@
 #>
 
 # Allow command line automation.
-param([string]$PingDestination = "google.com", [string]$OutputFile = "Internet Stress Test.log", [int]$LoopRounds = 0)
+param(
+    [string]$PingDestination = "bing.com",
+    [string]$OutputFile = "Internet Stress Test.log",
+    [int]$LoopRounds = 0
+)
 
 # Set the loop counter to 0.
 $loop_counter = 0
