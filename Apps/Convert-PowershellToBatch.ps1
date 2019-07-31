@@ -1,50 +1,50 @@
 <#
 .SYNOPSIS
-This script converts PowerShell scripts to batch scripts to execute directly on systems.
+    This script converts PowerShell scripts to batch scripts to execute directly on systems.
 .DESCRIPTION
-This script takes the input PowerShell script and exports it as a batch script that can be directly run on the system.
-This script can be run on the CLI mode or as a GUI mode.
+    This script takes the input PowerShell script and exports it as a batch script that can be directly run on the system.
+    This script can be run on the CLI mode or as a GUI mode.
 .PARAMETER LegacyVisuals
-When this flag is specified, the user interface will render with the Windows 98 reminiscent visual styles of the classic theme.
-This parameter is only useable when the UI is used.
-This flag does nothing if used with the CLIMode flag.
+    When this flag is specified, the user interface will render with the Windows 98 reminiscent visual styles of the classic theme.
+    This parameter is only useable when the UI is used.
+    This flag does nothing if used with the CLIMode flag.
 .PARAMETER CLIMode
-When this flag is set, the GUI will not be displayed and the other CLI arguments will be used for the required information.
+    When this flag is set, the GUI will not be displayed and the other CLI arguments will be used for the required information.
 .PARAMETER InputFile
-The path to the file that will be used as the source for the outputted batch script.
-Only used with the CLIMode flag. This parameter is required.
+    The path to the file that will be used as the source for the outputted batch script.
+    Only used with the CLIMode flag. This parameter is required.
 .PARAMETER OutputFile
-The destination and file name that will be used when the source file has finished processing.
-If this parameter is not specified, the same file path to the input file is used and the ".bat" file extension is added to the file.
-This parameter is only used with the CLIMode flag.
+    The destination and file name that will be used when the source file has finished processing.
+    If this parameter is not specified, the same file path to the input file is used and the ".bat" file extension is added to the file.
+    This parameter is only used with the CLIMode flag.
 .PARAMETER AdminMode
-When this flag is specified a header will be added to the batch boot-strapper that checks to see fi the script is being run as admin.
-This parameter is only used with the CLIMode flag.
+    When this flag is specified a header will be added to the batch boot-strapper that checks to see fi the script is being run as admin.
+    This parameter is only used with the CLIMode flag.
 .PARAMETER SelfDelete
-When this flag is specified a line of code will be added to the end of the boot-strapper that will self delete the batch script.
-This parameter is only used with the CLIMode flag.
+    When this flag is specified a line of code will be added to the end of the boot-strapper that will self delete the batch script.
+    This parameter is only used with the CLIMode flag.
 .PARAMETER HideTerminal
-When this flag is specified The launch parameter fo the PowerShell script is modified to include a parameter that disabled the terminal from being displayed.
-This parameter is only used with the CLIMode flag.
+    When this flag is specified The launch parameter fo the PowerShell script is modified to include a parameter that disabled the terminal from being displayed.
+    This parameter is only used with the CLIMode flag.
 .PARAMETER CLIArgument
-Arguments to be included in the execution of the PowerShell code.
-This parameter is only used with the CLIMode flag.
+    Arguments to be included in the execution of the PowerShell code.
+    This parameter is only used with the CLIMode flag.
 .EXAMPLE
-Convert-PowerShellToBatch.ps1
-This will run the converter in full GUI mode.
+    Convert-PowerShellToBatch.ps1
+    This will run the converter in full GUI mode.
 
-OUTPUT:
-User interface with graphical options to configure the operation of this script.
+    OUTPUT:
+    User interface with graphical options to configure the operation of this script.
 .EXAMPLE
-Convert-PowerShellToBatch.ps1 -CLIMode -InputFile "C:\Get-UserNAP.ps1"
-This will disable GUI mode and take the inputted file and export it as a batch script with the same path and file name with ".bat" appended to it.
+    Convert-PowerShellToBatch.ps1 -CLIMode -InputFile "C:\Get-UserNAP.ps1"
+    This will disable GUI mode and take the inputted file and export it as a batch script with the same path and file name with ".bat" appended to it.
 .EXAMPLE
-Convert-PowerShellToBatch.ps1 -CLIMode -InputFile "C:\Get-UserNAP.ps1" -OutputFile "C:\Get-UserNAP.bat" -SelfDelete
-This will disable GUI mode and take the inputted file and export it as a batch script that will self delete after execution has completed.
-.NOTES
-This tool is not needed for general use and should only be used when you know you need to change a PowerShell file into a self contained batch script.
+    Convert-PowerShellToBatch.ps1 -CLIMode -InputFile "C:\Get-UserNAP.ps1" -OutputFile "C:\Get-UserNAP.bat" -SelfDelete
+    This will disable GUI mode and take the inputted file and export it as a batch script that will self delete after execution has completed.
 .LINK
-https://github.com/elliot-labs/PowerShell-Doodads
+    https://github.com/elliot-labs/PowerShell-Doodads
+.NOTES
+    This tool is not needed for general use and should only be used when you know you need to change a PowerShell file into a self contained batch script.
 #>
 
 # Add command line switch/flag support.
