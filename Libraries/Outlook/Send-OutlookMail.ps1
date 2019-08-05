@@ -128,7 +128,7 @@ End {
 
     # Clean up the objects that were created
     [System.Runtime.InteropServices.Marshal]::ReleaseComObject($Outlook) | Out-Null
-    $Outlook = $null
+    $Outlook = $Null
 
     if ($PSCmdlet.ShouldProcess("$EmailsSent eMails", "Simulated send")) {
         Write-Verbose -Message "Sent $EmailsSent emails"
