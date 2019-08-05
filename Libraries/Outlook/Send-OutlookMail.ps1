@@ -141,12 +141,15 @@ Begin {
         Write-Verbose -Message "Instantiating outlook object"
 
         # Initialize outlook
-        $Outlook = New-Object -ComObject Outlook.Application
+        $OutlookObject = New-Object -ComObject Outlook.Application
 
         # Check to see if the object has been created properly
-        if ($Outlook -IsNot [Microsoft.Office.Interop.Outlook.ApplicationClass]) {
+        if ($OutlookObject -IsNot [Microsoft.Office.Interop.Outlook.ApplicationClass]) {
             Write-Error "Outlook has not been initialized properly. Check to make sure it is installed."
             Exit 1
+        } else {
+            # If the Object was created, return it
+            Return $OutlookObject
         }
     }
 
