@@ -27,7 +27,7 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 # Allow the script to be run as part of another script or on the CLI
 param(
-    [String]$ToAddress = "ehuffman@elliot-labs.com",
+    [String[]]$ToAddress = "ehuffman@elliot-labs.com",
     [String]$Subject = "Subject",
     [String]$Body = "Your message here<br>HTML Capable!"
 )
@@ -68,7 +68,7 @@ Process {
 
         # Create the email
         $Mail = $Outlook.CreateItem(0)
-        $Mail.To = $ToAddress
+        $Mail.To = $ToAddress -join ";"
         $Mail.Subject = $Subject
         $Mail.HTMLBody = $Body
 
