@@ -124,7 +124,7 @@ End {
         $Outlook.GetNameSpace("MAPI").SendAndReceive(1)   
     }
     
-    Write-Verbose -Message "Releasing outlook instance from memory"
+    Write-Verbose -Message "Releasing Outlook COM object instance from memory"
 
     # Clean up the objects that were created
     [System.Runtime.InteropServices.Marshal]::ReleaseComObject($Outlook) | Out-Null
