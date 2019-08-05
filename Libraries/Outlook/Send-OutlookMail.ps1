@@ -185,7 +185,10 @@ Begin {
 
 # Create emails and place them in the outbox of outlook
 Process {
+    # Write verbose info to the console
     Write-Verbose -Message "Incrementing email sent counter"
+
+    # Increment the emails sent counter
     $EmailsSent++
 
     # Write debug info to the console
@@ -194,6 +197,10 @@ Process {
     # Check to see if outlook was terminated while the script was running.
     # If the ComObject is empty, the script will try to re-init the object. If the re-init fails, the script exits unsuccessfully.
     if ($null -eq $Outlook.Application) {
+
+        # Write verbose info to the console
+        Write-Verbose -Message "Outlook is not currently initialized, re-initializing outlook"
+        
         # Re-init the Outlook object
         $Outlook = New-Outlook
 
@@ -202,7 +209,9 @@ Process {
             # Write debug info to the console
             Write-Debug -Message $Outlook
 
+            # Write an error message to the PS host
             Write-Error -Message "The Outlook application was closed while the script was running!"
+            
             # Exit script unsuccessfully
             exit 2
         }
@@ -210,6 +219,7 @@ Process {
 
     # Check for WhatIf common parameter
     if ($PSCmdlet.ShouldProcess("Memory", "Create eMail")) {
+        # Write verbose info to the console
         Write-Verbose -Message "Composing message to $To"
 
         # Create the email
@@ -224,6 +234,7 @@ Process {
         # Write debug info to the console
         Write-Debug -Message $Mail
 
+        # Write verbose info to the console
         Write-Verbose -Message "Placing email in outbox"
     }
 
