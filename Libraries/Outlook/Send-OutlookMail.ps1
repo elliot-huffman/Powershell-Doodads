@@ -120,7 +120,7 @@ param(
 
 # Initialize the script
 Begin {
-    function New-Outlook {
+    Function New-Outlook {
         <#
         .SYNOPSIS
             Returns an Outlook COM Object instance
