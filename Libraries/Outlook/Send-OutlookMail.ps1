@@ -143,6 +143,10 @@ Begin {
         # Initialize outlook
         $OutlookObject = New-Object -ComObject Outlook.Application
 
+        # Write debug info to the console
+        Write-Debug -Message $OutlookObject
+        Write-Debug -Message $OutlookObject.Session
+
         # Check to see if the object has been created properly
         if ($OutlookObject -IsNot [Microsoft.Office.Interop.Outlook.ApplicationClass]) {
             Write-Error "Outlook has not been initialized properly. Check to make sure it is installed."
@@ -164,8 +168,16 @@ Begin {
         $WhatIfPreference = $PSCmdlet.SessionState.PSVariable.GetValue('WhatIfPreference')
     }
 
+    # Write debug info to the console
+    Write-Debug -Message $VerbosePreference
+    Write-Debug -Message $ConfirmPreference
+    Write-Debug -Message $WhatIfPreference
+
     # Initialize the email counter
     [int]$EmailsSent = 0
+
+    # Write debug info to the console
+    Write-Debug -Message $EmailsSent
 
     # Instantiate Outlook's COM Object
     $Outlook = New-Outlook
@@ -176,6 +188,9 @@ Process {
     Write-Verbose -Message "Incrementing email sent counter"
     $EmailsSent++
 
+    # Write debug info to the console
+    Write-Debug -Message $EmailsSent
+
     # Check to see if outlook was terminated while the script was running.
     # If the ComObject is empty, the script will try to re-init the object. If the re-init fails, the script exits unsuccessfully.
     if ($null -eq $Outlook.Application) {
@@ -184,6 +199,9 @@ Process {
 
         # Check if the Outlook Object is still null.
         if ($null -eq $Outlook.Application) {
+            # Write debug info to the console
+            Write-Debug -Message $Outlook
+
             Write-Error -Message "The Outlook application was closed while the script was running!"
             # Exit script unsuccessfully
             exit 2
@@ -203,6 +221,9 @@ Process {
         # Set the body of the email
         $Mail.HTMLBody = $Body
 
+        # Write debug info to the console
+        Write-Debug -Message $Mail
+
         Write-Verbose -Message "Placing email in outbox"
     }
 
@@ -216,12 +237,14 @@ Process {
 # Clean up after execution has completed
 End {
     if ($PSCmdlet.ShouldProcess("Outlook", "Send and Receive")) {
+        # Write verbose info to the console
         Write-Verbose -Message "Forcing a send and receive to process emails in outbox"
 
         # Force a send and receive
         $Outlook.GetNameSpace("MAPI").SendAndReceive(1)   
     }
     
+    # Write verbose info to the console
     Write-Verbose -Message "Releasing Outlook COM object instance from memory"
 
     # Clean up the objects that were created
@@ -229,6 +252,7 @@ End {
     $Outlook = $Null
 
     if ($PSCmdlet.ShouldProcess("$EmailsSent eMails", "Simulated send")) {
+        # Write verbose info to the console
         Write-Verbose -Message "Sent $EmailsSent emails"
     }
 }
