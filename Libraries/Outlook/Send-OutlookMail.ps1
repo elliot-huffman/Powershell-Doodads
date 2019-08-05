@@ -1,12 +1,12 @@
 <#
 .SYNOPSIS
-    Sends and email using outlook
+    Sends an email dynamically using Outlook as the client.
 .DESCRIPTION
     This script sends emails using the installed outlook application on the current system.
     This allows the script to send email that are compliant with company systems.
     By default it will use the current user's outlook context.
     E.G. email address and credentials.
-    E.G.2. SMTP, iMAP and POP(3) are disabled for security reasons, this will hook into outlook which may be configured for Exchange Active sync and send that way.
+    E.G.2. SMTP, iMAP and POP(3) are disabled for security reasons (the above can be used for MFA bypass), this will hook into Outlook which may be configured for Exchange ActiveSync and send that way.
     This script allows for usage in a pipeline and accepts multiple recipient addresses, as well as customizing the subject and (HTML compatible) body.
 .EXAMPLE
     PS C:\> Send-OutlookMail.ps1
@@ -24,7 +24,7 @@
     Sends an email message to EHuffman@Elliot-Labs.com, with the subject of "Hello World!", and a body of:
     Your message here<br>HTML Capable!<br><br>Psst, the test was successful 😎
 .EXAMPLE
-    PS C:\> Send-OutlookMail.ps1 -Body "World!" -Subject "Hello" -To user@contoso.com
+    PS C:\> Send-OutlookMail.ps1 -Body "World!" -Subject "Hello" -To User@Contoso.com
     Sends an email message to user@contoso.com, with the subject of "Hello", and a body of "World!"
 .PARAMETER To
     This parameter can take an array of email addresses.
