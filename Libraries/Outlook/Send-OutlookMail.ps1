@@ -28,7 +28,7 @@
 # Allow the script to be run as part of another script or on the CLI
 param(
     [String[]]$ToAddress = "ehuffman@elliot-labs.com",
-    [String]$Subject = "Subject",
+    [String]$Subject = "Powershell DooDads: Send-OutlookMail Test",
     [String]$Body = "Your message here<br>HTML Capable!"
     # [string[]]$CarbonCopy,
     # [string[]]$BlindCarbonCopy
