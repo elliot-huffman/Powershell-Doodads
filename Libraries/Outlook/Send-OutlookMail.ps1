@@ -35,6 +35,36 @@ param(
 )
 
 Begin {
+    function New-Outlook {
+        <#
+        .SYNOPSIS
+            Returns an Outlook COM Object instance
+        .DESCRIPTION
+            Initializes outlook and returns a COM instance of it after error checking.
+        .EXAMPLE
+            PS C:\> New-Outlook
+            Return an Outlook COM Object.
+        .OUTPUTS
+            Microsoft.Office.Interop.Outlook.ApplicationClass
+        .LINK
+            https://github.com/elliot-labs/Powershell-Doodads
+        .NOTES
+            Exit Codes:
+            1 - Outlook has not been initialized properly, check to ensure it has been installed.
+        #>
+
+        Write-Verbose -Message "Instantiating outlook object"
+
+        # Initialize outlook
+        $Outlook = New-Object -ComObject Outlook.Application
+
+        # Check to see if the object has been created properly
+        if ($Outlook -IsNot [Microsoft.Office.Interop.Outlook.ApplicationClass]) {
+            Write-Error "Outlook has not been initialized properly. Check to make sure it is installed."
+            Exit 1
+        }
+    }
+
     # Capture the common parameter overrides to inherit the values to all cmdlets
     if (-not $PSBoundParameters.ContainsKey('Verbose')) {
         $VerbosePreference = $PSCmdlet.SessionState.PSVariable.GetValue('VerbosePreference')
@@ -48,21 +78,23 @@ Begin {
 
     # Initialize the email counter
     [int]$EmailsSent = 0
-    Write-Verbose -Message "Instantiating outlook object"
 
-    # Initialize outlook
-    $Outlook = New-Object -ComObject Outlook.Application
-
-    # Check to see if the object has been created properly
-    if ($Outlook -IsNot [Microsoft.Office.Interop.Outlook.ApplicationClass]) {
-        Write-Error "Outlook has not been initialized properly. Check to make sure it is installed."
-        Exit 1
-    }
+    $Outlook = New-Outlook
 }
 
 Process {
     Write-Verbose -Message "Incrementing email sent counter"
     $EmailsSent++
+
+    # Check to see if outlook was terminated while the script was running.
+    # If outlook terminates, it clears the COM object. The script will need re-run.
+    if ($Outlook.Application -eq "") {
+        $Outlook = New-Outlook
+        if ($Outlook.Application -eq "") {
+            Write-Error -Message "The Outlook application was closed while the script was running!"
+            exit 2
+        }
+    }
 
     # Check for WhatIf common parameter
     if ($PSCmdlet.ShouldProcess("Memory", "Create eMail")) {
