@@ -3,6 +3,7 @@
         "FQDNs",
         "Interop",
         "MAPI",
+        "SMTP",
         "WESL",
         "dism",
         "ehuffman"
