@@ -27,9 +27,42 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 # Allow the script to be run as part of another script or on the CLI
 param(
+    [Parameter(
+        # Parameter can be omitted
+        Mandatory = $false,
+        # Parameter is the first positional parameter if used positionally
+        Position = 0,
+        # The below two value from pipeline options make it so that pipeline automatic matching magic happens
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true
+    )]
+    # Ensures that a user doesn't send a empty value to the parameter (this would cause issues)
+    [ValidateNotNullOrEmpty()]
     [String[]]$To = "ehuffman@elliot-labs.com",
+    [Parameter(
+        # Parameter can be omitted
+        Mandatory = $false,
+        # Parameter is the first positional parameter if used positionally
+        Position = 1,
+        # The below two value from pipeline options make it so that pipeline automatic matching magic happens
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true
+    )]
+    # Ensures that a user doesn't send a empty value to the parameter (this would cause issues)
+    [ValidateNotNullOrEmpty()]
     [String]$Subject = "Powershell DooDads: Send-OutlookMail Test",
-    [String]$Body = "Your message here<br>HTML Capable!"
+    [Parameter(
+        # Parameter can be omitted
+        Mandatory = $false,
+        # Parameter is the first positional parameter if used positionally
+        Position = 2,
+        # The below two value from pipeline options make it so that pipeline automatic matching magic happens
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true
+    )]
+    # Ensures that a user doesn't send a empty value to the parameter (this would cause issues)
+    [ValidateNotNullOrEmpty()]
+    [String]$Body = "Your message here<br>HTML Capable!<br><br>Psst, the test was successful 😎"
     # [string[]]$CarbonCopy,
     # [string[]]$BlindCarbonCopy
 )
