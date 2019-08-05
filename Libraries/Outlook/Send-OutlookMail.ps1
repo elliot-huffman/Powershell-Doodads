@@ -63,7 +63,29 @@ param(
     # Ensures that a user doesn't send a empty value to the parameter (this would cause issues)
     [ValidateNotNullOrEmpty()]
     [String]$Body = "Your message here<br>HTML Capable!<br><br>Psst, the test was successful 😎"
+    # [Parameter(
+    #     # Parameter can be omitted
+    #     Mandatory = $false,
+    #     # Parameter is the first positional parameter if used positionally
+    #     Position = 3,
+    #     # The below two value from pipeline options make it so that pipeline automatic matching magic happens
+    #     ValueFromPipeline = $true,
+    #     ValueFromPipelineByPropertyName = $true
+    # )]
+    # # Ensures that a user doesn't send a empty value to the parameter (this would cause issues)
+    # [ValidateNotNullOrEmpty()]
     # [string[]]$CarbonCopy,
+    # [Parameter(
+    #     # Parameter can be omitted
+    #     Mandatory = $false,
+    #     # Parameter is the first positional parameter if used positionally
+    #     Position = 4,
+    #     # The below two value from pipeline options make it so that pipeline automatic matching magic happens
+    #     ValueFromPipeline = $true,
+    #     ValueFromPipelineByPropertyName = $true
+    # )]
+    # # Ensures that a user doesn't send a empty value to the parameter (this would cause issues)
+    # [ValidateNotNullOrEmpty()]
     # [string[]]$BlindCarbonCopy
 )
 
