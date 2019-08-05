@@ -53,8 +53,10 @@
         Closing outlook while a COM Object is loaded will clear the COM Object even though the com object is separate from the GUI.
 #>
 
+# Bind to the cmdlet interface for common params and behaviors
 [CmdletBinding(SupportsShouldProcess = $true)]
-# Allow the script to be run as part of another script or on the CLI
+
+# Initialize the parameters
 param(
     [Parameter(
         # Parameter can be omitted
