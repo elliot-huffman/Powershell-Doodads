@@ -118,6 +118,7 @@ param(
     # [string[]]$BlindCarbonCopy
 )
 
+# Initialize the script
 Begin {
     function New-Outlook {
         <#
@@ -163,19 +164,25 @@ Begin {
     # Initialize the email counter
     [int]$EmailsSent = 0
 
+    # Instantiate Outlook's COM Object
     $Outlook = New-Outlook
 }
 
+# Create emails and place them in the outbox of outlook
 Process {
     Write-Verbose -Message "Incrementing email sent counter"
     $EmailsSent++
 
     # Check to see if outlook was terminated while the script was running.
-    # If outlook terminates, it clears the COM object. The script will need re-run.
+    # If the ComObject is empty, the script will try to re-init the object. If the re-init fails, the script exits unsuccessfully.
     if ($null -eq $Outlook.Application) {
+        # Re-init the Outlook object
         $Outlook = New-Outlook
+
+        # Check if the Outlook Object is still null.
         if ($null -eq $Outlook.Application) {
             Write-Error -Message "The Outlook application was closed while the script was running!"
+            # Exit script unsuccessfully
             exit 2
         }
     }
@@ -186,8 +193,11 @@ Process {
 
         # Create the email
         $Mail = $Outlook.CreateItem(0)
+        # Take the array of addresses to email to and join it into a single string of addresses separated by a semicolon, outlook style.
         $Mail.To = $To -join ";"
+        # Set the subject of the email
         $Mail.Subject = $Subject
+        # Set the body of the email
         $Mail.HTMLBody = $Body
 
         Write-Verbose -Message "Placing email in outbox"
@@ -200,6 +210,7 @@ Process {
     }
 }
 
+# Clean up after execution has completed
 End {
     if ($PSCmdlet.ShouldProcess("Outlook", "Send and Receive")) {
         Write-Verbose -Message "Forcing a send and receive to process emails in outbox"
