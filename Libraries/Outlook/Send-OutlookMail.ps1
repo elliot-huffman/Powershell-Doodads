@@ -143,9 +143,9 @@ Process {
 
     # Check to see if outlook was terminated while the script was running.
     # If outlook terminates, it clears the COM object. The script will need re-run.
-    if ($Outlook.Application -eq "") {
+    if ($null -eq $Outlook.Application) {
         $Outlook = New-Outlook
-        if ($Outlook.Application -eq "") {
+        if ($null -eq $Outlook.Application) {
             Write-Error -Message "The Outlook application was closed while the script was running!"
             exit 2
         }
