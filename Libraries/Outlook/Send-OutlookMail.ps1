@@ -2,17 +2,44 @@
 .SYNOPSIS
     Sends and email using outlook
 .DESCRIPTION
-    Long description
+    This script sends emails using the installed outlook application on the current system.
+    This allows the script to send email that are compliant with company systems.
+    By default it will use the current user's outlook context.
+    E.G. email address and credentials.
+    E.G.2. SMTP, iMAP and POP(3) are disabled for security reasons, this will hook into outlook which may be configured for Exchange Active sync and send that way.
+    This script allows for usage in a pipeline and accepts multiple recipient addresses, as well as customizing the subject and (HTML compatible) body.
 .EXAMPLE
     PS C:\> Send-OutlookMail.ps1
     Sends an email message to ehuffman@elliot-labs.com with the subject of "subject", and a body of "Your message here<br>HTML Capable!"
-.PARAMETER ToAddress
-    pass
+.EXAMPLE
+    PS C:\> Send-OutlookMail.ps1
+    Sends an email message to ehuffman@elliot-labs.com with the subject of "Powershell DooDads: Send-OutlookMail Test", and a body of:
+    Your message here<br>HTML Capable!<br><br>Psst, the test was successful 😎
+.EXAMPLE
+    PS C:\> Send-OutlookMail.ps1 -To "Elliot.Huffman@Microsoft.com","EHuffman@Elliot-Labs.com"
+    Sends an email message to Elliot.Huffman@Microsoft.com and EHuffman@Elliot-Labs.com, with the subject of "Powershell DooDads: Send-OutlookMail Test", and a body of:
+    Your message here<br>HTML Capable!<br><br>Psst, the test was successful 😎
+.EXAMPLE
+    PS C:\> Send-OutlookMail.ps1 -Subject "Hello World!"
+    Sends an email message to EHuffman@Elliot-Labs.com, with the subject of "Hello World!", and a body of:
+    Your message here<br>HTML Capable!<br><br>Psst, the test was successful 😎
+.EXAMPLE
+    PS C:\> Send-OutlookMail.ps1 -Body "World!" -Subject "Hello" -To user@contoso.com
+    Sends an email message to user@contoso.com, with the subject of "Hello", and a body of "World!"
+.PARAMETER To
+    This parameter can take an array of email addresses.
+    Each address will have the specified email sent to it.
+    By default the email will go to ehuffman@elliot-labs.com
 .PARAMETER Subject
-    pass
+    This parameter optionally sets the subject line of the email that is being created.
+    The default value is "Powershell DooDads: Send-OutlookMail Test".
+    This parameter can only accept standard text, HTML will not be parsed.
 .PARAMETER Body
-    pass
+    This parameter sets the value of the body of the email.
+    HTML is parsed in this parameter, so you can use standard tags such as <br> for breaks.
+    Multi lined strings are also supported.
 .INPUTS
+    System.String[]
     System.String
 .OUTPUTS
     Void
@@ -22,6 +49,8 @@
     Outlook is required to be installed for this script to work.
     Exit codes:
     1 - Outlook has not been initialized properly, check to ensure it has been installed.
+    2 - Outlook process closed while script was running and the script could not recover from this.
+        Closing outlook while a COM Object is loaded will clear the COM Object even though the com object is separate from the GUI.
 #>
 
 [CmdletBinding(SupportsShouldProcess = $true)]
