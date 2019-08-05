@@ -27,7 +27,7 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 # Allow the script to be run as part of another script or on the CLI
 param(
-    [String[]]$ToAddress = "ehuffman@elliot-labs.com",
+    [String[]]$To = "ehuffman@elliot-labs.com",
     [String]$Subject = "Powershell DooDads: Send-OutlookMail Test",
     [String]$Body = "Your message here<br>HTML Capable!"
     # [string[]]$CarbonCopy,
@@ -102,7 +102,7 @@ Process {
 
         # Create the email
         $Mail = $Outlook.CreateItem(0)
-        $Mail.To = $ToAddress -join ";"
+        $Mail.To = $To -join ";"
         $Mail.Subject = $Subject
         $Mail.HTMLBody = $Body
 
