@@ -30,6 +30,8 @@ param(
     [String[]]$ToAddress = "ehuffman@elliot-labs.com",
     [String]$Subject = "Subject",
     [String]$Body = "Your message here<br>HTML Capable!"
+    # [string[]]$CarbonCopy,
+    # [string[]]$BlindCarbonCopy
 )
 
 Begin {
