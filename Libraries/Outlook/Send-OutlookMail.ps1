@@ -189,7 +189,7 @@ Process {
 
     # Check for WhatIf common parameter
     if ($PSCmdlet.ShouldProcess("Memory", "Create eMail")) {
-        Write-Verbose -Message "Composing message to $ToAddress"
+        Write-Verbose -Message "Composing message to $To"
 
         # Create the email
         $Mail = $Outlook.CreateItem(0)
