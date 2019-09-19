@@ -77,15 +77,7 @@ param(
         ParameterSetName = "CLI",
         ValueFromPipeline = $false
     )]
-    [switch]$GlobalCatalog,
-    # Allow the library to be used as a standalone command line application
-    [Parameter(
-        Mandatory = $false,
-        Position = 4,
-        ParameterSetName = "CLI",
-        ValueFromPipeline = $false
-    )]
-    [switch]$CLIMode
+    [switch]$GlobalCatalog
 )
 
 # Define a function that will connect to the domain
@@ -377,7 +369,7 @@ Function Merge-ConnectionString {
 }
 
 # Allow this library to be used in a standalone mode as a command line application
-if ($CLIMode) {
+if ($MyInvocation.Line -NotMatch "^\.\s") {
     # Build the connection string
     $ConnectionString = Merge-ConnectionString -ComputerName $ComputerName -Domain $Domain -GlobalCatalog:$GlobalCatalog
     

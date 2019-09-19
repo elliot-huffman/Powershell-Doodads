@@ -178,7 +178,7 @@ Function Show-ChangeOutput {
 }
 
 # Starts the main interface
-Function Show-MainUI () {
+Function Show-MainUI {
     # Initialize font setting
     $Label_Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Regular)
     $Argument_Label_Font = New-Object System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Regular)

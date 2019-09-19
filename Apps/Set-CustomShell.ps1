@@ -129,7 +129,8 @@ Process {
 
     # Create a handle to the class instance so we can call the static methods.
     try {
-        $ShellLauncherClass = [WMIClass]"\\$COMPUTER\root\standardCIMv2\embedded:WESL_UserSetting"
+        $ShellLauncherClass = [WMIClass]"\\$ComputerName\root\standardCIMv2\embedded:WESL_UserSetting"
+        # Invoke-CimMethod -Namespace "root\standardCIMv2\embedded" -ClassName "WESL_UserSetting"
     }
     catch [Exception] {
         Write-Error $_.Exception.Message;
@@ -138,7 +139,7 @@ Process {
     }
 
     # Get the SID for a user account named "Cashier". Rename "Cashier" to an existing account on your system to test this script.
-    $TargetUserSID = Get-UsernameSID($User)
+    $TargetUserSID = Get-UsernameSID -Account $User
 
     # Sets the default shell for Windows to explorer and to do nothing if it is closed (this is the default behavior of windows)
     $ShellLauncherClass.SetDefaultShell("explorer.exe", 3)
