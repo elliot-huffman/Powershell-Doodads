@@ -37,6 +37,10 @@
     Prompts the user for their Azure credentials and stores the context.
     The script uses the subscription id specified to find the tenant that houses the subscription.
     The script then uses the tenant id in a filter search of the tokens and returns the appropriate access token as a string.
+.EXAMPLE
+    PS C:\> Get-AzAccessToken -Account (Connect-AzAccount) -SubscriptionID "5823e060-075d-4447-aa2d-3472e41ed362"
+    The script takes the output of the Connect-AzAccount cmdlet and uses teh specified subscription ID.
+    Because of this, the script does not prompt for credentials and it executes faster because it does not have to cauculate the approiate subscription to retrieve teh acess token from.
 .INPUTS
     Microsoft.Azure.Commands.Profile.Models.Core.PSAzureProfile
     System.Guid
