@@ -118,10 +118,26 @@ param(
     # # Ensures that a user doesn't send a empty value to the parameter (this would cause issues)
     # [ValidateNotNullOrEmpty()]
     # [string[]]$BlindCarbonCopy
-)
+) 
 
 # Initialize the script
 Begin {
+
+    # Get a copy of the Process ID of the process that is the parent of the powershell instance.
+    $ParentID = (Get-CimInstance win32_process | Where-Object processid -eq  $pid).ParentProcessId
+
+    # Set a list of process that can accept object based returns.
+    $ListOfProcessHosts = "powershell", "explorer", "conhost", "code"
+
+    # Checks if the name of the process that matches the parent id is present in the list
+    if ((Get-Process -id $ParentID).Name -in $ListOfProcessHosts) {
+        # If the process is in the list, set the return variable to true
+        $SetReturn = $true
+    } else {
+        # If the process is not in the list, set the return variable to false
+        $SetReturn = $false
+    }
+
     Function New-Outlook {
         <#
         .SYNOPSIS
