@@ -176,6 +176,9 @@ Begin {
     }
 
     # Capture the common parameter overrides to inherit the values to all cmdlets
+    if (-not $PSBoundParameters.ContainsKey('Debug')) {
+        $DebugPreference = $PSCmdlet.SessionState.PSVariable.GetValue('DebugPreference')
+    }
     if (-not $PSBoundParameters.ContainsKey('Verbose')) {
         $VerbosePreference = $PSCmdlet.SessionState.PSVariable.GetValue('VerbosePreference')
     }
