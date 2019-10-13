@@ -45,6 +45,7 @@
     Void
 .LINK
     https://github.com/elliot-labs/Powershell-Doodads
+    Send-MailMessage
 .NOTES
     Outlook is required to be installed for this script to work.
     Exit codes:
