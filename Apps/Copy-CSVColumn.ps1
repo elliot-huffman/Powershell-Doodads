@@ -74,8 +74,8 @@ param(
 )
 
 # Import the CSV files into memory.
-$SourceCSV = Import-Csv -Path $SourceCSVPath
-$DestinationCSV = Import-Csv -Path $DestinationCSVPath
+$SourceCSV = Import-Csv -Path $Source
+$DestinationCSV = Import-Csv -Path $Destination
 
 # If the source doesn't have the specified column or the destination already has it, write an error and return.
 if ($SourceCSV.$ColumnName -eq $null) {
@@ -90,17 +90,17 @@ if ($SourceCSV.$ColumnName -eq $null) {
 $DestinationCSV | Add-Member -MemberType NoteProperty -Name $ColumnName -Value $null
 
 # Export the destination CSV with the new column name.
-$DestinationCSV | Export-Csv -Path $DestinationCSVPath
+$DestinationCSV | Export-Csv -Path $Destination
 
 # Re-import the Destination CSV with the new column name for easy manipulation.
-$DestinationCSV = Import-Csv -Path $DestinationCSVPath
+$DestinationCSV = Import-Csv -Path $Destination
 
 <#
 For the future: Build a system that can make new rows to support a source that is larger than the destination.
 Below is header isolation for a potential row generator. Header isolation is successful. Row creation is currently unsuccessful.
 
 # Create a definition of the destination schema.
-$DestinationCSVDefinition = (Get-Content -Path $DestinationCSVPath)[0,1]
+$DestinationCSVDefinition = (Get-Content -Path $Destination)[0,1]
 if ($DestinationCSVDefinition[0] -cMatch "^#TYPE") {
     $DestinationCSVDefinition = $DestinationCSVDefinition[1]
 } else {
@@ -129,7 +129,7 @@ if ($SourceCSV.Count -gt $DestinationCSV.Count) {
         }
     }
     # Save in memory work to disk.
-    $DestinationCSV | Export-Csv -Path $DestinationCSVPath
+    $DestinationCSV | Export-Csv -Path $Destination
 
     # Stop execution and return that efforts were successful.
     return $true
