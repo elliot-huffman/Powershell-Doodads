@@ -2,8 +2,8 @@
 [CmdletBinding(SupportsShouldProcess=$true)]
 # Cmdlet binding requires a param statement to properly bind.
 param(
-    # Whatever params you want here, I just included a filler param here
-    [string]$String
+    # Whatever params you want here.
+    # Script does not actually have to have params.
 )
 
 # The object is returned/pushed here, if a .net compatible system can take the data, it will be available.
