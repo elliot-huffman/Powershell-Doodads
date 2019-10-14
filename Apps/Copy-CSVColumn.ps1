@@ -73,15 +73,6 @@ param(
     [System.String]$ColumnName
 )
 
-# If the source or destination path is not valid, write an error and return false.
-if (!(Test-Path -Path $SourceCSVPath)) {
-    Write-Error -Message "A valid path must be specified for the source file!"
-    return $false
-} elseif (!(Test-Path -Path $DestinationCSVPath)) {
-    Write-Error -Message "A valid path must be specified for the destination file!"
-    return $false
-}
-
 # Import the CSV files into memory.
 $SourceCSV = Import-Csv -Path $SourceCSVPath
 $DestinationCSV = Import-Csv -Path $DestinationCSVPath
