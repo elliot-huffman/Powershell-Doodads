@@ -6,14 +6,14 @@
     The script check the source and destination for compatibility before copying the column to the destination.
     The script will return $true for success and $false for failure.
     If there is a failure, the system will write an error to the console and return $false.
-.PARAMETER SourceCSVPath
+.PARAMETER Source
     The path to the source CSV file. Wild cards are not permitted.
-.PARAMETER DestinationCSVPath
+.PARAMETER Destination
     The path to the destination CSV file. Wild cards are not permitted.
 .PARAMETER ColumnName
     Name of the column in the source file to copy to the destination file.
 .EXAMPLE
-    PS C:\> Copy-CSVColumn.ps1 -SourceCSVPath .\Source.csv -DestinationCSVPath .\Destination.csv -ColumnName "Foo Bar"
+    PS C:\> Copy-CSVColumn.ps1 -Source .\Source.csv -Destination .\Destination.csv -ColumnName "Foo Bar"
     Copies the column named "Foo Bar" from the source.csv file and makes a new column in the file named Destination.csv with the same values and column name that were present in the source file.
 .INPUTS
     System.String
@@ -32,36 +32,38 @@
 # Accept command line parameters.
 [OutputType([String])]
 param(
-    # Specifies a path to a location.
-    [Parameter(Mandatory = $true,
+    [Parameter(
+        Mandatory = $true,
         Position = 0,
         ParameterSetName = "CLI",
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Path to source CSV file.")]
-    [Alias("PSPath","Source")]
+        ValueFromPipelineByPropertyName = $true
+    )]
+    [Alias("PSPath","SourceCSVPath")]
     [ValidateNotNullOrEmpty()]
-    [string]$SourceCSVPath,
-    # Specifies a path to one or more locations.
-    [Parameter(Mandatory = $true,
+    [ValidateScript({Test-Path -Path $_ -PathType "Leaf" -Include "*.csv"})]
+    [System.String]$Source,
+    [Parameter(
+        Mandatory = $true,
         Position = 1,
         ParameterSetName = "CLI",
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Path to destination CSV file.")]
-    [Alias("Destination")]
+        ValueFromPipelineByPropertyName = $true
+    )]
+    [Alias("DestinationCSVPath")]
     [ValidateNotNullOrEmpty()]
-    [string]$DestinationCSVPath,
-    # Column name to copy to destination CSV file.
-    [Parameter(Mandatory = $true,
-        Position = 3,
+    [ValidateScript({Test-Path -Path $_ -PathType "Leaf" -Include "*.csv"})]
+    [System.String]$Destination,
+    [Parameter(
+        Mandatory = $true,
+        Position = 2,
         ParameterSetName = "CLI",
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        HelpMessage = "Name of the column that will be copied over")]
+        ValueFromPipelineByPropertyName = $true
+    )]
     [Alias("Property","Name")]
     [ValidateNotNullOrEmpty()]
-    [string]$ColumnName
+    [System.String]$ColumnName
 )
 
 # If the source or destination path is not valid, write an error and return false.
