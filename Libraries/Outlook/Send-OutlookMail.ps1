@@ -153,7 +153,13 @@ Begin {
 
         # Check to see if the object has been created properly
         if ($OutlookObject -IsNot [Microsoft.Office.Interop.Outlook.ApplicationClass]) {
+            # Write an error message to stderr (this is non-terminating)
             Write-Error "Outlook has not been initialized properly. Check to make sure it is installed."
+            
+            # Return $False for a failed email
+            $PSCmdlet.WriteObject($false)
+
+            # Exit Script execution unsuccessfully
             Exit 1
         } else {
             # If the Object was created, return it
@@ -216,10 +222,13 @@ Process {
             # Write debug info to the console
             Write-Debug -Message $Outlook
 
-            # Write an error message to the PS host
+            # Write a message to stderr (non-terminating)
             Write-Error -Message "The Outlook application was closed while the script was running!"
             
-            # Exit script unsuccessfully
+            # Return $false for failed email operation
+            $PSCmdlet.WriteObject($false)
+
+            # Exit script unsuccessfully with exit code
             exit 2
         }
     }
