@@ -36,7 +36,7 @@
 #>
 
 # Accept command line parameters.
-[OutputType([String])]
+[OutputType([System.String])]
 param(
     [Parameter(
         Mandatory = $true,
