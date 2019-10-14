@@ -77,13 +77,25 @@ param(
 $SourceCSV = Import-Csv -Path $Source
 $DestinationCSV = Import-Csv -Path $Destination
 
-# If the source doesn't have the specified column or the destination already has it, write an error and return.
+# If the source doesn't have the specified column or the destination already has it, write an error, return and exit.
 if ($SourceCSV.$ColumnName -eq $null) {
+    # Write an error message to stderr (this is non-terminating)
     Write-Error -Message "The source column does not exist!"
-    return $false
+    
+    # Return $False for a failed copy
+    $PSCmdlet.WriteObject($false)
+
+    # Exit Script execution unsuccessfully
+    exit 1
 } elseif ($DestinationCSV.$ColumnName -ne $null) {
+    # Write an error message to stderr (this is non-terminating)
     Write-Error -Message "The column already exists in the destination!"
-    return $false
+
+    # Return $False for a failed copy
+    $PSCmdlet.WriteObject($false)
+
+    # Exit Script execution unsuccessfully
+    exit 2
 } 
 
 # Add the column to be populated with data.
@@ -112,11 +124,14 @@ $DestinationCSVDefinition = $DestinationCSVDefinition -split ","
 
 # Check to see if the destination can handle all of the rows of the source CSV and throw and error if it can't.
 if ($SourceCSV.Count -gt $DestinationCSV.Count) {
-    # Write an error to the console.
+    # Write an error message to stderr (this is non-terminating)
     Write-Error -Message "Cannot have a source file that has more rows than the destination file!"
     
-    # Stop execution and return that execution was not successful.
-    return $false
+    # Return $False for a failed copy
+    $PSCmdlet.WriteObject($false)
+
+    # Exit Script execution unsuccessfully
+    exit 3
 } else {
     # Loop through the source CSV file.
     for ($i = 0; $i -lt $SourceCSV.Count; $i++) {
