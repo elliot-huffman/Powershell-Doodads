@@ -17,16 +17,22 @@
     Copies the column named "Foo Bar" from the source.csv file and makes a new column in the file named Destination.csv with the same values and column name that were present in the source file.
 .INPUTS
     System.String
-    You can pipe all parameters. On the back end the system looks for Source, Destination and Name parameters in addition to the parameters that are documented.
 .OUTPUTS
     Copy-CSVColumn returns $true if execution is successful, and $false if it is unsuccessful.
 .LINK
     https://github.com/elliot-labs/PowerShell-Doodads
+    Export-CSV
+    Import-CSV
 .NOTES
     You must ensure that the destination file has an equal amount or more rows than the source file.
     The script also checks if the column name in the source exists. If it doesn't it will write an error and return false.
     If the column already exists in the destination, it will write an error and return false.
     Otherwise the script will halt and return $false.
+
+    Exit Codes:
+        1 - The column name does not exist in the specified source file.
+        2 - The column name already exists in the specified destination CSV file.
+        3 - The source CSV file cannot have more rows than the destination CSV file.
 #>
 
 # Accept command line parameters.
