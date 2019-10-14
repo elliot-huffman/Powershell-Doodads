@@ -42,7 +42,8 @@
     System.String[]
     System.String
 .OUTPUTS
-    Void
+    Void - Successful
+    System.Boolean - Unsuccessful
 .LINK
     https://github.com/elliot-labs/Powershell-Doodads
     Send-MailMessage
