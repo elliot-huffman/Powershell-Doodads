@@ -100,38 +100,39 @@ if ($SourceCSV.$ColumnName -eq $null) {
     exit 2
 } 
 
-# If there are more rows in the source file than the destination file, prep a new row object
+# If there are more rows in the source file than the destination file, prep the headers list
 if ($SourceCSV.Count -gt $DestinationCSV.Count) {
 
     # Get a list of columns in the Destination file
     $Headers = $DestinationCSV[0].PSObject.Properties.Name
-
-    # The reason that the HashTable is not created fresh in each loop is that only the one column of data is updated.
-    # It is updated *every* time to the value of the source file, so if it is blank, it will be blank, it will not be the previous value.
-    
-    # This creates a blank HashTable.
-    $HeaderHashTable = @{ }
-
-    # Loop through the list of headers and make a table of them
-    foreach ($Header in $Headers) {
-        # Set each column of data to blank for the additional rows
-        $HeaderHashTable[$Header] = ""
-    }
-
-    # Add the new column to the Header HashTable
-    $HeaderHashTable[$ColumnName] = ""
-
-    # Convert the HashTable to a PSCustomObject
-    $NewRow = [PSCustomObject]$HeaderHashTable
 }
 
 # Loop through the source CSV file
 for ($i = 0; $i -lt $SourceCSV.Count; $i++) {
 
+    # If the destination CSV file doesn't have any more rows, create new rows
     if ($null -ne $DestinationCSV[$i]) {
         # Add the column and date to the destination CSV file
         $DestinationCSV[$i] | Add-Member -MemberType "NoteProperty" -Name $ColumnName -Value $SourceCSV[$i].$ColumnName
     } else {
+        # The reason that the HashTable is not created fresh in each loop is that only the one column of data is updated.
+        # It is updated *every* time to the value of the source file, so if it is blank, it will be blank, it will not be the previous value.
+
+        # This creates a blank HashTable.
+        $HeaderHashTable = @{ }
+
+        # Loop through the list of headers and make a table of them
+        foreach ($Header in $Headers) {
+            # Set each column of data to blank for the additional rows
+            $HeaderHashTable[$Header] = ""
+        }
+
+        # Add the new column to the Header HashTable
+        $HeaderHashTable[$ColumnName] = ""
+
+        # Convert the HashTable to a PSCustomObject
+        $NewRow = [PSCustomObject]$HeaderHashTable
+
         # Replace the row data with the appropriate new row data so that old data is not reused
         $NewRow.$ColumnName = $SourceCSV[$i].$ColumnName
 
