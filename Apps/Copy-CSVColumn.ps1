@@ -36,7 +36,7 @@
 #>
 
 # Accept command line parameters.
-[CmdletBinding(SupportsShouldProcess=$true)]
+[CmdletBinding(SupportsShouldProcess = $true)]
 [OutputType([System.String])]
 param(
     [Parameter(
@@ -46,9 +46,9 @@ param(
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true
     )]
-    [Alias("PSPath","SourceCSVPath")]
+    [Alias("PSPath", "SourceCSVPath")]
     [ValidateNotNullOrEmpty()]
-    [ValidateScript({Test-Path -Path $_ -PathType "Leaf" -Include "*.csv"})]
+    [ValidateScript( { Test-Path -Path $_ -PathType "Leaf" -Include "*.csv" })]
     [System.String]$Source,
     [Parameter(
         Mandatory = $true,
@@ -59,7 +59,7 @@ param(
     )]
     [Alias("DestinationCSVPath")]
     [ValidateNotNullOrEmpty()]
-    [ValidateScript({Test-Path -Path $_ -PathType "Leaf" -Include "*.csv"})]
+    [ValidateScript( { Test-Path -Path $_ -PathType "Leaf" -Include "*.csv" })]
     [System.String]$Destination,
     [Parameter(
         Mandatory = $true,
@@ -68,7 +68,7 @@ param(
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true
     )]
-    [Alias("Property","Name")]
+    [Alias("Property", "Name")]
     [ValidateNotNullOrEmpty()]
     [System.String]$ColumnName
 )
