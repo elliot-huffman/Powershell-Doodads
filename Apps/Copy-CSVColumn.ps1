@@ -102,14 +102,12 @@ if ($null -eq $SourceCSV[0].$ColumnName) {
 
 # If there are more rows in the source file than the destination file, prep the headers list
 if ($SourceCSV.Count -gt $DestinationCSV.Count) {
-
     # Get a list of columns in the Destination file
     $Headers = $DestinationCSV[0].PSObject.Properties.Name
 }
 
 # Loop through the source CSV file
 for ($i = 0; $i -lt $SourceCSV.Count; $i++) {
-
     # If the destination CSV file doesn't have any more rows, create new rows
     if ($null -ne $DestinationCSV[$i]) {
         # Add the column and date to the destination CSV file
