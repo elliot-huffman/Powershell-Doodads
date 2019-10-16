@@ -131,7 +131,7 @@ for ($i = 0; $i -lt $SourceCSV.Count; $i++) {
         $DestinationCSV[$i] | Add-Member -MemberType "NoteProperty" -Name $ColumnName -Value $SourceCSV[$i].$ColumnName
     } else {
         # Replace the row data with the appropriate new row data so that old data is not reused
-        $NewRow[$ColumnName] = $SourceCSV[$i].$ColumnName
+        $NewRow.$ColumnName = $SourceCSV[$i].$ColumnName
 
         # Add the new row to the DestinationCSV file
         $DestinationCSV += $NewRow
