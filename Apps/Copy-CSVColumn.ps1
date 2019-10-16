@@ -141,8 +141,12 @@ for ($i = 0; $i -lt $SourceCSV.Count; $i++) {
     }
 }
 
-# Save in memory work to disk
-$DestinationCSV | Export-Csv -Path $Destination
+# Check if WhatIf/Confirm is specified, implement risk mitigation
+if ($PSCmdlet.ShouldProcess("Disk", "Write CSV")) {
+
+    # Save in memory work to disk
+    $DestinationCSV | Export-Csv -Path $Destination
+}
 
 # Stop execution and return that efforts were successful.
 return $true
