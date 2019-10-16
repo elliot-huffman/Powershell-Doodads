@@ -5,34 +5,36 @@
     Copies a column from a source CSV file to a destination CSV file.
     The script check the source and destination for compatibility before copying the column to the destination.
     The script will return $true for success and $false for failure.
-    If there is a failure, the system will write an error to the console and return $false.
+    If there is a failure, the system will write an error to the console, set an exit code and return $false.
 .PARAMETER Source
     The path to the source CSV file. Wild cards are not permitted.
 .PARAMETER Destination
     The path to the destination CSV file. Wild cards are not permitted.
 .PARAMETER ColumnName
     Name of the column in the source file to copy to the destination file.
+    This parameter is case sensitive.
 .EXAMPLE
     PS C:\> Copy-CSVColumn.ps1 -Source .\Source.csv -Destination .\Destination.csv -ColumnName "Foo Bar"
     Copies the column named "Foo Bar" from the source.csv file and makes a new column in the file named Destination.csv with the same values and column name that were present in the source file.
 .INPUTS
     System.String
 .OUTPUTS
-    Copy-CSVColumn returns $true if execution is successful, and $false if it is unsuccessful.
+    System.Boolean
 .LINK
     https://github.com/elliot-labs/PowerShell-Doodads
     Export-CSV
     Import-CSV
+    ConvertFrom-Csv
+    ConvertTo-Csv
 .NOTES
-    You must ensure that the destination file has an equal amount or more rows than the source file.
-    The script also checks if the column name in the source exists. If it doesn't it will write an error and return false.
+    The script checks if the column name in the source exists.
+    If it doesn't it will write an error and return false.
     If the column already exists in the destination, it will write an error and return false.
     Otherwise the script will halt and return $false.
 
     Exit Codes:
         1 - The column name does not exist in the specified source file.
         2 - The column name already exists in the specified destination CSV file.
-        3 - The source CSV file cannot have more rows than the destination CSV file.
 #>
 
 # Accept command line parameters.
