@@ -80,7 +80,7 @@ $SourceCSV = Import-Csv -Path $Source
 $DestinationCSV = Import-Csv -Path $Destination
 
 # If the source doesn't have the specified column or the destination already has it, write an error, return and exit.
-if ($SourceCSV.$ColumnName -eq $null) {
+if ($null -eq $SourceCSV[0].$ColumnName) {
     # Write an error message to stderr (this is non-terminating)
     Write-Error -Message "The source column does not exist!"
     
@@ -89,7 +89,7 @@ if ($SourceCSV.$ColumnName -eq $null) {
 
     # Exit Script execution unsuccessfully
     exit 1
-} elseif ($DestinationCSV.$ColumnName -ne $null) {
+} elseif ($null -ne $DestinationCSV[0].$ColumnName) {
     # Write an error message to stderr (this is non-terminating)
     Write-Error -Message "The column already exists in the destination!"
 
