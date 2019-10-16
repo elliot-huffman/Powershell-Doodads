@@ -98,54 +98,48 @@ if ($SourceCSV.$ColumnName -eq $null) {
     exit 2
 } 
 
-# Add the column to be populated with data.
-$DestinationCSV | Add-Member -MemberType NoteProperty -Name $ColumnName -Value $null
+# If there are more rows in the source file than the destination file, prep a new row object
+if ($SourceCSV.Count -gt $DestinationCSV.Count) {
 
-# Export the destination CSV with the new column name.
+    # Get a list of columns in the Destination file
+    $Headers = $DestinationCSV[0].PSObject.Properties.Name
+
+    # The reason that the HashTable is not created fresh in each loop is that only the one column of data is updated.
+    # It is updated *every* time to the value of the source file, so if it is blank, it will be blank, it will not be the previous value.
+    
+    # This creates a blank HashTable.
+    $HeaderHashTable = @{ }
+
+    # Loop through the list of headers and make a table of them
+    foreach ($Header in $Headers) {
+        # Set each column of data to blank for the additional rows
+        $HeaderHashTable[$Header] = ""
+    }
+
+    # Add the new column to the Header HashTable
+    $HeaderHashTable[$ColumnName] = ""
+
+    # Convert the HashTable to a PSCustomObject
+    $NewRow = [PSCustomObject]$HeaderHashTable
+}
+
+# Loop through the source CSV file
+for ($i = 0; $i -lt $SourceCSV.Count; $i++) {
+
+    if ($null -ne $DestinationCSV[$i]) {
+        # Add the column and date to the destination CSV file
+        $DestinationCSV[$i] | Add-Member -MemberType "NoteProperty" -Name $ColumnName -Value $SourceCSV[$i].$ColumnName
+    } else {
+        # Replace the row data with the appropriate new row data so that old data is not reused
+        $NewRow[$ColumnName] = $SourceCSV[$i].$ColumnName
+
+        # Add the new row to the DestinationCSV file
+        $DestinationCSV += $NewRow
+    }
+}
+
+# Save in memory work to disk
 $DestinationCSV | Export-Csv -Path $Destination
 
-# Re-import the Destination CSV with the new column name for easy manipulation.
-$DestinationCSV = Import-Csv -Path $Destination
-
-<#
-For the future: Build a system that can make new rows to support a source that is larger than the destination.
-Below is header isolation for a potential row generator. Header isolation is successful. Row creation is currently unsuccessful.
-
-# Create a definition of the destination schema.
-$DestinationCSVDefinition = (Get-Content -Path $Destination)[0,1]
-if ($DestinationCSVDefinition[0] -cMatch "^#TYPE") {
-    $DestinationCSVDefinition = $DestinationCSVDefinition[1]
-} else {
-    $DestinationCSVDefinition = $DestinationCSVDefinition[0]
-}
-$DestinationCSVDefinition = $DestinationCSVDefinition -split ","
-
-#>
-
-# Check to see if the destination can handle all of the rows of the source CSV and throw and error if it can't.
-if ($SourceCSV.Count -gt $DestinationCSV.Count) {
-    # Write an error message to stderr (this is non-terminating)
-    Write-Error -Message "Cannot have a source file that has more rows than the destination file!"
-    
-    # Return $False for a failed copy
-    $PSCmdlet.WriteObject($false)
-
-    # Exit Script execution unsuccessfully
-    exit 3
-} else {
-    # Loop through the source CSV file.
-    for ($i = 0; $i -lt $SourceCSV.Count; $i++) {
-        # Check if data exists, and if it doesn't set it to an empty string.
-        if ($null -eq $SourceCSV[$i].$ColumnName) {
-            $DestinationCSV[$i].$ColumnName = ""
-        } else {
-            # If there is data, set it to the data that is found.
-            $DestinationCSV[$i].$ColumnName = $SourceCSV[$i].$ColumnName
-        }
-    }
-    # Save in memory work to disk.
-    $DestinationCSV | Export-Csv -Path $Destination
-
-    # Stop execution and return that efforts were successful.
-    return $true
-}
+# Stop execution and return that efforts were successful.
+return $true
