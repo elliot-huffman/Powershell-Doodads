@@ -38,7 +38,7 @@
 # Accept command line parameters.
 [CmdletBinding(SupportsShouldProcess = $true)]
 [OutputType([System.String])]
-param(
+param (
     [Parameter(
         Mandatory = $true,
         Position = 0,
