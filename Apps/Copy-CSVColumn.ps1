@@ -90,6 +90,7 @@ $DestinationCSV = Import-Csv -Path $Destination
 
 # Write debugging info
 Write-Debug -Message "============================ Source CSV First Two Rows ============================"
+# Write the first two rows to the debug output if debug mode is specified
 $SourceCSV | Select-Object -First 2 | ForEach-Object -Process {Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - $_"}
 Write-Debug -Message "============================ Destination CSV First Two Rows ======================="
 $DestinationCSV | Select-Object -First 2 | ForEach-Object -Process { Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - $_"}
@@ -102,10 +103,9 @@ if ($null -eq $SourceCSV[0].$ColumnName) {
     Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$SourceCSV[0].`$ColumnName: $($SourceCSV[0].$ColumnName)"
     Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - The above debug statement won't have a value if the source does not exist"
 
-
     # Write an error message to stderr (this is non-terminating)
     Write-Error -Message "The source column does not exist!"
-    
+
     # Return $False for a failed copy
     $PSCmdlet.WriteObject($false)
 
@@ -117,6 +117,7 @@ if ($null -eq $SourceCSV[0].$ColumnName) {
     Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Failure occurred, variable data at if statement:"
     Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$DestinationCSV[0].`$ColumnName: $($DestinationCSV[0].$ColumnName)"
     Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Column data type: $($DestinationCSV[0].$ColumnName.GetType().FullName)"
+
     # Write an error message to stderr (this is non-terminating)
     Write-Error -Message "The column already exists in the destination!"
 
@@ -125,12 +126,15 @@ if ($null -eq $SourceCSV[0].$ColumnName) {
 
     # Exit Script execution unsuccessfully
     exit 2
-} 
+}
 
 # If there are more rows in the source file than the destination file, prep the headers list
 if ($SourceCSV.Count -gt $DestinationCSV.Count) {
     # Get a list of columns in the Destination file
     $Headers = $DestinationCSV[0].PSObject.Properties.Name
+
+    # Write verbose information
+    Write-Verbose -Message "Creating new rows for destination CSV file"
 
     # Write debugging info
     Write-Debug -Message "============================ Header list =========================================="
