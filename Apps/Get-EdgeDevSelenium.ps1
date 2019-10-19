@@ -1,3 +1,37 @@
+<#
+.SYNOPSIS
+    Set up Edge Selenium Driver and do a quick demonstration of Edge Chrome control
+.DESCRIPTION
+    This script sets up the Edge Chromium Web driver and selenium for web dev activities.
+
+    This downloads the appropriate web driver from microsoft and Selenium from the NuGet repository.
+    Tested on Edge Dev and Edge Beta.
+.EXAMPLE
+    PS C:\> Get-EdgeDevSelenium.ps1
+    Executes the Script with the default parameters.
+    It will check to see if a folder exists at "C:\EdgeSelenium" and if it does not, it will create the directory.
+    After the directory is created it will download and install the proper components to run Edge Chromium with Selenium.
+    After the components are installed, it will navigate the web browser to "https://github.com/elliot-labs/PowerShell-Doodads" to demonstrate that it is operational.
+.PARAMETER RegistryPath
+    The registry path parameter is used to identify the registry key that specifies where the Edge Chromium instance is installed.
+    The default value has been tested with Edge Beta and Dev.
+.PARAMETER SeleniumDirectory
+    This is the directory that the Selenium instance and web driver is installed to.
+    The default value is C:\EdgeSelenium however this can be whatever value that you want.
+.INPUTS
+    System.String
+.OUTPUTS
+    Void
+.LINK
+    https://github.com/elliot-labs/PowerShell-Doodads
+.NOTES
+    This script requires Administrative rights.
+    
+    Exit Codes:
+    1 - Edge - Chrome is not installed, please install a version from here: https://www.microsoftedgeinsider.com/en-us/download
+    2 - The CPU architecture is not supported, supported Architectures are: x86, AMD64, and Mac64.
+#>
+
 #Requires -RunAsAdministrator
 
 [CmdletBinding(SupportsShouldProcess=$true)]
