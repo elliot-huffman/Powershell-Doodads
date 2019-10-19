@@ -1,5 +1,8 @@
 # Create the touch command
-New-Alias -Name "Touch" -Value "New-Item" -Description "Create touch command similar to Linux"
+New-Alias -Name "Touch" -Value "New-Item" -Description "Create touch command, similar to Linux"
+
+# Create the Grep command
+New-Alias -Name "Grep" -Value "Select-String" -Description "Create the grep command, similar to Linux"
 
 # Replace the ping command with a modern replacement
 New-Alias -Name "Ping" -Value "Test-NetConnection" -Description "Replace the legacy ping command with a modern replacement"
