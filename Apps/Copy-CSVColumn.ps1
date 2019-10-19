@@ -3,7 +3,7 @@
     Copies a column to another CSV file.
 .DESCRIPTION
     Copies a column from a source CSV file to a destination CSV file.
-    The script check the source and destination for compatibility before copying the column to the destination.
+    The script checks the source and the destination for compatibility before copying the column to the destination.
     The script will return $true for success and $false for failure.
     If there is a failure, the system will write an error to the console, set an exit code and return $false.
 .PARAMETER Source
