@@ -7,7 +7,7 @@
     Otherwise, it takes the first subscription and uses the associated tenant ID.
 .PARAMETER Account
     Accepts a user account context session, otherwise establishes its own session.
-    If a context is not specified, a log in process will be launched.
+    If a context is not specified, the log in process will be launched.
 .PARAMETER TenantID
     Accepts a Tenant ID, does not require subscription id if specified.
     Data format is in GUID format: "00000000-0000-0000-0000-000000000000".
