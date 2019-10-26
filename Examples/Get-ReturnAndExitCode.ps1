@@ -1,5 +1,5 @@
 # Cmdlet binding is required for the $PSCmdlet variable to be present
-[CmdletBinding(SupportsShouldProcess=$true)]
+[CmdletBinding()]
 # Cmdlet binding requires a param statement to properly bind.
 param(
     # Whatever params you want here.
