@@ -92,11 +92,11 @@ function Set-NTRegistration {
                 [ValidateSet("RegisteredOwner", "RegisteredOrganization")]
                 [System.String]$Name,
                 # The value can have anything, as long as it is a string, if value is specified, it cannot be empty
-                [ValidateNotNullOrEmpty()]
                 [System.String]$Value = ""
             )
-            # Set the specified registry key with the appropriate value
-            Set-ItemProperty -Name $Name -Value $Value -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\"
+
+            # Set the registry value for the system registration information
+            Set-ItemProperty -Name $Name -Value $Value -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\"            
         }
     }
     end {
@@ -111,11 +111,18 @@ function Set-NTRegistration {
             ScriptBlock = $ScriptBlock
         }
 
+        # Create the dynamic parameters HashTable for the organization registration
+        $ClearParams = @{
+            # The scriptblock property is used to store the script block that will be executed remotely
+            ScriptBlock = $ScriptBlock
+        }
+
         # If the script is to execute remotely, set up the computer name parameter
         if ($ComputerName.Count -gt 0) {
             # If there are remote computers, add them to the computer name property of the HashTables
             $OwnerParams.ComputerName = $ComputerName
             $OrganizationParams.ComputerName = $ComputerName
+            $ClearParams.ComputerName = $ComputerName
         }
 
         # If the owner parameter is specified, build the params
@@ -130,8 +137,10 @@ function Set-NTRegistration {
                 # Parameter splat (use @ instead of $ for HashTable) the cmdlet with dynamically built parameters
                 Invoke-Command @OwnerParams
             }
+        }
+
         # Check to see if the Organization parameter is specified
-        } elseif ($Organization) {
+        if ($Organization) {
             # Add the registered organization string to the param list in array form
             $OrganizationParams.ArgumentList = @("RegisteredOrganization")
             # Add the organization registration value to the list of arguments for the script block
@@ -142,6 +151,25 @@ function Set-NTRegistration {
                 # Parameter splat (use @ instead of $ for HashTable) the cmdlet with dynamically built parameters
                 Invoke-Command @OrganizationParams
             }
+        # If the clear parameter is specified, remove the registration.
+        # Only if the Organization and Owner parameters are not specified, the organization check is implied via elseif
+        } elseif ($Clear -and (-not $Owner)) {
+            # implement -WhatIf and -Confirm support (Should process)
+            if ($PSCmdlet.ShouldProcess("Registry", "Clear Owner Registration")) {
+                # Set the clear parameters to Owner mode
+                $ClearParams.ArgumentList = "RegisteredOwner"
+
+                # Execute the clear command against owner
+                Invoke-Command @ClearParams
+            }
+            # implement -WhatIf and -Confirm support (Should process)
+            if ($PSCmdlet.ShouldProcess("Registry", "Clear Organization Registration")) {
+                # Set the clear parameters to Owner mode
+                $ClearParams.ArgumentList = "RegisteredOrganization"
+
+                # Execute the clear command against organization
+                Invoke-Command @ClearParams
+            }            
         }
     }
 }
