@@ -24,7 +24,52 @@
 
 #Requires -RunAsAdministrator
 
-param()
+# Cmdlet bind the script to enable advanced functions
+# Set ShouldProcess to $true to enable the capability to use -WhatIf and -Confirm
+[CmdletBinding(
+    SupportsShouldProcess=$true,
+    DefaultParameterSetName='Clear'
+)]
+
+Param (
+    # Create the Clear parameter and set metadata
+    # It is its own param set and should not be used with any other param combos
+    [Parameter(
+        Mandatory=$true,
+        ParameterSetName="Clear"
+    )]
+    [Switch]$Clear,
+
+    # Create the Owner parameter and set metadata
+    [Parameter(
+        Mandatory=$false,
+        Position=0,
+        ValueFromPipelineByPropertyName=$true,
+        ParameterSetName='Set-Data'
+    )]
+    [ValidateNotNullOrEmpty()]
+    [System.String]$Owner,
+
+    # Create the Organization parameter and set metadata
+    [Parameter(
+        Mandatory=$false,
+        Position=1,
+        ValueFromPipelineByPropertyName=$true,
+        ParameterSetName='Set-Data'
+    )]
+    [ValidateNotNullOrEmpty()]
+    [System.String]$Organization,
+
+    # Validate that the computer(s) is/are accessible
+    [ValidateScript({Test-Connection -ComputerName $_ -Quiet})]
+    # Ensure that the data is not empty
+    [ValidateNotNullOrEmpty()]
+    [Parameter(
+        Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true
+    )]
+    [System.String[]]$ComputerName
+)
 
 function Set-NTRegistration {
     <#
