@@ -1,11 +1,13 @@
 {
     "cSpell.words": [
         "FQDNs",
+        "HKEY",
         "HKLM",
         "Interop",
         "MAPI",
         "SMTP",
         "WESL",
+        "Winver",
         "dism",
         "ehuffman"
     ]
