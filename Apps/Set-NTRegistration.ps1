@@ -211,18 +211,26 @@ function Set-NTRegistration {
             Rights to edit the HKEY_Local_Machine registry hive; This is usually administrator rights.
             This applies to both local and remote targets.
     #>
+
     #Requires -RunAsAdministrator
+
+    # Cmdlet bind the script to enable advanced functions
+    # Set ShouldProcess to $true to enable the capability to use -WhatIf and -Confirm
     [CmdletBinding(
         SupportsShouldProcess=$true,
         DefaultParameterSetName='Clear'
     )]
+
     Param (
+        # Create the Clear parameter and set metadata
+        # It is its own param set and should not be used with any other param combos
         [Parameter(
             Mandatory=$true,
             ParameterSetName="Clear"
         )]
         [Switch]$Clear,
 
+        # Create the Owner parameter and set metadata
         [Parameter(
             Mandatory=$false,
             Position=0,
@@ -232,6 +240,7 @@ function Set-NTRegistration {
         [ValidateNotNullOrEmpty()]
         [System.String]$Owner,
 
+        # Create the Organization parameter and set metadata
         [Parameter(
             Mandatory=$false,
             Position=1,
@@ -252,6 +261,7 @@ function Set-NTRegistration {
         [System.String[]]$ComputerName
     )
 
+    # Run the begin block once for init
     begin {
         # Create the script block for remote execution, this stores the code to be executed remotely
         $ScriptBlock = {
@@ -268,12 +278,15 @@ function Set-NTRegistration {
             Set-ItemProperty -Name $Name -Value $Value -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\"            
         }
     }
+
+    # Run the end block once after pipeline completes
     end {
         # Create the dynamic parameters HashTable for the owner registration
         $OwnerParams = @{
             # The scriptblock property is used to store the script block that will be executed remotely
             ScriptBlock = $ScriptBlock
         }
+
         # Create the dynamic parameters HashTable for the organization registration
         $OrganizationParams = @{
             # The scriptblock property is used to store the script block that will be executed remotely
@@ -298,10 +311,11 @@ function Set-NTRegistration {
         if ($Owner) {
             # Add the registered owner string to the param list in array form
             $OwnerParams.ArgumentList = @("RegisteredOwner")
+
             # Add the owner registration value to the list of arguments for the script block
             $OwnerParams.ArgumentList += $Owner
 
-            # Enable -WhatIf and -Confirm support
+            # implement -WhatIf and -Confirm support (Should process)s
             if ($PSCmdlet.ShouldProcess("Registry", "Change owner")) {
                 # Parameter splat (use @ instead of $ for HashTable) the cmdlet with dynamically built parameters
                 Invoke-Command @OwnerParams
@@ -312,10 +326,11 @@ function Set-NTRegistration {
         if ($Organization) {
             # Add the registered organization string to the param list in array form
             $OrganizationParams.ArgumentList = @("RegisteredOrganization")
+
             # Add the organization registration value to the list of arguments for the script block
             $OrganizationParams.ArgumentList += $Organization
 
-            # Enable -WhatIf and -Confirm support
+            # implement -WhatIf and -Confirm support (Should process)
             if ($PSCmdlet.ShouldProcess("Registry", "Change organization")) {
                 # Parameter splat (use @ instead of $ for HashTable) the cmdlet with dynamically built parameters
                 Invoke-Command @OrganizationParams
