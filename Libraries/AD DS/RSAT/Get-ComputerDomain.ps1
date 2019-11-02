@@ -27,6 +27,8 @@
 
 #Requires -Module ActiveDirectory
 
+[CmdletBinding()]
+
 # Set up the parameter input.
 Param(
     [System.String]$ComputerName = $env:ComputerName,
@@ -57,4 +59,4 @@ $DCList = $ComputerDN -split "," | Where-Object -FilterScript { $_ -like "DC=*" 
 $ComputerDomain = ($DCList -join ".") -replace @("DC=", "")
 
 # Make the output available to other scripts.
-Return $ComputerDomain
+$PSCmdlet.WriteObject($ComputerDomain)
