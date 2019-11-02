@@ -5,7 +5,12 @@
     This script looks up a computer's domain based upon the name of the computer.
 .PARAMETER ComputerName
     If specified, a search for the specified name will be executed.
-    Default: Use the local computer's name for the search.
+    Default:
+    Use the local computer's name for the search.
+.PARAMETER SearchDomain
+    The search domain parameter is a way to manually specify which domains are to be searched for the specified computer name.
+    Default:
+    The domains that are in the current forrest.
 .EXAMPLE
     PS C:\> Get-ComputerDomain.ps1
     This will gather the local computer's name and will run a search on the domain for the local computer's name.
@@ -30,6 +35,7 @@
 
 #Requires -Module ActiveDirectory
 
+# Cmdlet bind the script for advanced functionality
 [CmdletBinding()]
 
 # Set up the parameter input
