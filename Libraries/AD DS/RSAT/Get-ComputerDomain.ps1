@@ -34,7 +34,21 @@
 
 # Set up the parameter input.
 Param(
+    [Parameter(
+        Mandatory=$false,
+        Position=0,
+        ValueFromPipeline=$true,
+        ValueFromPipelineByPropertyName=$true
+    )]
+    [ValidateNotNullOrEmpty()]
     [System.String]$ComputerName = $env:ComputerName,
+    [Parameter(
+        Mandatory=$false,
+        Position=1,
+        ValueFromPipeline=$true,
+        ValueFromPipelineByPropertyName=$true
+    )]
+    [ValidateNotNullOrEmpty()]
     [System.String[]]$SearchDomain = (Get-ADForest).Domains
 )
 
