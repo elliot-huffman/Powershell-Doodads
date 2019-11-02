@@ -25,6 +25,8 @@
     Domain controller connectivity needs to be present for the Active directory searches to be successful.
 #>
 
+#Requires -Module ActiveDirectory
+
 # Set up the parameter input.
 Param(
     [System.String]$ComputerName = $env:ComputerName,
