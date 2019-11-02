@@ -4,19 +4,25 @@
 .DESCRIPTION
     This script looks up a computer's domain based upon the name of the computer.
 .PARAMETER ComputerName
-    If specified, a search for the specified name will be executed. Default: Use the local computer's name for the search.
+    If specified, a search for the specified name will be executed.
+    Default: Use the local computer's name for the search.
 .EXAMPLE
-    Get-ComputerDomain
+    PS C:\> Get-ComputerDomain.ps1
     This will gather the local computer's name and will run a search on the domain for the local computer's name.
     If found then it will output the name of the domain that the computer is currently located in.
 .EXAMPLE
-    Get-ComputerDomain -ComputerName "other-computer"
+    PS C:\> Get-ComputerDomain.ps1 -ComputerName "other-computer"
     This will search all domains in the forrest and will return the domain of the specified computer account.
-.NOTES
-    RSAT's Active directory powershell needs to be installed and enabled for this script to work.
-    Domain controller connectivity needs to be present for the Active directory searches to be successful.
+.INPUTS
+    System.String
+    System.String[]
+.OUTPUTS
+    System.String
 .LINK
     https://github.com/elliot-labs/Powershell-Doodads
+.NOTES
+    RSAT's Active Directory powershell needs to be installed and enabled for this script to work.
+    Domain controller connectivity needs to be present for the Active directory searches to be successful.
 #>
 
 # Set up the parameter input.
