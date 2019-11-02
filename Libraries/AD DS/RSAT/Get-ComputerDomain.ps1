@@ -23,6 +23,9 @@
 .NOTES
     RSAT's Active Directory powershell needs to be installed and enabled for this script to work.
     Domain controller connectivity needs to be present for the Active directory searches to be successful.
+
+    Exit Code:
+    1 - No computer found, check the computer name and try again.
 #>
 
 #Requires -Module ActiveDirectory
