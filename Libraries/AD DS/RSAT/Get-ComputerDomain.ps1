@@ -38,28 +38,30 @@ Param(
     [System.String[]]$SearchDomain = (Get-ADForest).Domains
 )
 
-# Create an empty array for multiple potential matches
-$ComputerDN = @()
+process {
+    # Create an empty array for multiple potential matches
+    $ComputerDN = @()
 
-# Iterate through each domain.
-foreach ($Domain in $SearchDomain) {
-    $ComputerDN += (Get-ADComputer -Identity $ComputerName -Server $Domain -ErrorAction "SilentlyContinue").DistinguishedName
+    # Iterate through each domain.
+    foreach ($Domain in $SearchDomain) {
+        $ComputerDN += (Get-ADComputer -Identity $ComputerName -Server $Domain -ErrorAction "SilentlyContinue").DistinguishedName
+    }
+
+    # If no computer is found with the above query, exit the script.
+    if ($ComputerDN.Count -eq 0) {
+        # Write and error
+        Write-Error -Message "No computer found, check the computer name and try again."
+
+        # Exit the script
+        exit 1
+    }
+
+    # Split each section of the distinguished name into separate entities.
+    $DCList = $ComputerDN -split "," | Where-Object -FilterScript { $_ -like "DC=*" }
+
+    # Join them back together and remove the trailing close currly bracket.
+    $ComputerDomain = ($DCList -join ".") -replace @("DC=", "")
+
+    # Make the output available to other scripts.
+    $PSCmdlet.WriteObject($ComputerDomain)
 }
-
-# If no computer is found with the above query, exit the script.
-if ($ComputerDN.Count -eq 0) {
-    # Write and error
-    Write-Error -Message "No computer found, check the computer name and try again."
-
-    # Exit the script
-    exit 1
-}
-
-# Split each section of the distinguished name into separate entities.
-$DCList = $ComputerDN -split "," | Where-Object -FilterScript { $_ -like "DC=*" }
-
-# Join them back together and remove the trailing close currly bracket.
-$ComputerDomain = ($DCList -join ".") -replace @("DC=", "")
-
-# Make the output available to other scripts.
-$PSCmdlet.WriteObject($ComputerDomain)
