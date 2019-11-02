@@ -263,6 +263,17 @@ function Set-NTRegistration {
 
     # Run the begin block once for init
     begin {
+
+        # Write information to console
+        Write-Verbose -Message "Running initialization"
+
+        # Write debugging info
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Parameter info:"
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$Clear: $Clear"
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$Owner: $Owner"
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$Organization: $Organization"
+        foreach ($Computer in $ComputerName) {Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$ComputerName: $Computer"}
+        
         # Create the script block for remote execution, this stores the code to be executed remotely
         $ScriptBlock = {
             # Accept parameter values
@@ -277,6 +288,9 @@ function Set-NTRegistration {
             # Set the registry value for the system registration information
             Set-ItemProperty -Name $Name -Value $Value -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\"            
         }
+
+        # Write debugging info
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$ScriptBlock: $($ScriptBlock.ToString())"
     }
 
     # Run the end block once after pipeline completes
@@ -319,6 +333,8 @@ function Set-NTRegistration {
             if ($PSCmdlet.ShouldProcess("Registry", "Change owner")) {
                 # Parameter splat (use @ instead of $ for HashTable) the cmdlet with dynamically built parameters
                 Invoke-Command @OwnerParams
+
+                Write-Verbose -Message "Set owner registration"
             }
         }
 
@@ -330,10 +346,15 @@ function Set-NTRegistration {
             # Add the organization registration value to the list of arguments for the script block
             $OrganizationParams.ArgumentList += $Organization
 
+            # Write debug info
+            $OrganizationParams | Out-String | Write-Debug
+
             # implement -WhatIf and -Confirm support (Should process)
             if ($PSCmdlet.ShouldProcess("Registry", "Change organization")) {
                 # Parameter splat (use @ instead of $ for HashTable) the cmdlet with dynamically built parameters
                 Invoke-Command @OrganizationParams
+
+                Write-Verbose -Message "Set organization registration"
             }
         # If the clear parameter is specified, remove the registration.
         # Only if the Organization and Owner parameters are not specified, the organization check is implied via elseif
@@ -343,16 +364,26 @@ function Set-NTRegistration {
                 # Set the clear parameters to Owner mode
                 $ClearParams.ArgumentList = "RegisteredOwner"
 
+                # Write debug info
+                $ClearParams | Out-String | Write-Debug
+
                 # Execute the clear command against owner
                 Invoke-Command @ClearParams
+
+                Write-Verbose -Message "Cleared Owner Registration"
             }
             # implement -WhatIf and -Confirm support (Should process)
             if ($PSCmdlet.ShouldProcess("Registry", "Clear Organization Registration")) {
                 # Set the clear parameters to Owner mode
                 $ClearParams.ArgumentList = "RegisteredOrganization"
 
+                # Write debug info
+                $ClearParams | Out-String | Write-Debug
+
                 # Execute the clear command against organization
                 Invoke-Command @ClearParams
+
+                Write-Verbose -Message "Cleared Organization Registration"
             }            
         }
     }
