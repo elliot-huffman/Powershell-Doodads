@@ -46,10 +46,14 @@
     System.Guid
 .OUTPUTS
     System.String
-.NOTES
-    This script requires the Az.Accounts module to be installed.
 .LINK
     https://github.com/elliot-labs/Powershell-Doodads/
+    Connect-AzAccount
+.NOTES
+    This script requires the Az.Accounts module to be installed.
+
+    Exit Codes:
+        1 - No Account context, this means that the user has exited the login process or somehow passed a unsupported object to the -Account parameter.
 #>
 
 #Requires -Modules Az.Accounts
