@@ -30,10 +30,14 @@
     System.Guid
 .OUTPUTS
     System.String
-.NOTES
-    This script requires the AzureRM.profile module to be installed.
 .LINK
     https://github.com/elliot-labs/Powershell-Doodads/
+    Connect-AzureRMAccount
+.NOTES
+    This script requires the AzureRM.profile module to be installed.
+
+    Exit Codes:
+        1 - No Account context, this means that the user has exited the login process or somehow passed a unsupported object to the -Account parameter.
 #>
 
 #Requires -Modules AzureRM.profile
@@ -72,60 +76,53 @@ param(
     [System.Guid]$SubscriptionID = (Get-AzureRmSubscription)[0].Id
 )
 
-# Verbose status output
-Write-Verbose -Message "Checking account context"
-
-# Check if the $Account context is populated
-if ($null -eq $Account) {
+# Execute the token retrieval process for each object
+Process {
     # Verbose status output
-    Write-Verbose -Message "Logging into the Azure account and storing the context"
+    Write-Verbose -Message "Checking account context"
 
-    # Catch authentication errors and if there are any, exit the script
-    try {
-        # If the account parameter is not populated with data, log in and store the login context
-        $Account = Connect-AzureRmAccount
-    }
-    catch {
-        Write-Error "Log in failed, exiting script"
+    # Check if the $Account context is populated
+    if ($Account -IsNot [Microsoft.Azure.Commands.Profile.Models.PSAzureProfile]) {
+        Write-Error "User is not logged in, please log in!"
         exit 1
-    }    
-}
+    }
 
-# Verbose status output
-Write-Verbose -Message "Checking tenant ID"
-
-# If the Tenant ID has not been specified, calculate it
-if ($null -eq $TenantID) {
     # Verbose status output
-    Write-Verbose -Message "Extracting Tenant ID from current subscription context"
+    Write-Verbose -Message "Checking tenant ID"
 
-    # Retrieve the Tenant ID by using the subscription's id to identify the subscription context
-    $TenantID = (Get-AzureRmSubscription -SubscriptionId $SubscriptionID).TenantId
+    # If the Tenant ID has not been specified, calculate it
+    if ($null -eq $TenantID) {
+        # Verbose status output
+        Write-Verbose -Message "Extracting Tenant ID from current subscription context"
+
+        # Retrieve the Tenant ID by using the subscription's id to identify the subscription context
+        $TenantID = (Get-AzureRMSubscription -SubscriptionId $SubscriptionID).TenantId
+    }
+
+    # Verbose status output
+    Write-Verbose -Message "Tenant ID is ready"
+
+    # Verbose status output
+    Write-Verbose -Message "Extracting tokens from context"
+
+    # Use the current account context to retrieve all the tokens currently available
+    [Microsoft.IdentityModel.Clients.ActiveDirectory.TokenCacheItem[]]$Tokens = $Account.Context.TokenCache.ReadItems()
+
+    # Verbose status output
+    Write-Verbose -Message "Filtering and sorting tokens"
+
+    # Filter the listed tokens to only the ones that apply to the current tenant and list them in descending order based upon expiration date
+    $FilteredTokens = $Tokens | Where-Object -FilterScript { $_.TenantId -eq $TenantID } | Sort-Object -Property ExpiresOn -Descending
+
+    # Verbose status output
+    Write-Verbose -Message "Extracting access token"
+
+    # Extract the access token
+    $AccessToken = $FilteredTokens[0].AccessToken
+
+    # Verbose status output
+    Write-Verbose -Message "Returning access token"
+
+    # Return the access token
+    Return $AccessToken
 }
-
-# Verbose status output
-Write-Verbose -Message "Tenant ID is ready"
-
-# Verbose status output
-Write-Verbose -Message "Extracting tokens from context"
-
-# Use the current account context to retrieve all the tokens currently available
-$Tokens = $Account.Context.TokenCache.ReadItems()
-
-# Verbose status output
-Write-Verbose -Message "Filtering and sorting tokens"
-
-# Filter the listed tokens to only the ones that apply to the current tenant and list them in descending order based upon expiration date
-$FilteredTokens = $Tokens | Where-Object -FilterScript {$_.TenantId -eq $TenantID} | Sort-Object -Property ExpiresOn -Descending
-
-# Verbose status output
-Write-Verbose -Message "Extracting access token"
-
-# Extract the access token
-$AccessToken = $FilteredTokens[0].AccessToken
-
-# Verbose status output
-Write-Verbose -Message "Returning access token"
-
-# Return the access token
-Return $AccessToken
