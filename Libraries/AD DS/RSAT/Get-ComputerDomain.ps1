@@ -21,24 +21,24 @@
 
 # Set up the parameter input.
 Param(
-    [string]$ComputerName = $env:computerName
+    [System.String]$ComputerName = $env:ComputerName,
+    [System.String[]]$SearchDomain = (Get-ADForest).Domains
 )
 
-# Get a list of all domains.
-$Domains = (Get-ADForest).Domains
-
 # Iterate through each domain.
-foreach ($Domain in $Domains) {
+foreach ($Domain in $SearchDomain) {
     # Use a try catch block to silence errors.
     try {
-        $ComputerData = Get-ADComputer -Identity $ComputerName -Server $Domain | Select-Object DistinguishedName
         # Record the results of the computer lookup for the current domain.
+        $ComputerDN = (Get-ADComputer -Identity $ComputerName -Server $Domain).DistinguishedName 
     } catch { } # Do nothing
 }
 
 # Split each section of the distinguished name into separate entities.
-$ComputerDomain = $ComputerData -split "," | Where-Object { $_ -like "DC=*" }
+$DCList = $ComputerDN -split "," | Where-Object -FilterScript { $_ -like "DC=*" }
+
 # Join them back together and remove the trailing close currly bracket.
-$ComputerDomain = ($ComputerDomain -join "." -replace ("DC=", "")).TrimEnd("}")
+$ComputerDomain = ($DCList -join ".") -replace @("dc=", "")
+
 # Make the output available to other scripts.
-Write-Output $ComputerDomain
+Return $ComputerDomain
