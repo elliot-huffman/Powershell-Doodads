@@ -93,6 +93,9 @@ process {
         exit 1
     }
 
+    # Write Verbose info
+    Write-Verbose -Message "Converting found DNs to FQDNs and returning"
+
     # Loop through each set of Distinguished names
     foreach ($DN in $ComputerDN) {
         # Split each section of the distinguished name into separate entities
