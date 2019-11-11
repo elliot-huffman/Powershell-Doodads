@@ -192,7 +192,6 @@ if ($PSCmdlet.ShouldProcess("Disk", "Write CSV")) {
     # Write Debug info
     Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Writing CSV to disk"
 
-
     # Save in memory work to disk
     $DestinationCSV | Export-Csv -Path $Destination
 
