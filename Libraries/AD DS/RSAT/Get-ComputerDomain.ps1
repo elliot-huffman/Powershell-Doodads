@@ -77,12 +77,16 @@ process {
         exit 1
     }
 
-    # Split each section of the distinguished name into separate entities
-    $DCList = $ComputerDN -split "," | Where-Object -FilterScript { $_ -like "DC=*" }
+    # Loop through each set of Distinguished names
+    foreach ($DN in $ComputerDN) {
+        # Split each section of the distinguished name into separate entities
+        $SplitDN = $DN -Split "," | Where-Object -FilterScript { $_ -like "DC=*" }
 
-    # Join them back together and remove the trailing close currly bracket
-    $ComputerDomain = ($DCList -join ".") -replace @("DC=", "")
 
-    # Make the output available to other scripts
-    $PSCmdlet.WriteObject($ComputerDomain)
+        # Join them back together and remove the trailing close currly bracket
+        $FQDN = ($SplitDN -join ".") -Replace @("DC=", "")
+
+        # Make the output available to other scripts
+        $PSCmdlet.WriteObject($FQDN)
+    }
 }
