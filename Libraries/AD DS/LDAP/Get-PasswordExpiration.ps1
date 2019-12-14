@@ -176,6 +176,7 @@ Function Get-PwdExpirationTime {
 
     # Specify the property that needs retrieved from AD
     $DirectorySearcher.PropertiesToLoad.Add('msDS-UserPasswordExpiryTimeComputed') | Out-Null
+    $DirectorySearcher.PropertiesToLoad.Add("UserAccountControl") | Out-Null
     
     # Build a search string and store it into a variable
     $SearchString = "(&(objectClass=user)(objectCategory=person)(SAMAccountName=$User))"
@@ -193,7 +194,7 @@ Function Get-PwdExpirationTime {
     $SearchTime = $SingleUser.Properties['msDS-UserPasswordExpiryTimeComputed']
 
     # If the password does not expire, return a zero date. Otherwise, return the expiration time.
-    if ($SearchTime -eq 9223372036854775807) {
+    if ($UserInstance.Properties."UserAccountControl" -eq 65536) {
         # return a 0 date (Monday, January 1, 0001 12:00:00 AM)
         Return 0 | Get-Date
     } else {
