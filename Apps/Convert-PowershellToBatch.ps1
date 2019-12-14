@@ -51,28 +51,56 @@
 # Each parameter is detailed in the above help documentation.
 param(
     # Parameters for GUI.
-    [Parameter(ParameterSetName='GUI', Mandatory=$false)] [switch]$LegacyVisuals = $False,
+    [Parameter(
+        ParameterSetName='GUI'
+    )]
+    [switch]$LegacyVisuals = $False,
 
     # Parameters for CLI.
-    [Parameter(ParameterSetName='CLI', Position = 0, Mandatory=$true)] [switch]$CLIMode = $False,
-    [Parameter(ParameterSetName='CLI', Position = 1, Mandatory=$true)] [string]$InputFile,
-    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [string]$OutputFile,
-    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [switch]$AdminMode = $False,
-    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [switch]$SelfDelete = $False,
-    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [switch]$HideTerminal = $False,
-    [Parameter(ParameterSetName='CLI', Mandatory=$false)] [string]$CLIArgument = ""
+    [Parameter(
+        ParameterSetName='CLI',
+        Position = 0,
+        Mandatory=$true
+    )]
+    [switch]$CLIMode,
+    [Parameter(
+        ParameterSetName='CLI',
+        Position = 1,
+        Mandatory=$true
+    )]
+    [string]$InputFile,
+    [Parameter(
+        ParameterSetName='CLI'
+    )]
+    [string]$OutputFile,
+    [Parameter(
+        ParameterSetName='CLI'
+    )]
+    [switch]$AdminMode,
+    [Parameter(
+        ParameterSetName='CLI'
+    )]
+    [switch]$SelfDelete,
+    [Parameter(
+        ParameterSetName='CLI'
+    )]
+    [switch]$HideTerminal,
+    [Parameter(
+        ParameterSetName='CLI'
+    )]
+    [string]$CLIArgument = ""
 )
 
 # Import required libraries
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName "System.Windows.Forms"
+Add-Type -AssemblyName "System.Drawing"
 
 # Enable pretty interface controls (by default)
 # Windows 98 styles are ugly compared to today's standards
 if (!$LegacyVisuals) {[System.Windows.Forms.Application]::EnableVisualStyles()}
 
 # Command Line interface mode logic starts here.
-Function Convert-File () {
+Function Convert-File {
     # Process the input path and update it to be the output path with modifications.
     if ($Script:OutputFile -eq "") {$Script:OutputFile = $Script:InputFile + ".bat"}
 
@@ -116,7 +144,7 @@ if %errorLevel% == 0 (
 '
 
     # Create the top of the outputted script.
-    $BatchHeader | Out-File -FilePath $Script:OutputFile -Encoding ASCII
+    $BatchHeader | Out-File -FilePath $Script:OutputFile -Encoding "ASCII"
     
     # Open the script to be converted and run a sequence of commands upon each line in order from top to bottom.
     Get-Content -Path $Script:InputFile | ForEach-Object {
@@ -148,7 +176,7 @@ if %errorLevel% == 0 (
     $BatchFooter | Out-File -FilePath $Script:OutputFile -Append -Encoding ASCII
 
     # Add the self deleting module to the batch script.
-    if ($Script:SelfDelete) {Out-File -FilePath $Script:OutputFile -InputObject "(goto) 2>nul & del `"%~f0`"" -Append -Encoding ASCII}
+    if ($Script:SelfDelete) {Out-File -FilePath $Script:OutputFile -InputObject "(goto) 2>nul & del `"%~f0`"" -Encoding "ASCII" -Append}
 
     # Only show the completed dialog if the script is not in CLI mode.
     if (!$Script:CLIMode) {[System.Windows.Forms.MessageBox]::Show("Recompile completed!", "Finished!")}
@@ -156,7 +184,7 @@ if %errorLevel% == 0 (
 
 # Create a open file dialog that only accepts powershell scripts and set the script level variable to the results.
 Function Show-ChangeInput {
-    $InputFileGUI = New-Object System.Windows.Forms.OpenFileDialog
+    $InputFileGUI = New-Object -TypeName "System.Windows.Forms.OpenFileDialog"
     $InputFileGUI.Filter = "PowerShell Script (*.ps1)|*.ps1"
     $GUIResult = $InputFileGUI.ShowDialog()
     if ($GUIResult -eq "OK") {
@@ -167,7 +195,7 @@ Function Show-ChangeInput {
 }
 
 Function Show-ChangeOutput {
-    $OutputFileGUI = New-Object System.Windows.Forms.SaveFileDialog
+    $OutputFileGUI = New-Object -TypeName "System.Windows.Forms.SaveFileDialog"
     $OutputFileGUI.Filter = "Batch Script (*.bat)|*.bat"
     $GUIResult = $OutputFileGUI.ShowDialog()
     if ($GUIResult -eq "OK") {
@@ -180,91 +208,91 @@ Function Show-ChangeOutput {
 # Starts the main interface
 Function Show-MainUI {
     # Initialize font setting
-    $Label_Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Regular)
-    $Argument_Label_Font = New-Object System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Regular)
-    $Form_Font = New-Object System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Regular)
+    $Label_Font = New-Object -TypeName System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Regular)
+    $Argument_Label_Font = New-Object -TypeName System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Regular)
+    $Form_Font = New-Object -TypeName System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Regular)
 
     # Create main form (window)
-    $Form = New-Object System.Windows.Forms.Form 
+    $Form = New-Object -TypeName "System.Windows.Forms.Form" 
     $Form.Text = "PowerShell 2 Batch"
     $Form.MaximizeBox = $false
     $Form.MinimizeBox = $false
     $Form.FormBorderStyle = "FixedSingle"
     $Form.Icon = [System.Drawing.SystemIcons]::Information
-    $Form.Size = New-Object System.Drawing.Size(300, 380)
+    $Form.Size = New-Object -TypeName "System.Drawing.Size(300, 380)"
     $Form.StartPosition = "CenterScreen"
     $Form.Font = $Form_Font
     $Form.Topmost = $True
 
     # Input file current settings.
-    $InputFile_Label = New-Object System.Windows.Forms.Label
-    $InputFile_Label.Location = New-Object System.Drawing.Point(100, 0)
-    $InputFile_Label.Size = New-Object System.Drawing.Size(184, 100)
+    $InputFile_Label = New-Object -TypeName "System.Windows.Forms.Label"
+    $InputFile_Label.Location = New-Object -TypeName "System.Drawing.Point(100, 0)"
+    $InputFile_Label.Size = New-Object -TypeName "System.Drawing.Size(184, 100)"
     $InputFile_Label.BorderStyle = "FixedSingle"
     $InputFile_Label.TextAlign = "MiddleCenter"
     $InputFile_Label.Font = $Label_Font
     $InputFile_Label.Text = "Input File"
 
     # Output file current settings.
-    $OutputFile_Label = New-Object System.Windows.Forms.Label
-    $OutputFile_Label.Location = New-Object System.Drawing.Point(100, 101)
-    $OutputFile_Label.Size = New-Object System.Drawing.Size(184, 100)
+    $OutputFile_Label = New-Object -TypeName "System.Windows.Forms.Label"
+    $OutputFile_Label.Location = New-Object -TypeName "System.Drawing.Point(100, 101)"
+    $OutputFile_Label.Size = New-Object -TypeName "System.Drawing.Size(184, 100)"
     $OutputFile_Label.BorderStyle = "FixedSingle"
     $OutputFile_Label.TextAlign = "MiddleCenter"
     $OutputFile_Label.Font = $Label_Font
     $OutputFile_Label.Text = "Output File"
 
     # Argument label.
-    $Argument_Label = New-Object System.Windows.Forms.Label
-    $Argument_Label.Location = New-Object System.Drawing.Point(0, 160)
-    $Argument_Label.Size = New-Object System.Drawing.Size(100, 40)
+    $Argument_Label = New-Object -TypeName "System.Windows.Forms.Label"
+    $Argument_Label.Location = New-Object -TypeName "System.Drawing.Point(0, 160)"
+    $Argument_Label.Size = New-Object -TypeName "System.Drawing.Size(100, 40)"
     $Argument_Label.BorderStyle = "None"
     $Argument_Label.TextAlign = "BottomCenter"
     $Argument_Label.Font = $Argument_Label_Font
     $Argument_Label.Text = "CLI Arg(s):"
 
     # Add Input File Button
-    $Input_Button = New-Object System.Windows.Forms.Button
-    $Input_Button.Location = New-Object System.Drawing.Point(0, 0)
-    $Input_Button.Size = New-Object System.Drawing.Size(100, 60)
+    $Input_Button = New-Object -TypeName "System.Windows.Forms.Button"
+    $Input_Button.Location = New-Object -TypeName "System.Drawing.Point(0, 0)"
+    $Input_Button.Size = New-Object -TypeName "System.Drawing.Size(100, 60)"
     $Input_Button.Text = "Input File"
 
     # Add Output File Button
-    $Output_Button = New-Object System.Windows.Forms.Button
-    $Output_Button.Location = New-Object System.Drawing.Point(0, 100)
-    $Output_Button.Size = New-Object System.Drawing.Size(100, 60)
+    $Output_Button = New-Object -TypeName "System.Windows.Forms.Button"
+    $Output_Button.Location = New-Object -TypeName "System.Drawing.Point(0, 100)"
+    $Output_Button.Size = New-Object -TypeName "System.Drawing.Size(100, 60)"
     $Output_Button.Text = "Output File"
 
     # Argument TextBox
-    $Argument_TextBox = New-Object System.Windows.Forms.TextBox
-    $Argument_TextBox.Location = New-Object System.Drawing.Point(0, 200)
-    $Argument_TextBox.Size = New-Object System.Drawing.Size(284, 10)
+    $Argument_TextBox = New-Object -TypeName "System.Windows.Forms.TextBox"
+    $Argument_TextBox.Location = New-Object -TypeName "System.Drawing.Point(0, 200)"
+    $Argument_TextBox.Size = New-Object -TypeName "System.Drawing.Size(284, 10)"
 
     # Yes Radio Button, checked by default
-    $Admin_CheckBox = New-Object System.Windows.Forms.CheckBox
-    $Admin_CheckBox.Location = New-Object System.Drawing.Point(5, 235)
-    $Admin_CheckBox.size = New-Object System.Drawing.Size(140, 20)
+    $Admin_CheckBox = New-Object -TypeName "System.Windows.Forms.CheckBox"
+    $Admin_CheckBox.Location = New-Object -TypeName "System.Drawing.Point(5, 235)"
+    $Admin_CheckBox.size = New-Object -TypeName "System.Drawing.Size(140, 20)"
     $Admin_CheckBox.Checked = $false 
     $Admin_CheckBox.Text = "Run as admin"
 
     # No Radio Button, not checked by default
-    $HideWindow_CheckBox = New-Object System.Windows.Forms.CheckBox
-    $HideWindow_CheckBox.Location = New-Object System.Drawing.Point(150, 235)
-    $HideWindow_CheckBox.size = New-Object System.Drawing.Size(160, 20)
+    $HideWindow_CheckBox = New-Object -TypeName "System.Windows.Forms.CheckBox"
+    $HideWindow_CheckBox.Location = New-Object -TypeName "System.Drawing.Point(150, 235)"
+    $HideWindow_CheckBox.size = New-Object -TypeName "System.Drawing.Size(160, 20)"
     $HideWindow_CheckBox.Checked = $false
     $HideWindow_CheckBox.Text = "Hide Console"
 
     # Yes Radio Button, checked by default
-    $SelfDelete_CheckBox = New-Object System.Windows.Forms.CheckBox
-    $SelfDelete_CheckBox.Location = New-Object System.Drawing.Point(5, 258)
-    $SelfDelete_CheckBox.size = New-Object System.Drawing.Size(140, 20)
+    $SelfDelete_CheckBox = New-Object -TypeName "System.Windows.Forms.CheckBox"
+    $SelfDelete_CheckBox.Location = New-Object -TypeName "System.Drawing.Point(5, 258)"
+    $SelfDelete_CheckBox.size = New-Object -TypeName "System.Drawing.Size(140, 20)"
     $SelfDelete_CheckBox.Checked = $false 
     $SelfDelete_CheckBox.Text = "Self Delete"
     
     # Add Convert Button
-    $Convert_Button = New-Object System.Windows.Forms.Button
-    $Convert_Button.Location = New-Object System.Drawing.Point(0, 281)
-    $Convert_Button.Size = New-Object System.Drawing.Size(284, 60)
+    $Convert_Button = New-Object -TypeName "System.Windows.Forms.Button"
+    $Convert_Button.Location = New-Object -TypeName "System.Drawing.Point(0, 281)"
+    $Convert_Button.Size = New-Object -TypeName "System.Drawing.Size(284, 60)"
     $Convert_Button.Text = "Convert PowerShell 2 Batch"
 
     # Add Button onClick event listener and logic
