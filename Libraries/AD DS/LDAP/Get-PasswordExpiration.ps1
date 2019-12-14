@@ -175,7 +175,7 @@ Function Get-PwdExpirationTime {
     $DirectorySearcher = [ADSISearcher]$DomainConnection
 
     # Specify the property that needs retrieved from AD
-    $DirectorySearcher.PropertiesToLoad.Add('msDS-UserPasswordExpiryTimeComputed') | Out-Null
+    $DirectorySearcher.PropertiesToLoad.Add("msDS-UserPasswordExpiryTimeComputed") | Out-Null
     $DirectorySearcher.PropertiesToLoad.Add("UserAccountControl") | Out-Null
     
     # Build a search string and store it into a variable
