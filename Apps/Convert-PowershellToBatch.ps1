@@ -47,6 +47,8 @@
     This tool is not needed for general use and should only be used when you know you need to change a PowerShell file into a self contained batch script.
 #>
 
+#Requires -PSEdition Desktop
+
 # Add command line switch/flag support.
 # Each parameter is detailed in the above help documentation.
 param(
