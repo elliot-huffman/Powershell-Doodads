@@ -184,26 +184,91 @@ if %errorLevel% == 0 (
     if (!$Script:CLIMode) {[System.Windows.Forms.MessageBox]::Show("Recompile completed!", "Finished!")}
 }
 
-# Create a open file dialog that only accepts powershell scripts and set the script level variable to the results.
+# Create input file dialog function
 Function Show-ChangeInput {
+    <#
+    .SYNOPSIS
+        Have user select file via GUI
+    .DESCRIPTION
+        Create an open file dialog that only accepts powershell scripts and set the script level variable to the results.
+    .EXAMPLE
+        Show-ChangeInput
+        The function will display a dialog box for the user to select a file.
+        The file types that will be visible will be restricted to powershell files.
+        If the user cancels the dialog, it will return false.
+        Example return:
+        "C:\PowerShell-Doodads\Apps\Food\Get-WalmartGiftCard.ps1"
+    .OUTPUTS
+        System.String
+        System.Boolean
+    .LINK
+        https://github.com/elliot-labs/PowerShell-Doodads
+    .NOTES
+        The function will return a string if successful, it will return false if unsuccessful. E.g. user cancels the dialog.
+        This function requires PS Desktop as it uses windows forms.
+    #>
+
+    #Requires -PSEdition Desktop
+
+    # Cmdlet bind the function for advanced functionality
+    [CmdletBinding()]
+
+    # Empty params as no input is necessary, this is so that cmdlet binding can take place
+    param()
+
+    # Write Verbose info
+    Write-Verbose -Message "Initializing Type (OpenFileDialog)"
+
+    # Initialize the OpenFileDialog type
     $InputFileGUI = New-Object -TypeName "System.Windows.Forms.OpenFileDialog"
+
+    # Write Verbose info
+    Write-Verbose -Message "Setting dialog settings (file type and title)"
+
+    # Set the file selector filter
     $InputFileGUI.Filter = "PowerShell Script (*.ps1)|*.ps1"
+
+    # Set the dialog's Window title
+    $InputFileGUI.Title = "Select a PowerShell File"
+
+    # Write Verbose info
+    Write-Verbose -Message "Rendering Open File Dialog"
+
+    # Render the dialog for the end user
     $GUIResult = $InputFileGUI.ShowDialog()
+
+    # Write debug info
+    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Dialog info:"
+    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$GUIResult: $GUIResult"
+    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$InputFileGUI.FileName: ${$InputFileGUI.FileName}"
+
+    # Check to see if the user has provided input
     if ($GUIResult -eq "OK") {
-        $Script:InputFile = $InputFileGUI.FileName
+        # Return the user's selected file
+        return $InputFileGUI.FileName
     } else {
-        $Script:InputFile = "Canceled"
+        # Return false for failure
+        return $false
     }
 }
 
 Function Show-ChangeOutput {
+    #Requires -PSEdition Desktop
+
+    # Initialize the SaveFileDialog class
     $OutputFileGUI = New-Object -TypeName "System.Windows.Forms.SaveFileDialog"
+
+    # Set the file type to be saved as a Batch Script
     $OutputFileGUI.Filter = "Batch Script (*.bat)|*.bat"
+
+    # Render the dialog for the end user.
     $GUIResult = $OutputFileGUI.ShowDialog()
+
+    # Check to see if the user has provided input
     if ($GUIResult -eq "OK") {
-        $Script:OutputFile = $OutputFileGUI.FileName
+        return $OutputFileGUI.FileName
     } else {
-        $Script:OutputFile = "Canceled"
+        return $false
     }
 }
 
