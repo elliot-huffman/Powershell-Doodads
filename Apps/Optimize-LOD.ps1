@@ -28,11 +28,14 @@ Start-Process -FilePath "CleanMgr.exe" -ArgumentList "/SageRun:0" -Wait
 # Set desktop wallpaper and window colorization
 Set-ItemProperty -Path "HKCU:\Control Panel\Colors" -Name "Background" -Value "0 0 0"
 Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "Wallpaper" -Value ""
+if (-not (Test-Path -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers" -PathType "Container")) {
+    New-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers"
+}
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers" -Name "BackgroundType" -Value 1
 Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "AutoColorization" -Value 1
 
 # Removes the PowerShell session history file
-Remove-Item -Path "$home\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt"
+Remove-Item -Path "$home\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" -ErrorAction "SilentlyContinue"
 
 # Removes the network history
 Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles\*" -Recurse
@@ -41,7 +44,7 @@ Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkLis
 Remove-Item -Path "$Env:WinDir\Prefetch\*" -Recurse -Force
 
 # Stop Edge Chrome if running
-Get-Process -Name "MSEdge" | Stop-Process
+Get-Process -Name "MSEdge" -ErrorAction "SilentlyContinue" | Stop-Process -ErrorAction "SilentlyContinue"
 
 # Remove Edge Chrome Data
 Set-Location -Path $EdgeChrome
