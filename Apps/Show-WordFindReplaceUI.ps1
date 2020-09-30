@@ -326,6 +326,84 @@ begin {
         Return (Get-ChildItem @GCIParams).FullName  
     }
 
+    function Update-WordDocFile {
+        # Get the list of word docs to run the find and replace against
+        $DocListParams = @{"Path" = $Path}
+
+        # Add the recurse parameter if the recurse parameter is specified
+        if ($Recurse) {$DocListParams.Recurse = $true}
+
+        # Param splat the required parameters in the file path list generator
+        $WordDocList = Get-DocPathList @DocListParams
+
+
+        foreach ($Doc in $WordDocList) {
+            # Check to see if MS Word was terminated while the script was running.
+            # If the ComObject is empty, the script will try to re-init the object. If the re-init fails, the script exits unsuccessfully.
+            if ($null -eq $MSWord.Application) {
+
+                # Write verbose info to the console
+                Write-Verbose -Message "MS Word is not currently initialized, re-initializing MS Word"
+
+                # Re-init the MS Word object
+                $MSWord = New-MSWord
+
+                # Check if the MS Word Object is still null.
+                if ($null -eq $MSWord.Application) {
+                    # Write debug info to the console
+                    Write-Debug -Message $MSWord
+
+                    # Write a message to stderr (non-terminating)
+                    Write-Error -Message "The MS Word application was closed while the script was running!"
+
+                    # Return $false for failed operation
+                    $PSCmdlet.WriteObject($false)
+
+                    # Exit script unsuccessfully with exit code
+                    exit 2
+                }
+            }
+
+            # Open the specified word document
+            $OpenWordDoc = $MSWord.Documents.Open($Doc, $true)
+            $OpenDocSelection = $MSWord.Selection
+
+            $MatchCase = $False
+            $MatchWholeWord = $true
+            $MatchWildcards = $False
+            $MatchSoundsLike = $False
+            $MatchAllWordForms = $False
+            $Forward = $True
+            $Wrap = 1
+            $Format = $False
+            $ReplaceAll = 2
+
+            $OpenDocSelection.Find.Execute(
+                $Find,
+                $MatchCase,
+                $MatchWholeWord,
+                $MatchWildcards,
+                $MatchSoundsLike,
+                $MatchAllWordForms,
+                $Forward,
+                $Wrap,
+                $Format,
+                $Replace,
+                $ReplaceAll
+            )
+
+            # Save the edits
+            $OpenWordDoc.Save()
+
+            # Record the file edits
+            $EditedFiles += $Doc
+
+            # Close the document
+            $OpenWordDoc.Close()
+        }
+
+    }
+
     # Capture the common parameter overrides to inherit the values to all cmdlets
     switch (0) {
         { -not $PSBoundParameters.ContainsKey('Debug') } { $DebugPreference = $PSCmdlet.SessionState.PSVariable.GetValue('DebugPreference') }
@@ -340,39 +418,13 @@ begin {
     Write-Debug -Message $WhatIfPreference
 
     # Initialize the file edited tracker
-    [System.Collections.Hashtable[]]$EditedFiles = $null
+    [System.String[]]$EditedFiles = $null
 
     # Instantiate MS Word
     $MSWord = New-MSWord
 }
 
-process {
-    # Check to see if MS Word was terminated while the script was running.
-    # If the ComObject is empty, the script will try to re-init the object. If the re-init fails, the script exits unsuccessfully.
-    if ($null -eq $MSWord.Application) {
-
-        # Write verbose info to the console
-        Write-Verbose -Message "MS Word is not currently initialized, re-initializing MS Word"
-
-        # Re-init the MS Word object
-        $MSWord = New-MSWord
-
-        # Check if the MS Word Object is still null.
-        if ($null -eq $MSWord.Application) {
-            # Write debug info to the console
-            Write-Debug -Message $MSWord
-
-            # Write a message to stderr (non-terminating)
-            Write-Error -Message "The MS Word application was closed while the script was running!"
-
-            # Return $false for failed operation
-            $PSCmdlet.WriteObject($false)
-
-            # Exit script unsuccessfully with exit code
-            exit 2
-        }
-    }
-}
+process {}
 
 end {
     # Stop the MS Word Process
