@@ -238,6 +238,13 @@ begin {
         $BrowseButton.height = 30
         $BrowseButton.location = New-Object System.Drawing.Point(17, 248)
         $BrowseButton.Font = New-Object System.Drawing.Font('Microsoft Sans Serif', 12)
+        $BrowseButton.Add_Click({
+            $DirectoryBrowseData = Show-DirectoryBrowserUI
+            if ($DirectoryBrowseData) {
+                $global:Path = $DirectoryBrowseData
+                $SelectedDirLabel.Text = $global:Path
+            }
+        })
 
         $RecurseCheckBox = New-Object "System.Windows.Forms.CheckBox"
         $RecurseCheckBox.text = "Recursive"
