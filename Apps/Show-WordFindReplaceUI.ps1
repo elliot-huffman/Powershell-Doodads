@@ -39,11 +39,11 @@ param(
         Position = 0,
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true
-        )
+    )
     ]
-    [ValidateScript({
-        Test-Path -Path $_ -PathType "Container"
-    })]
+    [ValidateScript( {
+            Test-Path -Path $_ -PathType "Container"
+        })]
     [ValidateNotNullOrEmpty()]
     [System.String]$Path,
 
@@ -51,7 +51,7 @@ param(
         Position = 1,
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true
-        )
+    )
     ]
     [ValidateNotNullOrEmpty()]
     [System.String]$Find,
@@ -60,7 +60,7 @@ param(
         Position = 2,
         ValueFromPipeline = $true,
         ValueFromPipelineByPropertyName = $true
-        )
+    )
     ]
     [ValidateNotNullOrEmpty()]
     [System.String]$Replace,
@@ -144,7 +144,8 @@ begin {
         # Automatically select the currently selected path
         if ($Path) {
             $OpenDialog.SelectedPath = $Path
-        } else {
+        }
+        else {
             $OpenDialog.SelectedPath = ""
         }
 
@@ -152,10 +153,12 @@ begin {
         # If the user selected a file return the file path. Otherwise return false if nothing is selected.
         if ($OpenDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
             Return $OpenDialog.SelectedPath
-        } else {
+        }
+        else {
             Return $false
         }
     }
+
     function Show-MainUI {
         <#
         .SYNOPSIS
@@ -175,83 +178,83 @@ begin {
         #Requires -Version 5.1
 
         # Create the blank form with require
-        $Form                            = New-Object "System.Windows.Forms.Form"
-        $Form.ClientSize                 = New-Object System.Drawing.Point(400,400)
-        $Form.text                       = "Word Bulk Find and Replace"
-        $Form.TopMost                    = $true
+        $Form = New-Object "System.Windows.Forms.Form"
+        $Form.ClientSize = New-Object System.Drawing.Point(400, 400)
+        $Form.text = "Word Bulk Find and Replace"
+        $Form.TopMost = $true
 
-        $FindLabel                       = New-Object "System.Windows.Forms.Label"
-        $FindLabel.text                  = "Find:"
-        $FindLabel.AutoSize              = $true
-        $FindLabel.width                 = 25
-        $FindLabel.height                = 10
-        $FindLabel.location              = New-Object System.Drawing.Point(17,18)
-        $FindLabel.Font                  = New-Object System.Drawing.Font('Segoe UI',12)
+        $FindLabel = New-Object "System.Windows.Forms.Label"
+        $FindLabel.text = "Find:"
+        $FindLabel.AutoSize = $true
+        $FindLabel.width = 25
+        $FindLabel.height = 10
+        $FindLabel.location = New-Object System.Drawing.Point(17, 18)
+        $FindLabel.Font = New-Object System.Drawing.Font('Segoe UI', 12)
 
-        $FindTextBox                     = New-Object "System.Windows.Forms.TextBox"
-        $FindTextBox.multiline           = $false
-        $FindTextBox.width               = 180
-        $FindTextBox.height              = 20
-        $FindTextBox.location            = New-Object System.Drawing.Point(17,45)
-        $FindTextBox.Font                = New-Object System.Drawing.Font('Segoe UI',12)
-        if ($Find) {$FindTextBox.Text = $Find}
+        $FindTextBox = New-Object "System.Windows.Forms.TextBox"
+        $FindTextBox.multiline = $false
+        $FindTextBox.width = 180
+        $FindTextBox.height = 20
+        $FindTextBox.location = New-Object System.Drawing.Point(17, 45)
+        $FindTextBox.Font = New-Object System.Drawing.Font('Segoe UI', 12)
+        if ($Find) { $FindTextBox.Text = $Find }
 
-        $ReplaceLabel                    = New-Object "System.Windows.Forms.Label"
-        $ReplaceLabel.text               = "Replace With:"
-        $ReplaceLabel.AutoSize           = $true
-        $ReplaceLabel.width              = 25
-        $ReplaceLabel.height             = 10
-        $ReplaceLabel.location           = New-Object System.Drawing.Point(17,94)
-        $ReplaceLabel.Font               = New-Object System.Drawing.Font('Microsoft Sans Serif',12)
+        $ReplaceLabel = New-Object "System.Windows.Forms.Label"
+        $ReplaceLabel.text = "Replace With:"
+        $ReplaceLabel.AutoSize = $true
+        $ReplaceLabel.width = 25
+        $ReplaceLabel.height = 10
+        $ReplaceLabel.location = New-Object System.Drawing.Point(17, 94)
+        $ReplaceLabel.Font = New-Object System.Drawing.Font('Microsoft Sans Serif', 12)
 
-        $ReplaceTextBox                  = New-Object "System.Windows.Forms.TextBox"
-        $ReplaceTextBox.multiline        = $false
-        $ReplaceTextBox.width            = 180
-        $ReplaceTextBox.height           = 20
-        $ReplaceTextBox.location         = New-Object System.Drawing.Point(17,118)
-        $ReplaceTextBox.Font             = New-Object System.Drawing.Font('Microsoft Sans Serif',12)
-        if ($Replace) {$ReplaceTextBox.Text = $Replace}
+        $ReplaceTextBox = New-Object "System.Windows.Forms.TextBox"
+        $ReplaceTextBox.multiline = $false
+        $ReplaceTextBox.width = 180
+        $ReplaceTextBox.height = 20
+        $ReplaceTextBox.location = New-Object System.Drawing.Point(17, 118)
+        $ReplaceTextBox.Font = New-Object System.Drawing.Font('Microsoft Sans Serif', 12)
+        if ($Replace) { $ReplaceTextBox.Text = $Replace }
 
-        $WorkingDirectoryLabel           = New-Object "System.Windows.Forms.Label"
-        $WorkingDirectoryLabel.text      = "Working Directory:"
-        $WorkingDirectoryLabel.AutoSize  = $true
-        $WorkingDirectoryLabel.width     = 25
-        $WorkingDirectoryLabel.height    = 10
-        $WorkingDirectoryLabel.location  = New-Object System.Drawing.Point(17,167)
-        $WorkingDirectoryLabel.Font      = New-Object System.Drawing.Font('Segoe UI',12)
+        $WorkingDirectoryLabel = New-Object "System.Windows.Forms.Label"
+        $WorkingDirectoryLabel.text = "Working Directory:"
+        $WorkingDirectoryLabel.AutoSize = $true
+        $WorkingDirectoryLabel.width = 25
+        $WorkingDirectoryLabel.height = 10
+        $WorkingDirectoryLabel.location = New-Object System.Drawing.Point(17, 167)
+        $WorkingDirectoryLabel.Font = New-Object System.Drawing.Font('Segoe UI', 12)
 
-        $SelectedDirLabel                = New-Object "System.Windows.Forms.Label"
-        $SelectedDirLabel.text           = "No working directory selected..."
-        $SelectedDirLabel.AutoSize       = $true
-        $SelectedDirLabel.width          = 25
-        $SelectedDirLabel.height         = 10
-        $SelectedDirLabel.location       = New-Object System.Drawing.Point(17,191)
-        $SelectedDirLabel.Font           = New-Object System.Drawing.Font('Segoe UI',12)
-        if ($Path) {$SelectedDirLabel.Text = $Path}
+        $SelectedDirLabel = New-Object "System.Windows.Forms.Label"
+        $SelectedDirLabel.text = "No working directory selected..."
+        $SelectedDirLabel.AutoSize = $true
+        $SelectedDirLabel.width = 25
+        $SelectedDirLabel.height = 10
+        $SelectedDirLabel.location = New-Object System.Drawing.Point(17, 191)
+        $SelectedDirLabel.Font = New-Object System.Drawing.Font('Segoe UI', 12)
+        if ($Path) { $SelectedDirLabel.Text = $Path }
 
-        $BrowseButton                    = New-Object "System.Windows.Forms.Button"
-        $BrowseButton.text               = "Browse for Directory"
-        $BrowseButton.width              = 178
-        $BrowseButton.height             = 30
-        $BrowseButton.location           = New-Object System.Drawing.Point(17,248)
-        $BrowseButton.Font               = New-Object System.Drawing.Font('Microsoft Sans Serif',12)
+        $BrowseButton = New-Object "System.Windows.Forms.Button"
+        $BrowseButton.text = "Browse for Directory"
+        $BrowseButton.width = 178
+        $BrowseButton.height = 30
+        $BrowseButton.location = New-Object System.Drawing.Point(17, 248)
+        $BrowseButton.Font = New-Object System.Drawing.Font('Microsoft Sans Serif', 12)
 
-        $RecurseCheckBox                 = New-Object system.Windows.Forms.CheckBox
-        $RecurseCheckBox.text            = "Recursive"
-        $RecurseCheckBox.AutoSize        = $false
-        $RecurseCheckBox.width           = 95
-        $RecurseCheckBox.height          = 20
-        $RecurseCheckBox.location        = New-Object System.Drawing.Point(18,299)
-        $RecurseCheckBox.Font            = New-Object System.Drawing.Font('Segoe UI',12)
-        if ($Recurse) {$RecurseCheckBox.Checked = $Recurse}
+        $RecurseCheckBox = New-Object "System.Windows.Forms.CheckBox"
+        $RecurseCheckBox.text = "Recursive"
+        $RecurseCheckBox.AutoSize = $false
+        $RecurseCheckBox.width = 95
+        $RecurseCheckBox.height = 20
+        $RecurseCheckBox.location = New-Object System.Drawing.Point(18, 299)
+        $RecurseCheckBox.Font = New-Object System.Drawing.Font('Segoe UI', 12)
+        if ($Recurse) { $RecurseCheckBox.Checked = $Recurse }
 
-        $FindAndReplaceButton            = New-Object "System.Windows.Forms.Button"
-        $FindAndReplaceButton.text       = "Find And Replace"
-        $FindAndReplaceButton.width      = 148
-        $FindAndReplaceButton.height     = 30
-        $FindAndReplaceButton.enabled    = $true
-        $FindAndReplaceButton.location   = New-Object System.Drawing.Point(125,343)
-        $FindAndReplaceButton.Font       = New-Object System.Drawing.Font('Microsoft Sans Serif',12)
+        $FindAndReplaceButton = New-Object "System.Windows.Forms.Button"
+        $FindAndReplaceButton.text = "Find And Replace"
+        $FindAndReplaceButton.width = 148
+        $FindAndReplaceButton.height = 30
+        $FindAndReplaceButton.enabled = $true
+        $FindAndReplaceButton.location = New-Object System.Drawing.Point(125, 343)
+        $FindAndReplaceButton.Font = New-Object System.Drawing.Font('Microsoft Sans Serif', 12)
 
         # Place the objects onto an array to be able to access them later.
         $UIItems = @(
