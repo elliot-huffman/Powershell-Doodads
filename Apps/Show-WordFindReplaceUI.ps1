@@ -286,6 +286,46 @@ begin {
         # Return $UIItems
     }
 
+    function Get-DocPathList {
+        <#
+        .SYNOPSIS
+            Retrieves a list of document paths
+        .DESCRIPTION
+            Long description
+        .EXAMPLE
+            PS C:\> Get-DocPathList
+            Explanation of what the example does
+        .INPUTS
+            System.String
+        .OUTPUTS
+            System.String[]
+        #>
+        param(
+            [Parameter(
+                Position = 0,
+                ValueFromPipeline = $true,
+                ValueFromPipelineByPropertyName = $true
+            )]
+            [ValidateScript({
+                Test-Path -Path $_ -PathType "Container"
+            })]
+            [ValidateNotNullOrEmpty()]
+            [System.String]$Path,
+            [Switch]$Recurse
+        )
+        # Build the params for the GCI cmdlet in a way to be able to dynamically call parameters as necessary
+        $GCIParams = @{
+            "Path"    = "$Path\*";
+            "Include" = "*.docx", "*.doc"
+        }
+
+        # Enable the recurse parameter if specified by the user
+        if ($Recurse) { $GCIParams.Recurse = $true }
+
+        # List all of the MS Word doc files and return the list of file paths
+        Return (Get-ChildItem @GCIParams).FullName  
+    }
+
     # Capture the common parameter overrides to inherit the values to all cmdlets
     switch (0) {
         { -not $PSBoundParameters.ContainsKey('Debug') } { $DebugPreference = $PSCmdlet.SessionState.PSVariable.GetValue('DebugPreference') }
