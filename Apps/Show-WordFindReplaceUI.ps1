@@ -262,6 +262,32 @@ begin {
         $FindAndReplaceButton.enabled = $true
         $FindAndReplaceButton.location = New-Object System.Drawing.Point(125, 343)
         $FindAndReplaceButton.Font = New-Object System.Drawing.Font('Microsoft Sans Serif', 12)
+        $FindAndReplaceButton.Add_Click({
+            # Validate required find data is present
+            if ((-not ($FindTextBox.Text)) -and (-not ($Find))) {
+                [System.Windows.Forms.MessageBox]::Show("You cannot run a find and replace without the find data!", "Operation Status")
+                Return $false
+            }
+            if ((-not ($ReplaceTextBox.Text)) -and (-not ($Replace))) {
+                [System.Windows.Forms.MessageBox]::Show("You cannot run a find and replace without the replace data!", "Operation Status")
+                Return $false
+            }
+            if (-not ($Path)) {
+                [System.Windows.Forms.MessageBox]::Show("You cannot run a bulk find and replace without a directory to operate against!", "Operation Status")
+                Return $false
+            }
+
+            # Update global variables at runtime
+            $global:Find = $FindTextBox.Text
+            $global:Replace = $ReplaceTextBox.Text
+            $global:Recurse = $RecurseCheckBox.Checked
+
+            # Execute the find and replace function
+            Update-WordDocFile
+
+            # Display a message to the user that find and replace has finished
+            [System.Windows.Forms.MessageBox]::Show("Find and replace completed", "Operation Status")
+        })
 
         # Place the objects onto an array to be able to access them later.
         $UIItems = @(
