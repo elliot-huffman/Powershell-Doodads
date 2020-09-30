@@ -168,17 +168,11 @@ Begin {
     }
 
     # Capture the common parameter overrides to inherit the values to all cmdlets
-    if (-not $PSBoundParameters.ContainsKey('Debug')) {
-        $DebugPreference = $PSCmdlet.SessionState.PSVariable.GetValue('DebugPreference')
-    }
-    if (-not $PSBoundParameters.ContainsKey('Verbose')) {
-        $VerbosePreference = $PSCmdlet.SessionState.PSVariable.GetValue('VerbosePreference')
-    }
-    if (-not $PSBoundParameters.ContainsKey('Confirm')) {
-        $ConfirmPreference = $PSCmdlet.SessionState.PSVariable.GetValue('ConfirmPreference')
-    }
-    if (-not $PSBoundParameters.ContainsKey('WhatIf')) {
-        $WhatIfPreference = $PSCmdlet.SessionState.PSVariable.GetValue('WhatIfPreference')
+    switch (0) {
+        { -not $PSBoundParameters.ContainsKey('Debug') } { $DebugPreference = $PSCmdlet.SessionState.PSVariable.GetValue('DebugPreference') }
+        { -not $PSBoundParameters.ContainsKey('Verbose') } { $VerbosePreference = $PSCmdlet.SessionState.PSVariable.GetValue('VerbosePreference') }
+        { -not $PSBoundParameters.ContainsKey('Confirm') } { $ConfirmPreference = $PSCmdlet.SessionState.PSVariable.GetValue('ConfirmPreference') }
+        { -not $PSBoundParameters.ContainsKey('WhatIf') } { $WhatIfPreference = $PSCmdlet.SessionState.PSVariable.GetValue('WhatIfPreference') }
     }
 
     # Write debug info to the console
