@@ -120,10 +120,41 @@ begin {
     }
 
     function Show-DirectoryBrowserUI {
-        param (
-            OptionalParameters
-        )
-        
+        <#
+        .SYNOPSIS
+            Displays the directory tree selector for the end user to select a folder.
+        .DESCRIPTION
+            Launches the directory tree selector and returns the path of the selected folder as a string.
+            If the user cancels, returns boolean $False.
+        .EXAMPLE
+            PS C:\> Show-DirectoryBrowserUI
+            Launches the directory tree selector and returns the path of the selected folder as a string.
+            If the user cancels, returns boolean $False.
+        .INPUTS
+            None
+        .OUTPUTS
+            System.String
+            System.Boolean
+        .NOTES
+            Will return false if the user cancels.
+        #>
+
+        # Create an directory file dialog box and set the accepted file types.
+        $OpenDialog = New-Object "System.Windows.Forms.FolderBrowserDialog"
+        # Automatically select the currently selected path
+        if ($Path) {
+            $OpenDialog.SelectedPath = $Path
+        } else {
+            $OpenDialog.SelectedPath = ""
+        }
+
+        # Show the dialog box and capture the results.
+        # If the user selected a file return the file path. Otherwise return false if nothing is selected.
+        if ($OpenDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+            Return $OpenDialog.SelectedPath
+        } else {
+            Return $false
+        }
     }
     function Show-MainUI {
         <#
