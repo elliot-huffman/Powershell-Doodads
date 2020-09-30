@@ -192,7 +192,7 @@ begin {
         $FindLabel.Font = New-Object System.Drawing.Font('Segoe UI', 12)
 
         $FindTextBox = New-Object "System.Windows.Forms.TextBox"
-        $FindTextBox.multiline = $false
+        $FindTextBox.MultiLine = $false
         $FindTextBox.width = 180
         $FindTextBox.height = 20
         $FindTextBox.location = New-Object System.Drawing.Point(17, 45)
@@ -208,7 +208,7 @@ begin {
         $ReplaceLabel.Font = New-Object System.Drawing.Font('Microsoft Sans Serif', 12)
 
         $ReplaceTextBox = New-Object "System.Windows.Forms.TextBox"
-        $ReplaceTextBox.multiline = $false
+        $ReplaceTextBox.MultiLine = $false
         $ReplaceTextBox.width = 180
         $ReplaceTextBox.height = 20
         $ReplaceTextBox.location = New-Object System.Drawing.Point(17, 118)
