@@ -441,8 +441,21 @@ begin {
 
     function Update-WordDocFile {
         <#
+        .SYNOPSIS
+            Short description
+        .DESCRIPTION
+            Long description
+        .EXAMPLE
+            PS C:\> <example usage>
+            Explanation of what the example does
+        .INPUTS
+            Inputs (if any)
+        .OUTPUTS
+            Output (if any)
         .LINK
             https://github.com/elliot-labs/Powershell-Doodads
+        .NOTES
+            Logic is inspired by https://codereview.stackexchange.com/questions/174455/powershell-script-to-find-and-replace-in-word-document-including-header-footer
         #>
         # Get the list of word docs to run the find and replace against
         $DocListParams = @{"Path" = $Path}
