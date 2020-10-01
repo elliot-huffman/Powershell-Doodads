@@ -468,6 +468,12 @@ begin {
 process {}
 
 end {
+    # Check if the script is dot sourced, if it is then do not execute the stuff inside.
+    if (($MyInvocation.Line -NotMatch "^\.\s") -and (-not $CLIMode)) {
+        # Show the main UI for user interaction
+        Show-MainUI
+    }
+
     # Stop the MS Word Process
     $MSWord.Quit()
 
@@ -475,9 +481,4 @@ end {
     [System.Runtime.InteropServices.Marshal]::ReleaseComObject($MSWord) | Out-Null
     $MSWord = $Null
 
-    # Check if the script is dot sourced, if it is then do not execute the stuff inside.
-    if (($MyInvocation.Line -NotMatch "^\.\s") -and (-not $CLIMode)) {
-        # Show the main UI for user interaction
-        Show-MainUI
-    }
 }
