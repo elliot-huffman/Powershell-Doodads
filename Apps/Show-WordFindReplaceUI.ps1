@@ -11,6 +11,10 @@
 .PARAMETER Path
     The path parameter is the directory that contains the word docs or other folders that needs to be recurse into for the find and replace operation.
     If you want recurse behavior, please specify the recurse parameter.
+.PARAMETER Find
+    This text is the literal text that needs to be searched for in the target documents that will be replaced.
+.PARAMETER Replace
+    This is the text that will replace the text specified in the find parameter.
 .PARAMETER Recurse
     When specified, the find and replace operation will search in sub folders of the specified path.
     When this parameter is omitted, the find and replace operation will only operate on the specified path and will not go into child directories.
