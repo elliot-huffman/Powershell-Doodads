@@ -21,6 +21,8 @@
     System.String
 .OUTPUTS
     Output (if any)
+.LINK
+        https://github.com/elliot-labs/Powershell-Doodads
 .NOTES
     Requires .net framework desktop as it uses windows forms to render a UI.
     Exit Codes:
@@ -87,6 +89,8 @@ begin {
             Return an Word COM object.
         .OUTPUTS
             Microsoft.Office.Interop.Word.ApplicationClass
+        .LINK
+            https://github.com/elliot-labs/Powershell-Doodads
         .NOTES
             Requires Word to be installed on the computer.
 
@@ -135,6 +139,8 @@ begin {
         .OUTPUTS
             System.String
             System.Boolean
+        .LINK
+            https://github.com/elliot-labs/Powershell-Doodads
         .NOTES
             Will return false if the user cancels.
         #>
@@ -171,6 +177,8 @@ begin {
             Renders the main user interface for end users to interact with.
         .OUTPUTS
             System.Object[]
+        .LINK
+            https://github.com/elliot-labs/Powershell-Doodads
         .NOTES
             Requires the .Net framework (not core) as it needs to render Windows.Forms applications
         #>
@@ -325,6 +333,8 @@ begin {
             System.String
         .OUTPUTS
             System.String[]
+        .LINK
+            https://github.com/elliot-labs/Powershell-Doodads
         #>
         param(
             [Parameter(
@@ -353,6 +363,10 @@ begin {
     }
 
     function Update-WordDocFile {
+        <#
+        .LINK
+            https://github.com/elliot-labs/Powershell-Doodads
+        #>
         # Get the list of word docs to run the find and replace against
         $DocListParams = @{"Path" = $Path}
 
