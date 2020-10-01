@@ -471,6 +471,9 @@ begin {
 
 
         foreach ($Doc in $WordDocList) {
+            # Reset the tracker that notes which file was edited
+            $RoundReplace = $false
+
             # Check to see if MS Word was terminated while the script was running.
             # If the ComObject is empty, the script will try to re-init the object. If the re-init fails, the script exits unsuccessfully.
             if ($null -eq $MSWord.Application) {
@@ -545,12 +548,11 @@ begin {
             }
 
             # Record the file edits
-            $EditedFiles += $Doc
+            if ($RoundReplace) {$global:EditedFiles += $Doc}
 
             # Close the document
             $OpenWordDoc.Close()
         }
-
     }
 
     # Capture the common parameter overrides to inherit the values to all cmdlets
@@ -595,4 +597,6 @@ end {
     [System.Runtime.InteropServices.Marshal]::ReleaseComObject($MSWord) | Out-Null
     $MSWord = $Null
 
+    # Return a list of files that were edited
+    Return $EditedFiles
 }
