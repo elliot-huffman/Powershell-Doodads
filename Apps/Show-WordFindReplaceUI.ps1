@@ -122,6 +122,57 @@ begin {
             Return $WordObject
         }
     }
+    function Invoke-FindReplaceExecute {
+        <#
+        .SYNOPSIS
+            DO NOT USE THIS FUNCTION EXTERNALLY!
+        .DESCRIPTION
+            This executes a find and replace operation.
+            This should not be used outside of this script as it is not built for best practices.
+        .EXAMPLE
+            PS C:\> Invoke-FindReplaceExecute -DocSelectionObject $Finder
+            Executes the find and replace method on the specified MS Word document section.
+        .INPUTS
+            System.Object
+            System.Int32
+        .OUTPUTS
+            System.Boolean
+        .LINK
+            https://github.com/elliot-labs/Powershell-Doodads
+        .NOTES
+            Return of $true is an operation that replaced text.
+            Return of $false is an operation that did not replace text.
+        #>
+
+        # Set the find and replace settings
+        param (
+            $DocSelectionObject,
+            $MatchCase = $false,
+            $MatchWholeWord = $true,
+            $MatchWildcards = $false,
+            $MatchSoundsLike = $false,
+            $MatchAllWordForms = $false,
+            $Forward = $true,
+            $Wrap = 1,
+            $Format = $false,
+            $ReplaceAll = 2
+        )
+
+        # Find and replace against the specified document section
+        Return $DocSelectionObject.Execute(
+            $Find,
+            $MatchCase,
+            $MatchWholeWord,
+            $MatchWildcards,
+            $MatchSoundsLike,
+            $MatchAllWordForms,
+            $Forward,
+            $Wrap,
+            $Format,
+            $Replace,
+            $ReplaceAll
+        )
+    }
 
     function Show-DirectoryBrowserUI {
         <#
@@ -406,34 +457,50 @@ begin {
 
             # Open the specified word document
             $OpenWordDoc = $MSWord.Documents.Open($Doc, $true)
-            $OpenDocSelection = $MSWord.Selection
 
-            $MatchCase = $False
-            $MatchWholeWord = $true
-            $MatchWildcards = $False
-            $MatchSoundsLike = $False
-            $MatchAllWordForms = $False
-            $Forward = $True
-            $Wrap = 1
-            $Format = $False
-            $ReplaceAll = 2
+            # Find and replace against the body of the document
+            if (Invoke-FindReplaceExecute -DocSelectionObject $MSWord.ActiveWindow.Selection.Find) {
+                # Note that the operation replaced text in the tracker
+                $RoundReplace = $true
+            }            
 
-            $OpenDocSelection.Find.Execute(
-                $Find,
-                $MatchCase,
-                $MatchWholeWord,
-                $MatchWildcards,
-                $MatchSoundsLike,
-                $MatchAllWordForms,
-                $Forward,
-                $Wrap,
-                $Format,
-                $Replace,
-                $ReplaceAll
-            )
+            # Loop through all of the document sections (does not include body)
+            foreach ($Section in $OpenWordDoc.Sections) {
+                # Loop through all of the headers
+                foreach ($Header in $Section.Headers) {
+                    # Execute the find and replace against the current header
+                    if (Invoke-FindReplaceExecute -DocSelectionObject $Header.Range.Find) {
+                        # Note that the operation replaced text in the tracker
+                        $RoundReplace = $true
+                    }
 
-            # Save the edits
-            $OpenWordDoc.Save()
+                    # Loop through the shapes in the current header
+                    foreach ($Shape in $Header.Shapes) {
+                        # Check if it is the right type of shape as not all shape types are editable
+                        if ($Shape.Type -eq [Microsoft.Office.Core.msoShapeType]::msoTextBox) {
+                            # Find and replace the current shape
+                            if (Invoke-FindReplaceExecute -DocSelectionObject $Shape.TextFrame.TextRange.Find) {
+                                # Note that the operation replaced text in the tracker
+                                $RoundReplace = $true
+                            }
+                        }
+                    }
+                }
+                # Loop through all of the footers reported by MS Word
+                foreach ($Footer in $Section.Footers) {
+                    # Execute the find and replace against the current footer
+                    if (Invoke-FindReplaceExecute -DocSelectionObject $Footer.Range.Find) {
+                        # Note that the operation replaced text in the tracker
+                        $RoundReplace = $true
+                    }
+                }
+            }
+
+            # Support simulation
+            if ($PSCmdlet.ShouldProcess("MS Word Document", "Save Changes")) {
+                # Save the edits
+                $OpenWordDoc.Save()
+            }
 
             # Record the file edits
             $EditedFiles += $Doc
