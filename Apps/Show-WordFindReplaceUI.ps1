@@ -257,7 +257,7 @@ begin {
             PS C:\> Show-MainUI
             Renders the main user interface for end users to interact with.
         .OUTPUTS
-            System.Object[]
+            Void
         .LINK
             https://github.com/elliot-labs/Powershell-Doodads
         .NOTES
@@ -330,8 +330,8 @@ begin {
         $BrowseButton.Add_Click( {
                 $DirectoryBrowseData = Show-DirectoryBrowserUI
                 if ($DirectoryBrowseData) {
-                    $global:Path = $DirectoryBrowseData
-                    $SelectedDirLabel.Text = $global:Path
+                    $script:Path = $DirectoryBrowseData
+                    $SelectedDirLabel.Text = $script:Path
                 }
             })
 
@@ -367,9 +367,9 @@ begin {
             }
 
             # Update global variables at runtime
-            $global:Find = $FindTextBox.Text
-            $global:Replace = $ReplaceTextBox.Text
-            $global:Recurse = $RecurseCheckBox.Checked
+            $script:Find = $FindTextBox.Text
+            $script:Replace = $ReplaceTextBox.Text
+            $script:Recurse = $RecurseCheckBox.Checked
 
             # Execute the find and replace function
             Update-WordDocFile
@@ -552,7 +552,7 @@ begin {
             }
 
             # Record the file edits
-            if ($RoundReplace) {$global:EditedFiles += $Doc}
+            if ($RoundReplace) {$script:EditedFiles += $Doc}
 
             # Close the document
             $OpenWordDoc.Close()
