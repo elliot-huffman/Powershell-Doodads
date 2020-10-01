@@ -453,6 +453,7 @@ begin {
     }
 
     # Write debug info to the console
+    Write-Debug -Message $DebugPreference
     Write-Debug -Message $VerbosePreference
     Write-Debug -Message $ConfirmPreference
     Write-Debug -Message $WhatIfPreference
