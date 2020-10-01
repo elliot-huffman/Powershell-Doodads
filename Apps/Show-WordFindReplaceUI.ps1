@@ -457,6 +457,9 @@ begin {
         .NOTES
             Logic is inspired by https://codereview.stackexchange.com/questions/174455/powershell-script-to-find-and-replace-in-word-document-including-header-footer
         #>
+
+        [CmdletBinding(SupportsShouldProcess = $true)]
+
         # Get the list of word docs to run the find and replace against
         $DocListParams = @{"Path" = $Path}
 
