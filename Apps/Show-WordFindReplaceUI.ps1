@@ -40,34 +40,60 @@ param(
     [Parameter(
         Position = 0,
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true
-    )
-    ]
-    [ValidateScript( {
-            Test-Path -Path $_ -PathType "Container"
-        })]
+        ValueFromPipelineByPropertyName = $true,
+        ParameterSetName = 'GUI'
+    )]
+    [Parameter(
+        Mandatory = $true,
+        Position = 0,
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true,
+        ParameterSetName = 'CLI'
+    )]
+    [ValidateScript({
+        Test-Path -Path $_ -PathType "Container"
+    })]
     [ValidateNotNullOrEmpty()]
     [System.String]$Path,
 
     [Parameter(
         Position = 1,
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true
-    )
-    ]
+        ValueFromPipelineByPropertyName = $true,
+        ParameterSetName = 'GUI'
+    )]
+    [Parameter(
+        Mandatory = $true,
+        Position = 1,
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true,
+        ParameterSetName = 'CLI'
+    )]
     [ValidateNotNullOrEmpty()]
     [System.String]$Find,
 
     [Parameter(
         Position = 2,
         ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true
-    )
-    ]
+        ValueFromPipelineByPropertyName = $true,
+        ParameterSetName = 'GUI'
+    )]
+    [Parameter(
+        Mandatory = $true,
+        Position = 2,
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true,
+        ParameterSetName = 'CLI'
+    )]
     [ValidateNotNullOrEmpty()]
     [System.String]$Replace,
 
     [Switch]$Recurse,
+    
+    [Parameter(
+        Mandatory = $true,
+        ParameterSetName = 'CLI'
+    )]
     [Switch]$CLIMode
 )
 
