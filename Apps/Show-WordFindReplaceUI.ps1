@@ -465,7 +465,12 @@ begin {
     $MSWord = New-MSWord
 }
 
-process {}
+process {
+    if ($CLIMode) {
+        # Execute the find and replace function
+        Update-WordDocFile
+    }
+}
 
 end {
     # Check if the script is dot sourced, if it is then do not execute the stuff inside.
