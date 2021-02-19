@@ -7,20 +7,31 @@
     PS C:\> <example usage>
     Explanation of what the example does
 .PARAMETER ComputerName
-    parameter info
+    The name of the computer to execute this script against.
+    If set to local host, no WinRM invocation will happen as the script will intelligently execute outside of a remote session.
 .PARAMETER User
-    parameter info
+    The user account that will have the custom shell settings applied to.
+    Do not specify a SID, the system will auto convert the name to a SID for you.
+
+    If no value is specified, it will take the current user's account name as the default setting and apply the specified shell settings to it.
 .PARAMETER ShellAction
-    parameter info
+    This configures the action which will be taken if the shell process is terminated.
+    The restart application option will start the application specified in the custom shell settings.
+    Restart, shutdown, and do nothing options will all do as named.
 .INPUTS
     System.String
 .OUTPUTS
-    Output (if any)
+    Void
 .LINK
     https://github.com/elliot-labs/PowerShell-Doodads
 .NOTES
     Requires the Enterprise or Education edition of Windows 10.
     Requires administrative privileges.
+
+    Some applications requre a user profile to be created so that data can be stored in the app data location (e.g. Microsoft Edge).
+    You may need to log in to the account that is to be degnated as the kiosk account before enabling the custom shell.
+
+    If you execute this script against remote computers, the remote computers must be accessable via WinRM using the executing user's credentials.
 
     Exit codes:
     1 - Incorrect windows edition (required Enterprise or Education to operate)
@@ -30,14 +41,14 @@
 #Requires -RunAsAdministrator
 
 param (
-    [string]$ComputerName = "localhost",
-    [string]$User = $env:USERNAME,
+    [System.String]$ComputerName = "localhost",
+    [System.String]$User = $env:USERNAME,
     [Parameter(
         Mandatory = $false,
         Position = 2
     )]
     [ValidateSet("Restart Application", "Restart Computer", "Shutdown Computer", "Do Nothing")]
-    [String]$ShellAction = "Do Nothing"
+    [System.String]$ShellAction = "Do Nothing"
 )
 
 Begin {
@@ -63,6 +74,12 @@ Begin {
 
     # This well-known security identifier (SID) corresponds to the BUILTIN\Administrators group.
     $AdminSID = "S-1-5-32-544"
+
+    # Create a script block that can enabled the custom shell launcher on a system.
+    [System.Management.Automation.ScriptBlock]$Script_EnableShellLauncher = {
+        # Sets up the shell launcher feature on the remote computer
+        Enable-WindowsOptionalFeature -Online -FeatureName "Client-EmbeddedShellLauncher" -NoRestart
+    }
 
     # Create a function to retrieve the SID for a user account on a machine. Works with domain accounts.
     Function Get-UserSID {
@@ -122,15 +139,19 @@ Begin {
 }
 
 Process {
-    Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-        # Sets up the shell launcher feature on the remote computer
-        dism --% /online /enable-feature /all /featureName:client-EmbeddedShellLauncher /NoRestart
+    # If the script is being executed locally, execute the scriptblock locally without invoking WinRM systems.
+    # Otherwise use WinRM to execute the optional feature installation.
+    if (($ComputerName -eq "localhost") -or ($ComputerName -match "127.[0-9]*.[0-9]*.[0-9]*")) {
+        & $Script_EnableShellLauncher
+    } else {
+        Invoke-Command -ComputerName $ComputerName -ScriptBlock $Script_EnableShellLauncher
     }
+    
 
     # Create a handle to the class instance so we can call the static methods.
     try {
         $ShellLauncherClass = [WMIClass]"\\$ComputerName\root\standardCIMv2\embedded:WESL_UserSetting"
-        # Invoke-CimMethod -Namespace "root\standardCIMv2\embedded" -ClassName "WESL_UserSetting"
+        # Get-CimClass -Namespace "root\standardCIMv2/embedded" -ClassName "WESL_UserSetting"
     }
     catch [Exception] {
         Write-Error $_.Exception.Message;
