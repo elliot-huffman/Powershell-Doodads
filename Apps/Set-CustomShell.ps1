@@ -28,10 +28,10 @@
     Requires the Enterprise or Education edition of Windows 10.
     Requires administrative privileges.
 
-    Some applications requre a user profile to be created so that data can be stored in the app data location (e.g. Microsoft Edge).
-    You may need to log in to the account that is to be degnated as the kiosk account before enabling the custom shell.
+    Some applications require a user profile to be created so that data can be stored in the app data location (e.g. Microsoft Edge).
+    You may need to log in to the account that is to be designated as the kiosk account before enabling the custom shell.
 
-    If you execute this script against remote computers, the remote computers must be accessable via WinRM using the executing user's credentials.
+    If you execute this script against remote computers, the remote computers must be accessible via WinRM using the executing user's credentials.
 
     Exit codes:
     1 - Incorrect windows edition (required Enterprise or Education to operate)
