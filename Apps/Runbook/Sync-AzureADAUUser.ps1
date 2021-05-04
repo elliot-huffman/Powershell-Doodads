@@ -30,7 +30,6 @@
     Requires a Managed Identity with "AdministrativeUnit.ReadWrite.All" and "User.Read.All" rights assigned to it.
 #>
 
-#Requires -Module AzureAD
 #Requires -Module Az.Accounts
 
 param(
@@ -45,28 +44,37 @@ param(
 )
 
 # Log into Azure
-Connect-AzAccount -Identity | Out-Null
+$ManagedIdentity = Connect-AzAccount -Identity
 
 # Get an Access token for Microsoft Graph
 $Token = (Get-AzAccessToken -Resource "https://graph.microsoft.com/").Token
 
-# Log into AzureAD cmdlets
-Connect-AzureAD -MsAccessToken $Token
+# Build the auth header
+$Header = @{Authorization = "Bearer $Token"}
 
-# Get all users
-[Microsoft.Open.AzureAD.Model.User[]]$UserList = Get-AzureADUser -All $true
+# Get all users GUIDs
+$UserList = (Invoke-RestMethod -Method "Get" -Uri "https://graph.microsoft.com/v1.0/users" -Headers $Header).value
 
 # Get all AU users and save their GUIDs
-[GUID[]]$AUUserGuidList = (Get-AzureADMSAdministrativeUnitMember -Id $AdminUnitID -All $true | Where-Object -FilterScript {$_.odataType -eq "#microsoft.graph.user"}).ID
+[GUID[]]$AUUserGuidList = ((Invoke-RestMethod -Method "Get" -Uri "https://graph.microsoft.com/v1.0/directory/administrativeUnits/$AdminUnitID/members" -Headers $Header).value | Where-Object -FilterScript {$_."@Odata.Type" -eq "#microsoft.graph.user"}).id
+
 
 # Loop through each user in the list to ensure they are in the correct AU
 foreach ($User in $UserList) {
     # Execute the blob matches on the UPN to ensure it is the correct UPN format.
     if (($User.UserPrincipalName -like $UPNBlobMatchString) -and ($User.UserPrincipalName -NotLike $UPNNegativeBlobMatch)) {
         # Only add users that are not in the AU, as if the user is already in it, it will throw an error.
-        if ($User.ObjectID -NotIn $AUUserGuidList) {
-            # Add the specified user to the AU
-            Add-AzureADMSAdministrativeUnitMember -Id $AdminUnitID -RefObjectId $User.ObjectID
+        if ($User.Id -NotIn $AUUserGuidList) {
+            # Expose the current user's object ID
+            $CurrentID = $User.Id
+
+            # Build the body of the web request
+            $Body = "{
+                `"@odata.id`":`"https://graph.microsoft.com/v1.0/users/$CurrentID`"
+            }"
+
+            # Add the user to the AU
+            Invoke-RestMethod -Method "Post" -Uri "https://graph.microsoft.com/v1.0/directory/administrativeUnits/$AdminUnitID/members/`$ref" -Headers $Header -Body $Body -ContentType "application/json"
         }
     }
 }
