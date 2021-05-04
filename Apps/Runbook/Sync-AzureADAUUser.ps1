@@ -44,7 +44,7 @@ param(
 )
 
 # Log into Azure
-$ManagedIdentity = Connect-AzAccount -Identity
+Connect-AzAccount -Identity | Out-Null
 
 # Get an Access token for Microsoft Graph
 $Token = (Get-AzAccessToken -Resource "https://graph.microsoft.com/").Token
