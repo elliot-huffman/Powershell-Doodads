@@ -40,7 +40,7 @@ param(
     [ValidateNotNullOrEmpty()]
     [String]$UPNBlobMatchString = "*@example.com",
     [ValidateNotNullOrEmpty()]
-    [String]$UPNNegativeBlobMatch = "*@examplered.com",
+    [String]$UPNNegativeBlobMatch,
     [ValidateNotNullOrEmpty()]
     [GUID[]]$ExcludedUserGUID
 )
