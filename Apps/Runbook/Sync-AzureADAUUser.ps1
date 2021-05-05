@@ -20,9 +20,9 @@
 .PARAMETER ExcludedUserGUID
     This parameter is used to explicitly exclude users.
     A match of the user's GUID with the value provided will exclude the user from sync.
-    Use commas to separate GUIDs to exclude more than one object.
+    Use commas to separate GUIDs to exclude more than one object. Do not put a space after the comma.
     Example value: "8f14a65f-3032-42c8-a196-1cf66d11b930"
-    Example values: "8f14a65f-3032-42c8-a196-1cf66d11b930", "00000000-0000-0000-0000-000000000000"
+    Example values: 8f14a65f-3032-42c8-a196-1cf66d11b930,00000000-0000-0000-0000-000000000000"
 .EXAMPLE
     PS C:\> Sync-AzureADAUUser.ps1 -AdminUnitID "00000000-0000-0000-0000-000000000000" -UPNBlobMatchString "*@example.com" -UPNNegativeBlobMatch "*priv*"
     Reads all of the users in the AAD and syncs them into the specified Administrative Unit (00000000-0000-0000-0000-000000000000).
@@ -31,7 +31,6 @@
 .INPUTS
     System.String
     System.GUID
-    System.GUID[]
 .OUTPUTS
     Void
 .NOTES
@@ -50,7 +49,7 @@ param(
     [ValidateNotNullOrEmpty()]
     [String]$UPNNegativeBlobMatch,
     [ValidateNotNullOrEmpty()]
-    [GUID[]]$ExcludedUserGUID
+    [String]$ExcludedUserGUID
 )
 
 # Log into Azure
@@ -74,7 +73,7 @@ foreach ($User in $UserList) {
     # Execute the blob matches on the UPN to ensure it is the correct UPN format.
     if (($User.UserPrincipalName -like $UPNBlobMatchString) -and ($User.UserPrincipalName -NotLike $UPNNegativeBlobMatch)) {
         # Only add users that are not in the AU, as if the user is already in it, it will throw an error.
-        if (($User.Id -NotIn $AUUserGuidList) -and ($User.ID -NotIn $ExcludedUserGUID)) {
+        if (($User.Id -NotIn $AUUserGuidList) -and ($User.ID -NotIn ($ExcludedUserGUID -split ","))) {
             # Expose the current user's object ID
             $CurrentID = $User.Id
 
