@@ -6,6 +6,7 @@
     The managed identity needs to have "AdministrativeUnit.ReadWrite.All" and "User.Read.All" assigned to it.
 .PARAMETER AdminUnitID
     This parameter is the GUID/ObjectID of the Administrative Unit that needs to have the users synced to.
+    Example Value: 8f14a65f-3032-42c8-a196-1cf66d11b930
 .PARAMETER UPNBlobMatchString
     This parameter is used to specify the positive match of the UPN.
     A positive match will add a user to the list of users to be synced.
@@ -42,7 +43,7 @@
 param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [GUID]$AdminUnitID = "00000000-0000-0000-0000-000000000000",
+    [GUID]$AdminUnitID,
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [String]$UPNBlobMatchString = "*@example.com",
