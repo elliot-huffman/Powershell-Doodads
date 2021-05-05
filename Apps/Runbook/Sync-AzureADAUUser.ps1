@@ -16,6 +16,12 @@
     A negative match will override a positive match.
     A negative match will exclude the user from the sync if the match is successful.
     E.G. "priv-*" will exclude all UPNs that have a prefix of priv-. so an email like this will be excluded form the AU sync: "priv-ehuffman@elliot-labs.com".
+.PARAMETER ExcludedUserGUID
+    This parameter is used to explicitly exclude users.
+    A match of the user's GUID with the value provided will exclude the user from sync.
+    Use commas to separate GUIDs to exclude more than one object.
+    Example value: "8f14a65f-3032-42c8-a196-1cf66d11b930"
+    Example values: "8f14a65f-3032-42c8-a196-1cf66d11b930", "00000000-0000-0000-0000-000000000000"
 .EXAMPLE
     PS C:\> Sync-AzureADAUUser.ps1 -AdminUnitID "00000000-0000-0000-0000-000000000000" -UPNBlobMatchString "*@example.com" -UPNNegativeBlobMatch "*priv*"
     Reads all of the users in the AAD and syncs them into the specified Administrative Unit (00000000-0000-0000-0000-000000000000).
@@ -24,6 +30,7 @@
 .INPUTS
     System.String
     System.GUID
+    System.GUID[]
 .OUTPUTS
     Void
 .NOTES
