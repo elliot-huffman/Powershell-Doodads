@@ -40,7 +40,9 @@ param(
     [ValidateNotNullOrEmpty()]
     [String]$UPNBlobMatchString = "*@example.com",
     [ValidateNotNullOrEmpty()]
-    [String]$UPNNegativeBlobMatch = "*@examplered.com"
+    [String]$UPNNegativeBlobMatch = "*@examplered.com",
+    [ValidateNotNullOrEmpty()]
+    [GUID[]]$ExcludedUserGUID
 )
 
 # Log into Azure
@@ -64,7 +66,7 @@ foreach ($User in $UserList) {
     # Execute the blob matches on the UPN to ensure it is the correct UPN format.
     if (($User.UserPrincipalName -like $UPNBlobMatchString) -and ($User.UserPrincipalName -NotLike $UPNNegativeBlobMatch)) {
         # Only add users that are not in the AU, as if the user is already in it, it will throw an error.
-        if ($User.Id -NotIn $AUUserGuidList) {
+        if (($User.Id -NotIn $AUUserGuidList) -and ($User.ID -NotIn $ExcludedUserGUID)) {
             # Expose the current user's object ID
             $CurrentID = $User.Id
 
