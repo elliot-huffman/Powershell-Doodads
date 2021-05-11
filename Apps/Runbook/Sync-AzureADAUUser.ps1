@@ -52,8 +52,14 @@ param(
     [String]$ExcludedUserGUID
 )
 
-# Remove whitespace from the excluded GUIDs parameter
-$ExcludedUserGUID = $ExcludedUserGUID -replace "\S+", ""
+# If the variable is defined, execute the whitespace removal
+if ($ExcludedUserGUID) {
+    # Remove whitespace from the excluded GUIDs parameter
+    $ExcludedUserGUID = $ExcludedUserGUID -replace "\S+", ""
+
+    # Split the results into an array
+    $ExcludedUserGUID = $ExcludedUserGUID -split ","
+}
 
 # Set the initial URL ofr AU queries
 $GraphAPIAdminUnitURL = "https://graph.microsoft.com/v1.0/directory/administrativeUnits/$AdminUnitID/members/microsoft.graph.user/"
@@ -112,7 +118,7 @@ foreach ($User in $UserList) {
     # Execute the blob matches on the UPN to ensure it is the correct UPN format.
     if (($User.UserPrincipalName -like $UPNBlobMatchString) -and ($User.UserPrincipalName -NotLike $UPNNegativeBlobMatch)) {
         # Only add users that are not in the AU, as if the user is already in it, it will throw an error.
-        if (($User.Id -NotIn $AUUserGuidList) -and ($User.ID -NotIn ($ExcludedUserGUID -split ","))) {
+        if (($User.Id -NotIn $AUUserGuidList) -and ($User.ID -NotIn $ExcludedUserGUID)) {
             # Expose the current user's object ID
             $CurrentID = $User.Id
 
