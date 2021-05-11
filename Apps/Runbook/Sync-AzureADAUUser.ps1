@@ -52,6 +52,20 @@ param(
     [String]$ExcludedUserGUID
 )
 
+# Remove whitespace from the excluded GUIDs parameter
+$ExcludedUserGUID = $ExcludedUserGUID -replace "\S+", ""
+
+# Set the initial URL ofr AU queries
+$GraphAPIAdminUnitURL = "https://graph.microsoft.com/v1.0/directory/administrativeUnits/$AdminUnitID/members/microsoft.graph.user/"
+
+# Set the initial URL for user queries
+$GraphAPIUserURL = "https://graph.microsoft.com/v1.0/users"
+
+# Initialize the User List array so that users can be added to it as well as the AU User GUID list
+[System.Object[]]$UserList = @()
+[GUID[]]$AUUserGuidList = @()
+
+
 # Log into Azure
 Connect-AzAccount -Identity | Out-Null
 
@@ -61,12 +75,37 @@ $Token = (Get-AzAccessToken -Resource "https://graph.microsoft.com/").Token
 # Build the auth header
 $Header = @{Authorization = "Bearer $Token"}
 
-# Get all users GUIDs
-$UserList = (Invoke-RestMethod -Method "Get" -Uri "https://graph.microsoft.com/v1.0/users" -Headers $Header).value
+# Get all users
+# If a next link property is returned, use the next link from the previous request as the url for the current request and all the users to the user list.
+do {
+    # Web request against the users endpoint
+    $Result = Invoke-RestMethod -Method "Get" -Uri $GraphAPIUserURL -Headers $Header
+    
+    # Set the Graph API Query url to the next link value that was passed from the Graph API if there are more pages to iterate over.
+    # This value may be blank, this means there are no more pages of data to iterate over.
+    $GraphAPIUserURL = $Result."@odata.nextLink"
 
-# Get all AU users and save their GUIDs
-[GUID[]]$AUUserGuidList = ((Invoke-RestMethod -Method "Get" -Uri "https://graph.microsoft.com/v1.0/directory/administrativeUnits/$AdminUnitID/members" -Headers $Header).value | Where-Object -FilterScript {$_."@Odata.Type" -eq "#microsoft.graph.user"}).id
+    # Extract the users from the list
+    $UserList += $Result.Value
 
+# Continue looping as long as there are more pages
+} while ($Result."@odata.nextLink")
+
+
+# Get the list of the users in the specified administrative unit
+do {
+    # Run the query
+    $Result = Invoke-RestMethod -Method "Get" -Uri $GraphAPIAdminUnitURL -Headers $Header
+    
+    # Set the Graph API Query url to the next link value that was passed from the Graph API if there are more pages to iterate over.
+    # This value may be blank, this means there are no more pages of data to iterate over.
+    $GraphAPIAdminUnitURL = $Result."@odata.nextLink"
+
+    # Extract the GUIDs from the result of the web request
+    [GUID[]]$AUUserGuidList += $Result.Value.ID
+
+# Continue looping as long as there are more pages
+} while ($Result."@odata.nextLink")
 
 # Loop through each user in the list to ensure they are in the correct AU
 foreach ($User in $UserList) {
@@ -78,9 +117,11 @@ foreach ($User in $UserList) {
             $CurrentID = $User.Id
 
             # Build the body of the web request
-            $Body = "{
-                `"@odata.id`":`"https://graph.microsoft.com/v1.0/users/$CurrentID`"
-            }"
+            $Body = @"
+{
+    "@odata.id":"https://graph.microsoft.com/v1.0/users/$CurrentID"
+}
+"@
 
             # Add the user to the AU
             Invoke-RestMethod -Method "Post" -Uri "https://graph.microsoft.com/v1.0/directory/administrativeUnits/$AdminUnitID/members/`$ref" -Headers $Header -Body $Body -ContentType "application/json"
