@@ -55,10 +55,10 @@ param(
 # If the variable is defined, execute the whitespace removal
 if ($ExcludedUserGUID) {
     # Remove whitespace from the excluded GUIDs parameter
-    $ExcludedUserGUID = $ExcludedUserGUID -replace "\S+", ""
+    $ExcludedUserGUID = $ExcludedUserGUID -replace "\s+", ""
 
-    # Split the results into an array
-    $ExcludedUserGUID = $ExcludedUserGUID -split ","
+    # Split the results into an array and enforce the GUID type
+    [GUID[]]$ExcludedUserGUID = $ExcludedUserGUID -split ","
 }
 
 # Set the initial URL ofr AU queries
