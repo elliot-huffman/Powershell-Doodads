@@ -208,8 +208,6 @@ Function Show-ChangeInput {
         This function requires PS Desktop as it uses windows forms.
     #>
 
-    #Requires -PSEdition Desktop
-
     # Cmdlet bind the function for advanced functionality
     [CmdletBinding()]
 
@@ -253,7 +251,6 @@ Function Show-ChangeInput {
 }
 
 Function Show-ChangeOutput {
-    #Requires -PSEdition Desktop
 
     # Initialize the SaveFileDialog class
     $OutputFileGUI = New-Object -TypeName "System.Windows.Forms.SaveFileDialog"
