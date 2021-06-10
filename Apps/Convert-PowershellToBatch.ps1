@@ -170,12 +170,12 @@ if %errorLevel% == 0 (
         } else {
 
             # Otherwise just convert the string to a batch export.
-            "echo $fileLine" | Out-File -FilePath $Script:OutputFile -Append -Encoding ASCII            
+            "echo $fileLine" | Out-File -FilePath $Script:OutputFile -Append -Encoding "ASCII"            
         }
     }
 
     # Add the footer to the outputted batch file.
-    $BatchFooter | Out-File -FilePath $Script:OutputFile -Append -Encoding ASCII
+    $BatchFooter | Out-File -FilePath $Script:OutputFile -Append -Encoding "ASCII"
 
     # Add the self deleting module to the batch script.
     if ($Script:SelfDelete) {Out-File -FilePath $Script:OutputFile -InputObject "(goto) 2>nul & del `"%~f0`"" -Encoding "ASCII" -Append}
