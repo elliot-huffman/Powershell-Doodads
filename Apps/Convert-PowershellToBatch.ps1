@@ -190,13 +190,13 @@ Function Show-ChangeInput {
     .SYNOPSIS
         Have user select file via GUI
     .DESCRIPTION
-        Create an open file dialog that only accepts powershell scripts and set the script level variable to the results.
+        Create an open file dialog that only accepts powershell scripts and returns the specified file path.
     .EXAMPLE
         Show-ChangeInput
         The function will display a dialog box for the user to select a file.
         The file types that will be visible will be restricted to powershell files.
         If the user cancels the dialog, it will return false.
-        Example return:
+        Example successful return:
         "C:\PowerShell-Doodads\Apps\Food\Get-WalmartGiftCard.ps1"
     .OUTPUTS
         System.String
@@ -251,20 +251,66 @@ Function Show-ChangeInput {
 }
 
 Function Show-ChangeOutput {
+    <#
+    .SYNOPSIS
+        Have a user select file location via GUI.
+    .DESCRIPTION
+        Create an save file dialog that only allows batch scripts and returns the file path selected by the user.
+    .EXAMPLE
+        Show-ChangeOutput
+        The function will display a dialog box for the user to save a file.
+        The file types that will be able to be saved is restricted to batch files.
+        If the user cancels the dialog, it will return false.
+        Example successful return:
+        "C:\PowerShell-Doodads\Apps\Food\Get-WalmartGiftCard.bat"
+    .OUTPUTS
+        System.String
+        System.Boolean
+    .LINK
+        https://github.com/elliot-labs/PowerShell-Doodads
+    .NOTES
+        The function will return a string if successful, it will return false if unsuccessful. E.g. user cancels the dialog.
+        This function requires PS Desktop as it uses windows forms.
+    #>
+
+    # Cmdlet bind the function for advanced functionality
+    [CmdletBinding()]
+
+    # Empty params as no input is necessary, this is so that cmdlet binding can take place
+    param()
+
+    # Write Verbose info
+    Write-Verbose -Message "Initializing Type (SaveFileDialog)"
 
     # Initialize the SaveFileDialog class
     $OutputFileGUI = New-Object -TypeName "System.Windows.Forms.SaveFileDialog"
 
+    # Write Verbose info
+    Write-Verbose -Message "Setting dialog settings (file type and title)"
+
     # Set the file type to be saved as a Batch Script
     $OutputFileGUI.Filter = "Batch Script (*.bat)|*.bat"
+
+    # Configure the title of the file save dialog
+    $OutputFileGUI.Title = "Save as"
+
+    # Write Verbose info
+    Write-Verbose -Message "Rendering Save File Dialog"
 
     # Render the dialog for the end user.
     $GUIResult = $OutputFileGUI.ShowDialog()
 
+    # Write debug info
+    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Dialog info:"
+    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$GUIResult: $GUIResult"
+    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$OutputFileGUI.FileName: ${$OutputFileGUI.FileName}"
+
     # Check to see if the user has provided input
     if ($GUIResult -eq "OK") {
+        # Return the user's specified file path
         return $OutputFileGUI.FileName
     } else {
+        # Return false for failure
         return $false
     }
 }
