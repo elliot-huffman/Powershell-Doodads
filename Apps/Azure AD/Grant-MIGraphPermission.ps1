@@ -92,7 +92,7 @@ begin {
         Write-Verbose -Message "Validating user selection for Managed Identity"
         
         # Throw an error and end execution if the end user doesn't select an object
-        if ($SelectedPrincipal -eq $null) {
+        if ($null -eq $SelectedPrincipal) {
             # Write an error to the console
             Write-Error -Message "User closed the selector without selecting a service principal!"
 
@@ -114,7 +114,7 @@ begin {
         Write-Verbose -Message "Validating user selection on App Role/Permission"
 
         # Throw an error and end execution if the end user doesn't select an object
-        if ($AppRole -eq $null) {
+        if ($null -eq $AppRole) {
             # Write an error to the console
             Write-Error -Message "User closed the selector without selecting a permission!"
 
@@ -146,7 +146,7 @@ begin {
         Write-Verbose -Message "Validating specified permission name specified by user"
 
         # Throw an error and end execution if the end user doesn't select an object
-        if ($AppRole -eq $null) {
+        if ($null -eq $AppRole) {
             # Write an error to the console
             Write-Error -Message "The specified permission/app role ($PermissionName) does not exist!"
 
