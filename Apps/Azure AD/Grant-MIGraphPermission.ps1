@@ -64,7 +64,7 @@ begin {
     Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$GraphAppSP: $GraphAppSP"
 
     # Check to see if the GUI was requested
-    if (!$ObjectID -and !$PermissionName) {
+    if (!$ObjectID -or !$PermissionName) {
         # Write Verbose info
         Write-Verbose -Message "Getting a list of all managed identities and render it in a picker dialog for the end user to select one."
 
