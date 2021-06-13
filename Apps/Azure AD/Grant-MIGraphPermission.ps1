@@ -21,7 +21,7 @@
         1 - lorem ipsum
 #>
 
-# Ensure the appropriate pre-reqs for the script
+# Ensure the appropriate pre-requirements for the script
 #Requires -Module AzureAD
 #Requires -PSEdition Desktop
 
@@ -33,23 +33,10 @@
 
 # Initialize the parameters for the script
 param(
-    [Parameter(
-        Mandatory=$true,
-        ParameterSetName='Manual ID'
-    )]
     [ValidateNotNullOrEmpty()]
     [GUID]$ObjectID,
-    [Parameter(
-        Mandatory=$true,
-        ParameterSetName='Manual ID'
-    )]
     [ValidateNotNullOrEmpty()]
-    [System.String]$PermissionName,
-    [Parameter(
-        Mandatory=$true,
-        ParameterSetName='GUI Selector'
-    )]
-    [Switch]$GUI
+    [System.String]$PermissionName
 )
 
 begin {
@@ -77,7 +64,7 @@ begin {
     Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$GraphAppSP: $GraphAppSP"
 
     # Check to see if the GUI was requested
-    if ($GUI) {
+    if (!$ObjectID -and !$PermissionName) {
         # Write Verbose info
         Write-Verbose -Message "Getting a list of all managed identities and render it in a picker dialog for the end user to select one."
 
