@@ -50,7 +50,7 @@ begin {
     [Microsoft.Open.Azure.AD.CommonLibrary.PSAzureContext]$AzureADSession = Connect-AzureAD
 
     # Write debug info
-    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Graph API SP Info:"
+    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Session Info:"
     Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$AzureADSession: $AzureADSession"
 
     # Write Verbose info
