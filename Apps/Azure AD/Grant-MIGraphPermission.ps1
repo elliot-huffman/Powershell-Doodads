@@ -146,12 +146,12 @@ begin {
     Write-Verbose -Message "Assigning the specified permission to the specified principal"
 
     # Simulate the result if asked to simulate
-    if ($PSCmdlet.ShouldProcess("Selected Service Principal", "Grant ${$AppRole.Value}")) {
+    if ($PSCmdlet.ShouldProcess("Selected Service Principal", "Grant $($AppRole.Value)")) {
         # Write debug info
         Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Pre-Assignment Variable Dump:"
-        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$SelectedPrincipal.ObjectId:" + $SelectedPrincipal.ObjectId
-        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$GraphAppSP.ObjectId:" + $GraphAppSP.ObjectId
-        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$AppRole.Id:" + $AppRole.Id
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$SelectedPrincipal.ObjectId: $($SelectedPrincipal.ObjectId)"
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$GraphAppSP.ObjectId: $($GraphAppSP.ObjectId)"
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$AppRole.Id: $($AppRole.Id)"
 
         # Assign the Graph API permission to the specified service principal
         New-AzureAdServiceAppRoleAssignment -ObjectId $SelectedPrincipal.ObjectId -PrincipalId $SelectedPrincipal.ObjectId -ResourceId $GraphAppSP.ObjectId -Id $AppRole.Id   
