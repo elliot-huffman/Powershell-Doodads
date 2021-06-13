@@ -78,6 +78,9 @@ begin {
 
     # Check to see if the GUI was requested
     if ($GUI) {
+        # Write Verbose info
+        Write-Verbose -Message "Getting a list of all managed identities and render it in a picker dialog for the end user to select one."
+
         # Get a list of Managed Identities and make the user select one of them
         [Microsoft.Open.AzureAD.Model.ServicePrincipal]$SelectedPrincipal = Get-AzureADServicePrincipal -Filter "ServicePrincipalType eq 'ManagedIdentity'" -All $true | Out-GridView -Title "Select the Managed Identity to Assign Permission" -OutputMode "Single"
         
@@ -85,6 +88,9 @@ begin {
         Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Selected Principal:"
         Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$SelectedPrincipal: $SelectedPrincipal"
 
+        # Write Verbose info
+        Write-Verbose -Message "Validating user selection for Managed Identity"
+        
         # Throw an error and end execution if the end user doesn't select an object
         if ($SelectedPrincipal -eq $null) {
             # Write an error to the console
@@ -94,12 +100,18 @@ begin {
             return $false
         }
 
+        # Write Verbose info
+        Write-Verbose -Message "Getting a list of all app roles/permissions and render it in a picker dialog for the end user to select one."
+
         # Get the specified permission that needs to be assigned
         [Microsoft.Open.AzureAD.Model.AppRole]$AppRole = $GraphAppSP.AppRoles | Out-GridView -Title "Select the Permission to Assign" -OutputMode "Single"
         
         # Write debug info
         Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Selected App Role/Permission:"
         Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$AppRole: $AppRole"
+
+        # Write Verbose info
+        Write-Verbose -Message "Validating user selection on App Role/Permission"
 
         # Throw an error and end execution if the end user doesn't select an object
         if ($AppRole -eq $null) {
@@ -110,6 +122,9 @@ begin {
             return $false
         }
     } else {
+        # Write Verbose info
+        Write-Verbose -Message "Getting the specified service principal."
+
         # Pull the specified Object ID
         [Microsoft.Open.AzureAD.Model.ServicePrincipal]$SelectedPrincipal = Get-AzureADServicePrincipal -ObjectId $ObjectID
 
@@ -117,12 +132,18 @@ begin {
         Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Selected Principal:"
         Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$SelectedPrincipal: $SelectedPrincipal"
 
+        # Write Verbose info
+        Write-Verbose -Message "Getting the specified app role/permission"
+
         # Get the specified permission that needs to be assigned
         [Microsoft.Open.AzureAD.Model.AppRole]$AppRole = $GraphAppSP.AppRoles | Where-Object -FilterScript {$_.Value -eq $PermissionName}
 
         # Write debug info
         Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Selected App Role/Permission:"
         Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$AppRole: $AppRole"
+
+        # Write Verbose info
+        Write-Verbose -Message "Validating specified permission name specified by user"
 
         # Throw an error and end execution if the end user doesn't select an object
         if ($AppRole -eq $null) {
@@ -134,8 +155,17 @@ begin {
         }
     }
 
+    # Write Verbose info
+    Write-Verbose -Message "Assigning the specified permission to the specified principal"
+
     # Simulate the result if asked to simulate
     if ($PSCmdlet.ShouldProcess("Selected Service Principal", "Grant ${$AppRole.Value}")) {
+        # Write debug info
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Pre-Assignment Variable Dump:"
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$SelectedPrincipal.ObjectId:" + $SelectedPrincipal.ObjectId
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$GraphAppSP.ObjectId:" + $GraphAppSP.ObjectId
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$AppRole.Id:" + $AppRole.Id
+
         # Assign the Graph API permission to the specified service principal
         New-AzureAdServiceAppRoleAssignment -ObjectId $SelectedPrincipal.ObjectId -PrincipalId $SelectedPrincipal.ObjectId -ResourceId $GraphAppSP.ObjectId -Id $AppRole.Id   
     }
