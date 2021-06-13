@@ -3,16 +3,17 @@
     Grants Graph API Permissions to MAnaged Identity Service Principals
 .DESCRIPTION
     App registration is not supported as it has a really good GUI in the Azure AD Portal.
+    Returns false on failure
 .EXAMPLE
     PS C:\> Grant-MIGraphPermission
     Explanation of what the example does
 .INPUTS
-    GUID
+    System.Guid
     System.String
 .OUTPUTS
-    Void
+    System.Boolean
 .NOTES
-    This script requries the AzureAD module to be installed before execution.
+    This script requires the AzureAD module to be installed before execution.
     PS Core 6 is not supported for this script since it utilizes Windows Forms.
     ISE must be installed as some PowerShell Windows Forms components are included in ISE that this script uses (Out-GridView)
     
@@ -80,21 +81,64 @@ begin {
         # Get a list of Managed Identities and make the user select one of them
         [Microsoft.Open.AzureAD.Model.ServicePrincipal]$SelectedPrincipal = Get-AzureADServicePrincipal -Filter "ServicePrincipalType eq 'ManagedIdentity'" -All $true | Out-GridView -Title "Select the Managed Identity to Assign Permission" -OutputMode "Single"
         
+        # Write debug info
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Selected Principal:"
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$SelectedPrincipal: $SelectedPrincipal"
+
+        # Throw an error and end execution if the end user doesn't select an object
+        if ($SelectedPrincipal -eq $null) {
+            # Write an error to the console
+            Write-Error -Message "User closed the selector without selecting a service principal!"
+
+            # Return false to the caller to indicate failure
+            return $false
+        }
+
         # Get the specified permission that needs to be assigned
         [Microsoft.Open.AzureAD.Model.AppRole]$AppRole = $GraphAppSP.AppRoles | Out-GridView -Title "Select the Permission to Assign" -OutputMode "Single"
+        
+        # Write debug info
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Selected App Role/Permission:"
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$AppRole: $AppRole"
+
+        # Throw an error and end execution if the end user doesn't select an object
+        if ($AppRole -eq $null) {
+            # Write an error to the console
+            Write-Error -Message "User closed the selector without selecting a permission!"
+
+            # Return false to the caller to indicate failure
+            return $false
+        }
     } else {
         # Pull the specified Object ID
         [Microsoft.Open.AzureAD.Model.ServicePrincipal]$SelectedPrincipal = Get-AzureADServicePrincipal -ObjectId $ObjectID
 
+        # Write debug info
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Selected Principal:"
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$SelectedPrincipal: $SelectedPrincipal"
+
         # Get the specified permission that needs to be assigned
         [Microsoft.Open.AzureAD.Model.AppRole]$AppRole = $GraphAppSP.AppRoles | Where-Object -FilterScript {$_.Value -eq $PermissionName}
+
+        # Write debug info
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Selected App Role/Permission:"
+        Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$AppRole: $AppRole"
+
+        # Throw an error and end execution if the end user doesn't select an object
+        if ($AppRole -eq $null) {
+            # Write an error to the console
+            Write-Error -Message "The specified permission/app role ($PermissionName) does not exist!"
+
+            # Return false to the caller to indicate failure
+            return $false
+        }
     }
 
+    # Simulate the result if asked to simulate
     if ($PSCmdlet.ShouldProcess("Selected Service Principal", "Grant ${$AppRole.Value}")) {
-        
+        # Assign the Graph API permission to the specified service principal
+        New-AzureAdServiceAppRoleAssignment -ObjectId $SelectedPrincipal.ObjectId -PrincipalId $SelectedPrincipal.ObjectId -ResourceId $GraphAppSP.ObjectId -Id $AppRole.Id   
     }
-    # Assign the Graph API permission to the specified service principal
-    New-AzureAdServiceAppRoleAssignment -ObjectId $SelectedPrincipal.ObjectId -PrincipalId $SelectedPrincipal.ObjectId -ResourceId $GraphAppSP.ObjectId -Id $AppRole.Id
 }
 
 end {
