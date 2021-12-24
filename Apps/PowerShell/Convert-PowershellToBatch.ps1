@@ -171,11 +171,19 @@ del %Script%"
             # Process the input path and update it to be the output path with modifications.
             if ($this.OutputFile -eq "") {$this.OutputFile = $this.InputFile + ".bat"}
         }
-
-    # [System.String] AutoEscape() {}
     [Void]WriteFile([System.String]$DataToWrite) {
         # Append the specified data to the bottom of the output file in ASCII format.
         Out-File -FilePath $this.OutputFile -Encoding "ASCII" -Append -InputObject $DataToWrite
+    }
+    [Void]WriteFile([System.String]$DataToWrite, [System.Boolean]$Delete = $true) {
+        # If the delete parameter is specified and is $true
+        if ($Delete) {
+            # Overwrite any existing file data with the new specified data in ASCII format.
+            Out-File -FilePath $this.OutputFile -Encoding "ASCII" -InputObject $DataToWrite
+        } else {
+            # Append the specified data to the bottom of the output file in ASCII format.
+            Out-File -FilePath $this.OutputFile -Encoding "ASCII" -InputObject $DataToWrite -Append
+        }
     }
 
     # A method that updates the batch header property to contain the expected values for the file write operation
@@ -239,7 +247,7 @@ set Script="%Temp%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.ps1"
         $this.ComputeBatchHeaderOptions()
 
         # Write the specified header to the batch file
-        $this.WriteFile($this.BatchHeader)
+        $this.WriteFile($this.BatchHeader, $true)
 
         # Execute the main conversion of the powershell script to the batch script file
         $this.ProcessScriptBody()
