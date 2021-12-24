@@ -119,6 +119,7 @@ class AppConfig {
     hidden [System.String]$BatchFooter
     hidden [System.String]$SelfDeleteFooter
 
+    # Constructor for the app config class
     AppConfig() {
         $this.InputFile = ""
         $this.OutputFile = ""
@@ -153,28 +154,25 @@ del %Script%"
     }
 
     # Process the parameter data into the app config data structure
-    [Void]ProcessParameters (
-        [System.String]$InputFile,
-        [System.String]$OutputFile,
-        [System.Boolean]$RunAsAdmin,
-        [System.Boolean]$SelfDelete,
-        [System.Boolean]$HideTerminal,
-        [System.String[]]$ArgumentList
-        ) {
-            $this.InputFile = $InputFile
-            $this.OutputFile = $OutputFile
-            $this.RunAsAdmin = $RunAsAdmin
-            $this.SelfDelete = $SelfDelete
-            $this.HideTerminal = $HideTerminal
-            $this.ArgumentList = $ArgumentList
+    [Void]ProcessParameters () {
+        $this.InputFile = $Script:InputFile
+        $this.OutputFile = $Script:OutputFile
+        $this.RunAsAdmin = $Script:AdminMode
+        $this.SelfDelete = $Script:SelfDelete
+        $this.HideTerminal = $Script:HideTerminal
+        $this.ArgumentList = $Script:ArgumentList
 
-            # Process the input path and update it to be the output path with modifications.
-            if ($this.OutputFile -eq "") {$this.OutputFile = $this.InputFile + ".bat"}
-        }
+        # Process the input path and update it to be the output path with modifications.
+        if ($this.OutputFile -eq "") {$this.OutputFile = $this.InputFile + ".bat"}
+    }
+
+    # Write the specified data in append mode to the output file
     [Void]WriteFile([System.String]$DataToWrite) {
         # Append the specified data to the bottom of the output file in ASCII format.
         Out-File -FilePath $this.OutputFile -Encoding "ASCII" -Append -InputObject $DataToWrite
     }
+
+    # Write data in either overwrite or append mode to the output file
     [Void]WriteFile([System.String]$DataToWrite, [System.Boolean]$Delete = $true) {
         # If the delete parameter is specified and is $true
         if ($Delete) {
@@ -197,7 +195,7 @@ cd /d %~dp0
 set Script="%Temp%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.ps1"
 "@
         # If the run as admin option is set, add the run as admin header section to the baseline
-        if ($this.RunAsAdmin) { $this.BatchHeader += "`n$($this.AdminHeader)" }
+        if ($this.RunAsAdmin) { $this.BatchHeader += "`n`n$($this.AdminHeader)" }
 
         # Add the necessary open parentheses to the batch header
         $this.BatchHeader += "`n("
@@ -400,7 +398,7 @@ function Show-ChangeOutput {
 # Starts the main interface
 Function Show-MainUI {
     # Process the command line parameters that were provided to the app during launch
-    $appConfigInstance.ProcessParameters($InputFile, $OutputFile, $RunAsAdmin, $SelfDelete, $HideTerminal, $ArgumentList)
+    $appConfigInstance.ProcessParameters()
 
     # Initialize font setting
     $Label_Font = New-Object -TypeName System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Regular)
@@ -533,7 +531,7 @@ Function Show-MainUI {
 # If the CLI Mode param was specified, execute conversion directly without rendering the main UI.
 if ($CLIMode) {
     # Process the parameters specified into the class object
-    $appConfigInstance.ProcessParameters($InputFile, $OutputFile, $RunAsAdmin, $SelfDelete, $HideTerminal, $ArgumentList)
+    $appConfigInstance.ProcessParameters()
 
     # Execute the conversion process
     $appConfigInstance.ExecuteConversion()
