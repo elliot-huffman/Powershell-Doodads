@@ -381,7 +381,7 @@ if ($MyInvocation.Line -NotMatch "^\.\s") {
     Return Get-PwdExpirationTime -DomainConnection $DomainInstance
 }
 
-# ToDo:
+# TODO:
 # Add parameter sets to avoid parameter issues where some params are used and others are not.
 # After parameter sets are set up properly, update all the help docs and comments.
 # Add cmdlet binding
