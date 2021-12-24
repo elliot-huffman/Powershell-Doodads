@@ -121,19 +121,23 @@ class AppConfig {
 
     # Constructor for the app config class
     AppConfig() {
-        $this.InputFile = ""
-        $this.OutputFile = ""
-        $this.RunAsAdmin = $False
-        $this.SelfDelete = $False
-        $this.HideTerminal = $False
-        $this.ArgumentList = @()
+        $this.InputFile = $Script:InputFile
+        $this.OutputFile = $Script:OutputFile
+        $this.RunAsAdmin = $Script:AdminMode
+        $this.SelfDelete = $Script:SelfDelete
+        $this.HideTerminal = $Script:HideTerminal
+        $this.ArgumentList = $Script:ArgumentList
+
+        # Process the input path and update it to be the output path with modifications.
+        if ($this.OutputFile -eq "") {$this.OutputFile = $this.InputFile + ".bat"}
+
+        # Build the initial batch header
         $this.BatchHeader = @"
 @echo off
 color 0A
 cls
 cd /d %~dp0
 set Script="%Temp%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.ps1"
-# TODO: Header admin code goes here
 (
 "@
         $this.AdminHeader = ':CheckAdmin
@@ -151,19 +155,6 @@ if %errorLevel% == 0 (
 PowerShell -ExecutionPolicy Unrestricted -File %Script%
 del %Script%"
         $this.SelfDeleteFooter = "(goto) 2>nul & del `"%~f0`""
-    }
-
-    # Process the parameter data into the app config data structure
-    [Void]ProcessParameters () {
-        $this.InputFile = $Script:InputFile
-        $this.OutputFile = $Script:OutputFile
-        $this.RunAsAdmin = $Script:AdminMode
-        $this.SelfDelete = $Script:SelfDelete
-        $this.HideTerminal = $Script:HideTerminal
-        $this.ArgumentList = $Script:ArgumentList
-
-        # Process the input path and update it to be the output path with modifications.
-        if ($this.OutputFile -eq "") {$this.OutputFile = $this.InputFile + ".bat"}
     }
 
     # Write the specified data in append mode to the output file
@@ -397,9 +388,6 @@ function Show-ChangeOutput {
 
 # Starts the main interface
 Function Show-MainUI {
-    # Process the command line parameters that were provided to the app during launch
-    $appConfigInstance.ProcessParameters()
-
     # Initialize font setting
     $Label_Font = New-Object -TypeName System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Regular)
     $Argument_Label_Font = New-Object -TypeName System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Regular)
@@ -530,9 +518,6 @@ Function Show-MainUI {
 
 # If the CLI Mode param was specified, execute conversion directly without rendering the main UI.
 if ($CLIMode) {
-    # Process the parameters specified into the class object
-    $appConfigInstance.ProcessParameters()
-
     # Execute the conversion process
     $appConfigInstance.ExecuteConversion()
 } else { # if the CLI mode param was not specified
