@@ -234,8 +234,8 @@ set Script="%Temp%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.ps1"
     [Void]ComputeBatchFooterOptions() {
         # Build the batch script's footer dynamically
         $this.BatchFooter = ") > %Script%
-        PowerShell -ExecutionPolicy Unrestricted $(if ($this.HideTerminal) {$this.HideTerminalParam}) -File %Script% $($this.ArgumentList)
-        del %Script%"
+PowerShell -ExecutionPolicy Unrestricted $(if ($this.HideTerminal) {$this.HideTerminalParam}) -File %Script% $($this.ArgumentList)
+del %Script%"
 
         # If the self delete option is selected, add the self delete footer to the batch footer
         if ($this.SelfDelete) { $this.BatchFooter += "`n$($this.SelfDeleteFooter)" }
