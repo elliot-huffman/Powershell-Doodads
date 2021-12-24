@@ -400,15 +400,15 @@ Function Show-MainUI {
     $Form.MinimizeBox = $false
     $Form.FormBorderStyle = "FixedSingle"
     $Form.Icon = [System.Drawing.SystemIcons]::Information
-    $Form.Size = New-Object -TypeName "System.Drawing.Size(300, 380)"
+    $Form.Size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 300, 380
     $Form.StartPosition = "CenterScreen"
     $Form.Font = $Form_Font
     $Form.Topmost = $True
 
     # Input file current settings.
     $InputFile_Label = New-Object -TypeName "System.Windows.Forms.Label"
-    $InputFile_Label.Location = New-Object -TypeName "System.Drawing.Point(100, 0)"
-    $InputFile_Label.Size = New-Object -TypeName "System.Drawing.Size(184, 100)"
+    $InputFile_Label.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 100, 0
+    $InputFile_Label.Size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 184, 100
     $InputFile_Label.BorderStyle = "FixedSingle"
     $InputFile_Label.TextAlign = "MiddleCenter"
     $InputFile_Label.Font = $Label_Font
@@ -416,8 +416,8 @@ Function Show-MainUI {
 
     # Output file current settings.
     $OutputFile_Label = New-Object -TypeName "System.Windows.Forms.Label"
-    $OutputFile_Label.Location = New-Object -TypeName "System.Drawing.Point(100, 101)"
-    $OutputFile_Label.Size = New-Object -TypeName "System.Drawing.Size(184, 100)"
+    $OutputFile_Label.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 100, 101
+    $OutputFile_Label.Size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 184, 100
     $OutputFile_Label.BorderStyle = "FixedSingle"
     $OutputFile_Label.TextAlign = "MiddleCenter"
     $OutputFile_Label.Font = $Label_Font
@@ -425,8 +425,8 @@ Function Show-MainUI {
 
     # Argument label.
     $Argument_Label = New-Object -TypeName "System.Windows.Forms.Label"
-    $Argument_Label.Location = New-Object -TypeName "System.Drawing.Point(0, 160)"
-    $Argument_Label.Size = New-Object -TypeName "System.Drawing.Size(100, 40)"
+    $Argument_Label.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 0, 160
+    $Argument_Label.Size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 100, 40
     $Argument_Label.BorderStyle = "None"
     $Argument_Label.TextAlign = "BottomCenter"
     $Argument_Label.Font = $Argument_Label_Font
@@ -434,46 +434,46 @@ Function Show-MainUI {
 
     # Add Input File Button
     $Input_Button = New-Object -TypeName "System.Windows.Forms.Button"
-    $Input_Button.Location = New-Object -TypeName "System.Drawing.Point(0, 0)"
-    $Input_Button.Size = New-Object -TypeName "System.Drawing.Size(100, 60)"
+    $Input_Button.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 0, 0
+    $Input_Button.Size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 100, 60
     $Input_Button.Text = "Input File"
 
     # Add Output File Button
     $Output_Button = New-Object -TypeName "System.Windows.Forms.Button"
-    $Output_Button.Location = New-Object -TypeName "System.Drawing.Point(0, 100)"
-    $Output_Button.Size = New-Object -TypeName "System.Drawing.Size(100, 60)"
+    $Output_Button.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 0, 100
+    $Output_Button.Size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 100, 60
     $Output_Button.Text = "Output File"
 
     # Argument TextBox
     $Argument_TextBox = New-Object -TypeName "System.Windows.Forms.TextBox"
-    $Argument_TextBox.Location = New-Object -TypeName "System.Drawing.Point(0, 200)"
-    $Argument_TextBox.Size = New-Object -TypeName "System.Drawing.Size(284, 10)"
+    $Argument_TextBox.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 0, 200
+    $Argument_TextBox.Size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 284, 10
 
     # Yes Radio Button, checked by default
     $Admin_CheckBox = New-Object -TypeName "System.Windows.Forms.CheckBox"
-    $Admin_CheckBox.Location = New-Object -TypeName "System.Drawing.Point(5, 235)"
-    $Admin_CheckBox.size = New-Object -TypeName "System.Drawing.Size(140, 20)"
+    $Admin_CheckBox.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 5, 235
+    $Admin_CheckBox.size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 140, 20
     $Admin_CheckBox.Checked = $false 
     $Admin_CheckBox.Text = "Run as admin"
 
     # No Radio Button, not checked by default
     $HideWindow_CheckBox = New-Object -TypeName "System.Windows.Forms.CheckBox"
-    $HideWindow_CheckBox.Location = New-Object -TypeName "System.Drawing.Point(150, 235)"
-    $HideWindow_CheckBox.size = New-Object -TypeName "System.Drawing.Size(160, 20)"
+    $HideWindow_CheckBox.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 150, 235
+    $HideWindow_CheckBox.size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 160, 20
     $HideWindow_CheckBox.Checked = $false
     $HideWindow_CheckBox.Text = "Hide Console"
 
     # Yes Radio Button, checked by default
     $SelfDelete_CheckBox = New-Object -TypeName "System.Windows.Forms.CheckBox"
-    $SelfDelete_CheckBox.Location = New-Object -TypeName "System.Drawing.Point(5, 258)"
-    $SelfDelete_CheckBox.size = New-Object -TypeName "System.Drawing.Size(140, 20)"
+    $SelfDelete_CheckBox.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 5, 258
+    $SelfDelete_CheckBox.size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 140, 20
     $SelfDelete_CheckBox.Checked = $false 
     $SelfDelete_CheckBox.Text = "Self Delete"
     
     # Add Convert Button
     $Convert_Button = New-Object -TypeName "System.Windows.Forms.Button"
-    $Convert_Button.Location = New-Object -TypeName "System.Drawing.Point(0, 281)"
-    $Convert_Button.Size = New-Object -TypeName "System.Drawing.Size(284, 60)"
+    $Convert_Button.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 0, 281
+    $Convert_Button.Size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 284, 60
     $Convert_Button.Text = "Convert PowerShell 2 Batch"
 
     # Add Button onClick event listener and logic
