@@ -126,7 +126,7 @@ class AppConfig {
         $this.RunAsAdmin = $Script:AdminMode
         $this.SelfDelete = $Script:SelfDelete
         $this.HideTerminal = $Script:HideTerminal
-        $this.ArgumentList = $Script:ArgumentList
+        $this.ArgumentList = $Script:CLIArgument
 
         # Process the input path and update it to be the output path with modifications.
         if ($this.OutputFile -eq "") {$this.OutputFile = $this.InputFile + ".bat"}
