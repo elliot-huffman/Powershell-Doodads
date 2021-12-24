@@ -47,94 +47,95 @@
     This tool is not needed for general use and should only be used when you know you need to change a PowerShell file into a self contained batch script.
 #>
 
-#Requires -PSEdition Desktop
+#Requires -Version 5.0
 
 # Add command line switch/flag support.
 # Each parameter is detailed in the above help documentation.
 param(
     # Parameters for GUI.
     [Parameter(
-        ParameterSetName='GUI'
+        ParameterSetName = 'GUI'
     )]
     [switch]$LegacyVisuals = $False,
 
     # Parameters for CLI.
     [Parameter(
-        ParameterSetName='CLI',
+        ParameterSetName = 'CLI',
         Position = 0,
-        Mandatory=$true
+        Mandatory = $true
     )]
     [switch]$CLIMode,
     [Parameter(
-        ParameterSetName='CLI',
+        ParameterSetName = 'CLI',
         Position = 1,
-        Mandatory=$true
+        Mandatory = $true
     )]
     [string]$InputFile,
     [Parameter(
-        ParameterSetName='CLI'
+        ParameterSetName = 'CLI'
     )]
     [string]$OutputFile,
     [Parameter(
-        ParameterSetName='CLI'
+        ParameterSetName = 'CLI'
     )]
     [switch]$AdminMode,
     [Parameter(
-        ParameterSetName='CLI'
+        ParameterSetName = 'CLI'
     )]
     [switch]$SelfDelete,
     [Parameter(
-        ParameterSetName='CLI'
+        ParameterSetName = 'CLI'
     )]
     [switch]$HideTerminal,
     [Parameter(
-        ParameterSetName='CLI'
+        ParameterSetName = 'CLI'
     )]
-    [string]$CLIArgument = ""
+    [string[]]$CLIArgument = ""
 )
 
-# Import required libraries
-Add-Type -AssemblyName "System.Windows.Forms"
-Add-Type -AssemblyName "System.Drawing"
+# If the app is running in GUI mode (not CLI mode), execute the below.
+# If the app is running in CLI mode, don't execute the below
+if (-not $CLIMode) {
+    # Import required libraries
+    Add-Type -AssemblyName "System.Windows.Forms"
+    Add-Type -AssemblyName "System.Drawing"
 
-# Enable pretty interface controls (by default)
-# Windows 98 styles are ugly compared to today's standards
-if (!$LegacyVisuals) {[System.Windows.Forms.Application]::EnableVisualStyles()}
+    # Enable pretty interface controls (by default)
+    # Windows 98 styles are ugly compared to today's standards
+    if (-not $LegacyVisuals) { [System.Windows.Forms.Application]::EnableVisualStyles() }
+}
 
-# Command Line interface mode logic starts here.
-Function Convert-File {
-    # Process the input path and update it to be the output path with modifications.
-    if ($Script:OutputFile -eq "") {$Script:OutputFile = $Script:InputFile + ".bat"}
+# The core class of the transpiler
+class AppConfig {
+    [System.String]$InputFile
+    [System.String]$OutputFile
+    [System.Boolean]$RunAsAdmin
+    [System.Boolean]$SelfDelete
+    [System.Boolean]$HideTerminal
+    [System.String[]]$ArgumentList
+    hidden [System.String]$BatchHeader
+    hidden [System.String]$AdminHeader
+    hidden [System.String]$HideTerminalParam
+    hidden [System.String]$BatchFooter
+    hidden [System.String]$SelfDeleteFooter
 
-    # Set the Administrative permission header of the batch script.
-    if ($AdminMode) {
-        $AdminSubHeader = 'net session >nul 2>&1
-if NOT %errorLevel% == 0 (
-    echo Please run this script as an administrator.
-    pause
-    exit
-)'
-    } else {$AdminSubHeader = ''}
-
-    # If the hide terminal option is specified, append the hide terminal option.
-    if ($Script:HideTerminal) {$DisplayTerminalCLI = ' -WindowStyle Hidden'}
-
-    # Code that will be added to the top of the converted script.
-    $BatchHeader = "@echo off
+    AppConfig() {
+        $this.InputFile = ""
+        $this.OutputFile = ""
+        $this.RunAsAdmin = $False
+        $this.SelfDelete = $False
+        $this.HideTerminal = $False
+        $this.ArgumentList = @()
+        $this.BatchHeader = @"
+@echo off
 color 0A
 cls
 cd /d %~dp0
-set Script=`"%Temp%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.ps1`"
-$($AdminSubHeader)
-("
-
-    # Code that will be added at the bottom of the converted script.
-    $BatchFooter = ") > %Script%
-PowerShell -ExecutionPolicy Unrestricted$DisplayTerminalCLI -File %Script% $Script:CLIArgument
-del %Script%"
-
-    # Code that will be added for admin permissions checker.
-    $AdminSubHeader = ':CheckAdmin
+set Script="%Temp%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.ps1"
+# TODO: Header admin code goes here
+(
+"@
+        $this.AdminHeader = ':CheckAdmin
 net session >nul 2>&1
 if %errorLevel% == 0 (
     echo Success: Administrative permissions confirmed.
@@ -144,48 +145,121 @@ if %errorLevel% == 0 (
     exit
 )
 '
+        $this.HideTerminalParam = "-WindowStyle Hidden"
+        $this.BatchFooter = ") > %Script%
+PowerShell -ExecutionPolicy Unrestricted -File %Script%
+del %Script%"
+        $this.SelfDeleteFooter = "(goto) 2>nul & del `"%~f0`""
+    }
 
-    # Create the top of the outputted script.
-    $BatchHeader | Out-File -FilePath $Script:OutputFile -Encoding "ASCII"
-    
-    # Open the script to be converted and run a sequence of commands upon each line in order from top to bottom.
-    Get-Content -Path $Script:InputFile | ForEach-Object {
+    # Process the parameter data into the app config data structure
+    [Void]ProcessParameters (
+        [System.String]$InputFile,
+        [System.String]$OutputFile,
+        [System.Boolean]$RunAsAdmin,
+        [System.Boolean]$SelfDelete,
+        [System.Boolean]$HideTerminal,
+        [System.String[]]$ArgumentList
+        ) {
+            $this.InputFile = $InputFile
+            $this.OutputFile = $OutputFile
+            $this.RunAsAdmin = $RunAsAdmin
+            $this.SelfDelete = $SelfDelete
+            $this.HideTerminal = $HideTerminal
+            $this.ArgumentList = $ArgumentList
 
-        # Automatically comments out pipe characters in the current line.
-        $fileLine = $_ -replace "\^", "^^"
-        $fileLine = $fileLine -replace "\|", "^|"
-        $fileLine = $fileLine -replace ">", "^>"
-        $fileLine = $fileLine -replace "<", "^<"
-        $fileLine = $fileLine -replace "%", "%%"
-        $fileLine = $fileLine -replace "&", "^&"
-        $fileLine = $fileLine -replace "\(", "^("
-        $fileLine = $fileLine -replace "\)", "^)"
-        $fileLine = $fileLine -replace '"', '^"'
-        
-        # If the line is blank then a blank line is generated for the batch file.
-        if ($fileLine -match "^\s*$") {
-            "echo." | Out-File -FilePath $Script:OutputFile -Append -Encoding ASCII
+            # Process the input path and update it to be the output path with modifications.
+            if ($this.OutputFile -eq "") {$this.OutputFile = $this.InputFile + ".bat"}
+        }
 
-        # If the line is not blank then the below applies.
-        } else {
+    # [System.String] AutoEscape() {}
+    [Void]WriteFile([System.String]$DataToWrite) {
+        # Append the specified data to the bottom of the output file in ASCII format.
+        Out-File -FilePath $this.OutputFile -Encoding "ASCII" -Append -InputObject $DataToWrite
+    }
 
-            # Otherwise just convert the string to a batch export.
-            "echo $fileLine" | Out-File -FilePath $Script:OutputFile -Append -Encoding "ASCII"            
+    # A method that updates the batch header property to contain the expected values for the file write operation
+    [Void]ComputeBatchHeaderOptions() {
+        # Set the baseline for the batch script's header section
+        $this.BatchHeader = @"
+@echo off
+color 0A
+cls
+cd /d %~dp0
+set Script="%Temp%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.ps1"
+"@
+        # If the run as admin option is set, add the run as admin header section to the baseline
+        if ($this.RunAsAdmin) { $this.BatchHeader += "`n$($this.AdminHeader)" }
+
+        # Add the necessary open parentheses to the batch header
+        $this.BatchHeader += "`n("
+    }
+
+    # Opens the input file, automatically escapes special chars and writes the results to the destination file
+    [Void]ProcessScriptBody() {
+        # Open the script to be converted and run a sequence of commands upon each line in order from top to bottom.
+        Get-Content -Path $this.InputFile | ForEach-Object {
+
+            # Automatically comments out special characters in the current line.
+            $fileLine = $_ -replace "\^", "^^"
+            $fileLine = $fileLine -replace "\|", "^|"
+            $fileLine = $fileLine -replace ">", "^>"
+            $fileLine = $fileLine -replace "<", "^<"
+            $fileLine = $fileLine -replace "%", "%%"
+            $fileLine = $fileLine -replace "&", "^&"
+            $fileLine = $fileLine -replace "\(", "^("
+            $fileLine = $fileLine -replace "\)", "^)"
+            $fileLine = $fileLine -replace '"', '^"'
+            
+            # If the current input file's line is blank.
+            if ($fileLine -match "^\s*$") {
+                # Enter a blank echo which is an echo with a period, this generates a line of nothing in the batch processor
+                $this.WriteFile("echo.")
+            } else { # If the line is not blank then the below applies.
+                # Directly write the line of converted code to the specified file while appending an echo command which will write the line contents to a file.
+                $this.WriteFile("echo $fileLine")            
+            }
         }
     }
 
-    # Add the footer to the outputted batch file.
-    $BatchFooter | Out-File -FilePath $Script:OutputFile -Append -Encoding "ASCII"
+    # A method that updates the batch footer property to contain the expected values for the file write operation
+    [Void]ComputeBatchFooterOptions() {
+        # Build the batch script's footer dynamically
+        $this.BatchFooter = ") > %Script%
+        PowerShell -ExecutionPolicy Unrestricted $(if ($this.HideTerminal) {$this.HideTerminalParam}) -File %Script% $($this.ArgumentList)
+        del %Script%"
 
-    # Add the self deleting module to the batch script.
-    if ($Script:SelfDelete) {Out-File -FilePath $Script:OutputFile -InputObject "(goto) 2>nul & del `"%~f0`"" -Encoding "ASCII" -Append}
+        # If the self delete option is selected, add the self delete footer to the batch footer
+        if ($this.SelfDelete) { $this.BatchFooter += "`n$($this.SelfDeleteFooter)" }
+    }
 
-    # Only show the completed dialog if the script is not in CLI mode.
-    if (!$Script:CLIMode) {[System.Windows.Forms.MessageBox]::Show("Recompile completed!", "Finished!")}
+    # Executes the correct transpilation process in the correct order. Aka, the business logic portion of the app.
+    [System.Boolean]ExecuteConversion() {
+        # Compute the batch file's header to be written
+        $this.ComputeBatchHeaderOptions()
+
+        # Write the specified header to the batch file
+        $this.WriteFile($this.BatchHeader)
+
+        # Execute the main conversion of the powershell script to the batch script file
+        $this.ProcessScriptBody()
+
+        # Compute the batch file's footer to be written
+        $this.ComputeBatchFooterOptions()
+
+        # Write the specified footer to the batch file
+        $this.WriteFile($this.BatchFooter)
+
+        # Return true for a successful conversion
+        return $true
+    }
 }
 
+# Instantiate the config engine
+$appConfigInstance = New-Object -TypeName "AppConfig"
+
 # Create input file dialog function
-Function Show-ChangeInput {
+function Show-ChangeInput {
     <#
     .SYNOPSIS
         Have user select file via GUI
@@ -250,7 +324,7 @@ Function Show-ChangeInput {
     }
 }
 
-Function Show-ChangeOutput {
+function Show-ChangeOutput {
     <#
     .SYNOPSIS
         Have a user select file location via GUI.
@@ -317,6 +391,9 @@ Function Show-ChangeOutput {
 
 # Starts the main interface
 Function Show-MainUI {
+    # Process the command line parameters that were provided to the app during launch
+    $appConfigInstance.ProcessParameters($InputFile, $OutputFile, $RunAsAdmin, $SelfDelete, $HideTerminal, $ArgumentList)
+
     # Initialize font setting
     $Label_Font = New-Object -TypeName System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Regular)
     $Argument_Label_Font = New-Object -TypeName System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Regular)
@@ -406,21 +483,26 @@ Function Show-MainUI {
     $Convert_Button.Text = "Convert PowerShell 2 Batch"
 
     # Add Button onClick event listener and logic
-    $Convert_Button.Add_Click({
-        $Script:CLIArgument = $Argument_TextBox.Text
-        $Script:AdminMode = $Admin_CheckBox.Checked
-        $Script:HideTerminal = $HideWindow_CheckBox.Checked
-        $Script:SelfDelete = $SelfDelete_CheckBox.Checked
-        Convert-File
-    })
-    $Input_Button.Add_Click({
-        Show-ChangeInput
-        $InputFile_Label.Text = "$Script:InputFile"
-    })
-    $Output_Button.Add_Click({
-        Show-ChangeOutput
-        $OutputFile_Label.Text = "$Script:OutputFile"
-    })
+    $Convert_Button.Add_Click(
+        {
+            $appConfigInstance.ArgumentList = $Argument_TextBox.Text
+            $appConfigInstance.RunAsAdmin = $Admin_CheckBox.Checked
+            $appConfigInstance.HideTerminal = $HideWindow_CheckBox.Checked
+            $appConfigInstance.SelfDelete = $SelfDelete_CheckBox.Checked
+            $appConfigInstance.ExecuteConversion()
+        })
+    $Input_Button.Add_Click(
+        {
+            $InputSelection = Show-ChangeInput
+            $InputFile_Label.Text = $InputSelection
+            $appConfigInstance.InputFile = $InputSelection
+        })
+    $Output_Button.Add_Click(
+        {
+            $OutputSelection = Show-ChangeOutput
+            $OutputFile_Label.Text = $OutputSelection
+            $appConfigInstance.OutputFile = $OutputSelection
+        })
 
     # Add the controls to the form for rendering
     $Form.Controls.Add($Input_Button)
@@ -438,8 +520,16 @@ Function Show-MainUI {
     $Form.ShowDialog() | Out-Null
 }
 
+# TODO: add automatic dot sourcing support '$MyInvocation.Line -NotMatch "^\.\s"'
+
+# If the CLI Mode param was specified, execute conversion directly without rendering the main UI.
 if ($CLIMode) {
-    Convert-File
-} else {
+    # Process the parameters specified into the class object
+    $appConfigInstance.ProcessParameters($InputFile, $OutputFile, $RunAsAdmin, $SelfDelete, $HideTerminal, $ArgumentList)
+
+    # Execute the conversion process
+    $appConfigInstance.ExecuteConversion()
+} else { # if the CLI mode param was not specified
+    # Start the Main UI renderer
     Show-MainUI
 }
