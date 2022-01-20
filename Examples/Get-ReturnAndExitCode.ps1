@@ -14,7 +14,7 @@ param(
 # it works for the current scope of execution, not just loops.
 # The "exit" key word will stop the current script execution, not the entire process.
 $PSCmdlet.WriteObject(@{elliot=123})
-$PSCmdlet.WriteObject(@{elliot=456})
+$PSCmdlet.WriteObject(@{huffman=456})
 
 # Set an exit code, if another script had called this one, this number is lost, the other script will need to specify an error code
 # If this script stops the powershell process with the exit statement, this is the %errorlevel%/exit code that will be used
