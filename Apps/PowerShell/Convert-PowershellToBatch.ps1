@@ -425,7 +425,7 @@ Function Show-MainUI {
 
     # Argument label.
     $Argument_Label = New-Object -TypeName "System.Windows.Forms.Label"
-    $Argument_Label.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 0, 160
+    $Argument_Label.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 0, 162
     $Argument_Label.Size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 100, 40
     $Argument_Label.BorderStyle = "None"
     $Argument_Label.TextAlign = "BottomCenter"
@@ -446,7 +446,7 @@ Function Show-MainUI {
 
     # Argument TextBox
     $Argument_TextBox = New-Object -TypeName "System.Windows.Forms.TextBox"
-    $Argument_TextBox.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 0, 200
+    $Argument_TextBox.Location = New-Object -TypeName "System.Drawing.Point" -ArgumentList 0, 202
     $Argument_TextBox.Size = New-Object -TypeName "System.Drawing.Size" -ArgumentList 284, 10
 
     # Yes Radio Button, checked by default
