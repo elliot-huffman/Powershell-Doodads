@@ -1,11 +1,14 @@
 # Add command line switch/flag support
 # Legacy visuals are for people who like the old visual styles.
 # by using the switch, the variable becomes true, bypassing the enable modern visuals step
-param([switch]$LegacyVisuals = $false, [string]$UserName)
+param(
+    [switch]$LegacyVisuals = $false,
+    [string]$UserName
+)
 
 # Import required libraries
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName "System.Windows.Forms"
+Add-Type -AssemblyName "System.Drawing"
 
 # Enable pretty interface controls (by default)
 # Windows 98 styles are ugly compared to today's standards

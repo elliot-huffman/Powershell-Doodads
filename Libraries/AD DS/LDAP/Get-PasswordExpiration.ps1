@@ -30,7 +30,7 @@
     https://github.com/elliot-labs/PowerShell-Doodads
 #>
 
-#requires -PSEdition Desktop
+#Requires -PSEdition Desktop
 
 # Add command line parameter/argument support.
 # Each parameter is detailed in the above help documentation.
@@ -77,15 +77,7 @@ param(
         ParameterSetName = "CLI",
         ValueFromPipeline = $false
     )]
-    [switch]$GlobalCatalog,
-    # Allow the library to be used as a standalone command line application
-    [Parameter(
-        Mandatory = $false,
-        Position = 4,
-        ParameterSetName = "CLI",
-        ValueFromPipeline = $false
-    )]
-    [switch]$CLIMode = $false
+    [switch]$GlobalCatalog
 )
 
 # Define a function that will connect to the domain
@@ -183,7 +175,8 @@ Function Get-PwdExpirationTime {
     $DirectorySearcher = [ADSISearcher]$DomainConnection
 
     # Specify the property that needs retrieved from AD
-    $DirectorySearcher.PropertiesToLoad.Add('msDS-UserPasswordExpiryTimeComputed') | Out-Null
+    $DirectorySearcher.PropertiesToLoad.Add("msDS-UserPasswordExpiryTimeComputed") | Out-Null
+    $DirectorySearcher.PropertiesToLoad.Add("UserAccountControl") | Out-Null
     
     # Build a search string and store it into a variable
     $SearchString = "(&(objectClass=user)(objectCategory=person)(SAMAccountName=$User))"
@@ -201,7 +194,7 @@ Function Get-PwdExpirationTime {
     $SearchTime = $SingleUser.Properties['msDS-UserPasswordExpiryTimeComputed']
 
     # If the password does not expire, return a zero date. Otherwise, return the expiration time.
-    if ($SearchTime -eq 9223372036854775807) {
+    if ($UserInstance.Properties."UserAccountControl" -eq 65536) {
         # return a 0 date (Monday, January 1, 0001 12:00:00 AM)
         Return 0 | Get-Date
     } else {
@@ -338,7 +331,7 @@ Function Merge-ConnectionString {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = "Specifies that a global catalog should be connected to"
         )]
-        [switch]$GlobalCatalog = $false
+        [switch]$GlobalCatalog
     )
 
     # Build the base search string
@@ -377,7 +370,7 @@ Function Merge-ConnectionString {
 }
 
 # Allow this library to be used in a standalone mode as a command line application
-if ($CLIMode) {
+if ($MyInvocation.Line -NotMatch "^\.\s") {
     # Build the connection string
     $ConnectionString = Merge-ConnectionString -ComputerName $ComputerName -Domain $Domain -GlobalCatalog:$GlobalCatalog
     
@@ -388,7 +381,7 @@ if ($CLIMode) {
     Return Get-PwdExpirationTime -DomainConnection $DomainInstance
 }
 
-# ToDo:
+# TODO:
 # Add parameter sets to avoid parameter issues where some params are used and others are not.
 # After parameter sets are set up properly, update all the help docs and comments.
 # Add cmdlet binding

@@ -12,6 +12,8 @@
     System.DateTime
 .OUTPUTS
     Output (if any)
+.LINK
+    https://github.com/elliot-labs/PowerShell-Doodads
 .NOTES
     General notes
 #>
@@ -59,7 +61,7 @@ param(
         HelpMessage = "Specify the expiration date of the password"
     )]
     [ValidateNotNullOrEmpty()]
-    [System.DateTime]$PasswordExpirationDate = (&"..\Libraries\AD DS\LDAP\Get-PasswordExpiration.ps1" -CLIMode)
+    [System.DateTime]$PasswordExpirationDate = (&"..\..\Libraries\AD DS\LDAP\Get-PasswordExpiration.ps1" -CLIMode)
 )
 
 # Define the popup function
@@ -84,15 +86,6 @@ Function Show-Popup {
 
     # Import the Windows forms assembly
     Add-Type -AssemblyName System.Windows.Forms
-
-    # Set the message box icon variable to the appropriate value based upon the input
-    switch ($MessageBoxIcon) {
-        "Information" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Information }
-        "Question" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Question }
-        "Warning" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Warning }
-        "Error" { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Error }
-        Default { $IconObject = [System.Windows.Forms.MessageBoxIcon]::Information }
-    }
 
     # Display the message box with the specified text and icon
     [System.Windows.Forms.MessageBox]::Show($MessageBody, $TitleBarText, [System.Windows.Forms.MessageBoxButtons]::OK, $IconObject) | Out-Null

@@ -1,26 +1,30 @@
 <#
 .SYNOPSIS
-Placeholder
+    Placeholder
 .DESCRIPTION
-Placeholder
+    Placeholder
 .PARAMETER PingDestination
-Placeholder
+    Placeholder
 .PARAMETER OutputFile
-Placeholder
+    Placeholder
 .PARAMETER LoopRounds
-Placeholder
+    Placeholder
 .EXAMPLE
-Placeholder
+    Placeholder
 .EXAMPLE
-Placeholder
-.NOTES
-Placeholder
+    Placeholder
 .LINK
-https://github.com/elliot-labs/Powershell-Doodads
+    https://github.com/elliot-labs/PowerShell-Doodads
+.NOTES
+    Placeholder
 #>
 
 # Allow command line automation.
-param([string]$PingDestination = "google.com", [string]$OutputFile = "Internet Stress Test.log", [int]$LoopRounds = 0)
+param(
+    [string]$PingDestination = "bing.com",
+    [string]$OutputFile = "Internet Stress Test.log",
+    [int]$LoopRounds = 0
+)
 
 # Set the loop counter to 0.
 $loop_counter = 0
