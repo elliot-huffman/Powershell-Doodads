@@ -150,9 +150,9 @@ if %errorLevel% == 0 (
     exit
 )
 '
-        $this.HideTerminalParam = "-WindowStyle Hidden"
+        $this.HideTerminalParam = "-WindowStyle `"Hidden`""
         $this.BatchFooter = ") > %Script%
-PowerShell -ExecutionPolicy Unrestricted -File %Script%
+PowerShell -ExecutionPolicy `"Unrestricted`" -File %Script%
 del %Script%"
         $this.SelfDeleteFooter = "(goto) 2>nul & del `"%~f0`""
     }
@@ -223,7 +223,7 @@ set Script="%Temp%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.ps1"
     [Void]ComputeBatchFooterOptions() {
         # Build the batch script's footer dynamically
         $this.BatchFooter = ") > %Script%
-PowerShell -ExecutionPolicy Unrestricted $(if ($this.HideTerminal) {$this.HideTerminalParam}) -File %Script% $($this.ArgumentList)
+PowerShell -ExecutionPolicy `"Unrestricted`" $(if ($this.HideTerminal) {$this.HideTerminalParam}) -File %Script% $($this.ArgumentList)
 del %Script%"
 
         # If the self delete option is selected, add the self delete footer to the batch footer
