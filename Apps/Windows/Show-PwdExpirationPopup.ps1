@@ -61,7 +61,7 @@ param(
         HelpMessage = "Specify the expiration date of the password"
     )]
     [ValidateNotNullOrEmpty()]
-    [System.DateTime]$PasswordExpirationDate = (&"..\Libraries\AD DS\LDAP\Get-PasswordExpiration.ps1" -CLIMode)
+    [System.DateTime]$PasswordExpirationDate = (&"..\..\Libraries\AD DS\LDAP\Get-PasswordExpiration.ps1" -CLIMode)
 )
 
 # Define the popup function
