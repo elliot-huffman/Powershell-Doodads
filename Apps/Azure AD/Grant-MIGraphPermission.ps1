@@ -18,10 +18,14 @@
     This is the display name of the permission the be granted to the target ObjectID.
 .PARAMETER GraphServicePrincipalID
     This is the GUID of the service principal that is the permissions provider.
-    By default the service provider is the Microsoft Graph API (GraphServicePrincipalID), however you can grant permissions on other providers too.
+    By default the service provider is the Microsoft Graph API, however you can grant permissions on other providers too by providing their GUID.
     Common providers are as below:
-    Defender for Endpoint: [system.guid]
-    Defender for Cloud Apps: [system.guid]
+    Microsoft Graph API: 00000003-0000-0000-c000-000000000000
+    Defender for Endpoint: fc780465-2017-40d4-a0c5-307022471b92
+    Defender for Cloud Apps: 05a65629-4c1b-48c1-a78b-804c4abdd4af
+    SharePoint Online: 00000003-0000-0ff1-ce00-000000000000
+    Yammer: 00000005-0000-0ff1-ce00-000000000000
+    Universal Print: da9b70f6-5323-4ce6-ae5c-88dcc5082966
 .INPUTS
     Switch
     System.GUID
