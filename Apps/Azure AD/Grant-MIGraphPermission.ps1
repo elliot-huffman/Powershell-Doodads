@@ -34,17 +34,16 @@
 .OUTPUTS
     System.Boolean
 .NOTES
-    This script requires the AzureAD module to be installed before execution.
-    PS Core 6 is not supported for this script since it utilizes Windows Forms.
-    ISE must be installed as some PowerShell Windows Forms components are included in ISE that this script uses (Out-GridView)
+    This script requires the Microsoft.Graph.Authentication and Microsoft.Graph.Applications modules to be installed before execution.
+    If the GUI mode is to be used, ISE must be installed as some Windows Forms components are included in ISE that this script uses (Out-GridView).
     
     Exit Codes:
         1 - lorem ipsum
 #>
 
 # Ensure the appropriate pre-requirements for the script
-#Requires -Module AzureAD
-#Requires -PSEdition Desktop
+#Requires -Module Microsoft.Graph.Authentication
+#Requires -Module Microsoft.Graph.Applications
 
 # Cmdlet bind script so that it can perform advanced operations
 [CmdletBinding(
@@ -93,11 +92,7 @@ begin {
     Write-Verbose -Message "Logging into Azure AD"
     
     # Log into Azure AD
-    [Microsoft.Open.Azure.AD.CommonLibrary.PSAzureContext]$AzureADSession = Connect-AzureAD
-
-    # Write debug info
-    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Session Info:"
-    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$AzureADSession: $AzureADSession"
+    Connect-MgGraph -Scopes "Directory.Read.All", "AppRoleAssignment.ReadWrite.All", "Application.ReadWrite.All"
 
     # Check to see if GUI mode is forced or necessary
     if ($CLIMode) {
@@ -120,7 +115,7 @@ process {
     Write-Verbose -Message "Getting an instance of the Graph API App Service Principal"
 
     # Get the GraphAPI instance
-    [Microsoft.Open.AzureAD.Model.ServicePrincipal]$GraphAppSP = Get-AzureADServicePrincipal -Filter "AppID eq '$GraphServicePrincipalID'"
+    [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphServicePrincipal]$GraphAppSP = Get-MgServicePrincipal -Filter "AppID eq '$GraphServicePrincipalID'"
 
     # Write debug info
     Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Graph API SP Info:"
@@ -132,13 +127,16 @@ process {
         Write-Verbose -Message "Getting a list of all managed identities and render it in a picker dialog for the end user to select one."
 
         # Get a list of Managed Identities and make the user select one of them
-        [Microsoft.Open.AzureAD.Model.ServicePrincipal[]]$SelectedPrincipalList = Get-AzureADServicePrincipal -Filter "ServicePrincipalType eq 'ManagedIdentity'" -All $true | Out-GridView -Title "Select the Managed Identity to Assign Permission" -OutputMode "Multiple"
+        [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphServicePrincipal[]]$SelectedPrincipalList = Get-MgServicePrincipal -Filter "ServicePrincipalType eq 'ManagedIdentity'" -All $true | Out-GridView -Title "Select the Managed Identity to Assign Permission" -OutputMode "Multiple"
     } else {
         # Write Verbose info
         Write-Verbose -Message "Getting the specified service principal."
 
-        # Pull the specified Object ID
-        [Microsoft.Open.AzureAD.Model.ServicePrincipal[]]$SelectedPrincipalList = Get-AzureADServicePrincipal -ObjectId $ObjectID
+        # Loop through each ID specified and save the results into a new list.
+        foreach ($GUID in $ObjectID) {
+            # Pull the specified Object ID's graph object
+            [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphServicePrincipal[]]$SelectedPrincipalList += Get-MgServicePrincipal -ServicePrincipalId $GUID
+        }
     }
 
     # Write debug info
@@ -149,7 +147,7 @@ process {
     Write-Verbose -Message "Validating principal selection was successful"
         
     # Throw an error and end execution if the end user doesn't select an object
-    if ($null -eq $SelectedPrincipalList) {
+    if (($null -eq $SelectedPrincipalList) -or ($SelectedPrincipalList.Count -eq 0)) {
         # Write an error to the console
         Write-Error -Message "No principals were selected successfully.
         If GUI was used, this usually indicates that the end user closed the dialog.
@@ -165,7 +163,7 @@ process {
         Write-Verbose -Message "Getting a list of all app roles/permissions and render it in a picker dialog for the end user to select one."
 
         # Get the specified permission that needs to be assigned
-        [Microsoft.Open.AzureAD.Model.AppRole[]]$AppRoleList = $GraphAppSP.AppRoles | Out-GridView -Title "Select the Permission to Assign" -OutputMode "Multiple"
+        [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphAppRole[]]$AppRoleList = $GraphAppSP.AppRoles | Out-GridView -Title "Select the Permission to Assign" -OutputMode "Multiple"
     } else {
         # Write Verbose info
         Write-Verbose -Message "Getting the specified app role/permission"
@@ -173,7 +171,7 @@ process {
         # Loop through each permission requested and enrich the permission provided with system context
         foreach ($RoleName in $PermissionName) {
             # Add each context instance to the app role list
-            [Microsoft.Open.AzureAD.Model.AppRole[]]$AppRoleList += $GraphAppSP.AppRoles | Where-Object -FilterScript { $_.Value -eq $RoleName }
+            [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphAppRole[]]$AppRoleList += $GraphAppSP.AppRoles | Where-Object -FilterScript { $_.Value -eq $RoleName }
         }         
     }
 
@@ -186,7 +184,7 @@ process {
     Write-Verbose -Message "Validating role selection was successful"
 
     # Throw an error and end execution if the end user doesn't select an object
-    if ($null -eq $AppRoleList) {
+    if (($null -eq $AppRoleList) -or ($AppRoleList.Count -eq 0)) {
         # Write an error to the console
         Write-Error -Message "No API roles were selected successfully.
         If GUI was used, this usually indicates that the end user closed the dialog.
@@ -207,12 +205,12 @@ process {
             if ($PSCmdlet.ShouldProcess("Selected Service Principal", "Grant $($Role.Value)")) {
                 # Write debug info
                 Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Pre-Assignment Variable Dump:"
-                Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$Principal.ObjectId: $($Principal.ObjectId)"
-                Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$GraphAppSP.ObjectId: $($GraphAppSP.ObjectId)"
+                Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$Principal.ObjectId: $($Principal.Id)"
+                Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$GraphAppSP.ObjectId: $($GraphAppSP.Id)"
                 Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$Role.Id: $($Role.Id)"
 
                 # Assign the Graph API permission to the specified service principal
-                New-AzureAdServiceAppRoleAssignment -ObjectId $Principal.ObjectId -PrincipalId $Principal.ObjectId -ResourceId $GraphAppSP.ObjectId -Id $Role.Id   
+                New-MgServicePrincipalAppRoleAssignment -PrincipalId $Principal.Id -ServicePrincipalId $Principal.Id -AppRoleId $Role.Id -ResourceId $GraphAppSP.Id
             }
         }
     }
@@ -220,6 +218,6 @@ process {
 
 # Run the necessary cleanup commands after processing is complete
 end {
-    # Log out of Azure AD
-    Disconnect-AzureAD
+    # Log out of the session
+    Disconnect-MgGraph
 }
