@@ -4,7 +4,7 @@
 [CmdletBinding(SupportsShouldProcess=$true)]
 
 param(
-    [System.String]$ComputerName = "S-911cad01.nc-cherokee.com",
+    [System.String]$ComputerName = "licenseserver.example.com",
     [System.String]$EngineVersion = "10.8"
 );
 
