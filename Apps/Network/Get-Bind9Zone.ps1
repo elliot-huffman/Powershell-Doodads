@@ -234,6 +234,7 @@ begin {
                     "Host"     = $HostName;
                     "Type"     = $Type;
                     "Class"    = $Class;
+                    "TTL"      = $TTL;
                     "Priority" = $Priority;
                     "Weight"   = $Weight;
                     "Port"     = $Port;
