@@ -41,8 +41,8 @@
 [CmdletBinding()]
 
 param(
-    [ValidateScript({ Test-Path -Path $_ -PathType "Container" })]
-    [System.String]$Path = ".\"
+    [ValidateScript({ Test-Path -Path $_ -PathType 'Container' })]
+    [System.String]$Path = '.\'
 )
 
 # Run this section only once before script processing starts
@@ -87,12 +87,12 @@ begin {
         #>
 
         param (
-            [ValidateSet("SOA", "A", "AAAA", "CNAME", "CAA", "MX", "NS", "TXT", "SRV", "PTR")]
+            [ValidateSet('SOA', 'A', 'AAAA', 'CNAME', 'CAA', 'MX', 'NS', 'TXT', 'SRV', 'PTR')]
             [ValidateNotNullOrEmpty()]
             [Parameter(Mandatory = $true)]
             [System.String]$Type,
-            [ValidateSet("IN", "HS", "CH")]
-            [System.String]$Class = "IN",
+            [ValidateSet('IN', 'HS', 'CH')]
+            [System.String]$Class = 'IN',
             [Parameter(Mandatory = $true)]
             [ValidateNotNullOrEmpty()]
             [System.String]$HostName,
@@ -128,7 +128,7 @@ begin {
             [ValidateNotNullOrEmpty()]
             [System.Int64]$Flag,
             [Parameter(Mandatory = $true, ParameterSetName = 'CAA')]
-            [ValidateSet("issue", "issuewild", "iodef")]
+            [ValidateSet('issue', 'issuewild', 'iodef')]
             [ValidateNotNullOrEmpty()]
             [System.String]$Tag,
             [Parameter(Mandatory = $true, ParameterSetName = 'CAA')]
@@ -152,98 +152,98 @@ begin {
         
         # Change execution flow based on the type of DNS record
         switch ($Type) {
-            "SOA" {
+            'SOA' {
                 # Return a SOA record
                 return [PSCustomObject]@{
-                    "Host"      = $HostName;
-                    "Type"      = $Type;
-                    "Class"     = $Class;
-                    "TTL"       = $TTL;
-                    "PrimaryNS" = $PrimaryNameServer;
-                    "Serial"    = $Serial;
-                    "Refresh"   = $Refresh;
-                    "Retry"     = $Retry;
-                    "Expire"    = $Expire;
-                    "Minimum"   = $Minimum;
-                    "Contact"   = $ZoneContact
+                    'Host'      = $HostName;
+                    'Type'      = $Type;
+                    'Class'     = $Class;
+                    'TTL'       = $TTL;
+                    'PrimaryNS' = $PrimaryNameServer;
+                    'Serial'    = $Serial;
+                    'Refresh'   = $Refresh;
+                    'Retry'     = $Retry;
+                    'Expire'    = $Expire;
+                    'Minimum'   = $Minimum;
+                    'Contact'   = $ZoneContact
                 }
             }
-            { ($_ -eq "A") -or ($_ -eq "AAAA") } {
+            { ($_ -eq 'A') -or ($_ -eq 'AAAA') } {
                 return [PSCustomObject]@{
-                    "Host"  = $HostName;
-                    "Type"  = $Type;
-                    "Class" = $Class;
-                    "TTL"   = $TTL;
-                    "IP"    = $IP;
+                    'Host'  = $HostName;
+                    'Type'  = $Type;
+                    'Class' = $Class;
+                    'TTL'   = $TTL;
+                    'IP'    = $IP;
                 }
             }
-            "CNAME" {
+            'CNAME' {
                 return [PSCustomObject]@{
-                    "Host"  = $HostName;
-                    "Type"  = $Type;
-                    "Class" = $Class;
-                    "TTL"   = $TTL;
-                    "Value" = $Value;
+                    'Host'  = $HostName;
+                    'Type'  = $Type;
+                    'Class' = $Class;
+                    'TTL'   = $TTL;
+                    'Value' = $Value;
                 }
             }
-            "CAA" {
+            'CAA' {
                 return [PSCustomObject]@{
-                    "Host"  = $HostName;
-                    "Type"  = $Type;
-                    "Class" = $Class;
-                    "TTL"   = $TTL;
-                    "Flag"  = $Flag;
-                    "Tag"   = $Tag;
-                    "Value" = $Value;
+                    'Host'  = $HostName;
+                    'Type'  = $Type;
+                    'Class' = $Class;
+                    'TTL'   = $TTL;
+                    'Flag'  = $Flag;
+                    'Tag'   = $Tag;
+                    'Value' = $Value;
                 }
             }
-            "MX" {
+            'MX' {
                 return [PSCustomObject]@{
-                    "Host"     = $HostName;
-                    "Type"     = $Type;
-                    "Class"    = $Class;
-                    "TTL"      = $TTL;
-                    "Priority" = $Priority;
-                    "Value"    = $Value;
+                    'Host'     = $HostName;
+                    'Type'     = $Type;
+                    'Class'    = $Class;
+                    'TTL'      = $TTL;
+                    'Priority' = $Priority;
+                    'Value'    = $Value;
                 }
             }
-            "NS" {
+            'NS' {
                 return [PSCustomObject]@{
-                    "Host"  = $HostName;
-                    "Type"  = $Type;
-                    "Class" = $Class;
-                    "TTL"   = $TTL;
-                    "Value" = $Value;
+                    'Host'  = $HostName;
+                    'Type'  = $Type;
+                    'Class' = $Class;
+                    'TTL'   = $TTL;
+                    'Value' = $Value;
                 }
             }
-            "TXT" {
+            'TXT' {
                 return [PSCustomObject]@{
-                    "Host"  = $HostName;
-                    "Type"  = $Type;
-                    "Class" = $Class;
-                    "TTL"   = $TTL;
-                    "Value" = $Value;
+                    'Host'  = $HostName;
+                    'Type'  = $Type;
+                    'Class' = $Class;
+                    'TTL'   = $TTL;
+                    'Value' = $Value;
                 }
             }
-            "SRV" {
+            'SRV' {
                 return [PSCustomObject]@{
-                    "Host"     = $HostName;
-                    "Type"     = $Type;
-                    "Class"    = $Class;
-                    "TTL"      = $TTL;
-                    "Priority" = $Priority;
-                    "Weight"   = $Weight;
-                    "Port"     = $Port;
-                    "Value"    = $Value;
+                    'Host'     = $HostName;
+                    'Type'     = $Type;
+                    'Class'    = $Class;
+                    'TTL'      = $TTL;
+                    'Priority' = $Priority;
+                    'Weight'   = $Weight;
+                    'Port'     = $Port;
+                    'Value'    = $Value;
                 }
             }
-            "PTR" {
+            'PTR' {
                 return [PSCustomObject]@{
-                    "Host"  = $HostName;
-                    "Type"  = $Type;
-                    "Class" = $Class;
-                    "TTL"   = $TTL;
-                    "Value" = $Value;
+                    'Host'  = $HostName;
+                    'Type'  = $Type;
+                    'Class' = $Class;
+                    'TTL'   = $TTL;
+                    'Value' = $Value;
                 }
             }
         }
@@ -256,7 +256,7 @@ begin {
 # Process each object passed
 process {
     # List all of the zone files in the specified directory
-    [System.IO.FileInfo[]]$ConfigList = Get-ChildItem -Path $Path -Filter "db.*" -File
+    [System.IO.FileInfo[]]$ConfigList = Get-ChildItem -Path $Path -Filter 'db.*' -File
 
     # Initialize the dictionary that will contain each config's contents for later use
     $LoadedFileList = @{}
@@ -271,44 +271,44 @@ process {
     foreach ($LoadedFile in $LoadedFileList.GetEnumerator()) {
 
         # Write verbose info to console
-        Write-Verbose -Message "----------------"
-        Write-Verbose -Message "Operating on file:"
+        Write-Verbose -Message '----------------'
+        Write-Verbose -Message 'Operating on file:'
         Write-Verbose -Message $LoadedFile.Name
-        Write-Verbose -Message "----------------"
+        Write-Verbose -Message '----------------'
 
         # Initialize parser variables
         [System.Int64]$CurrentTTL = 0               # The TTL that the current section runs at
-        [System.String]$CurrentOrigin = "."         # The origin is the suffix of the FQDN that the record's name will use
-        [System.String]$CurrentHost = ""            # The current host name for the record set that is currently being operated on
+        [System.String]$CurrentOrigin = '.'         # The origin is the suffix of the FQDN that the record's name will use
+        [System.String]$CurrentHost = ''            # The current host name for the record set that is currently being operated on
         [System.Boolean]$InParentheses = $false     # Keeps track if the current line is in a parentheses set
-        [System.String]$SoaClass = ""               # The class type of the SOA, valid values are "IN", "HS", or "CH"
+        [System.String]$SoaClass = ''               # The class type of the SOA, valid values are "IN", "HS", or "CH"
         [System.String[]]$SoaConfig = @()           # Array of SOA configs in order of scan from the Zone
         [PSCustomObject[]]$RecordList = @()         # List of records in the specified zone
 
         # Iterate through each line
         foreach ($Line in $LoadedFile.Value) {
             # Remove a comment in a line if it exists and remove any extra whitespace that may be left over because of the comment removal
-            [System.String]$NoCommentLine = ($Line -split ";")[0].TrimEnd()
+            [System.String]$NoCommentLine = ($Line -split ';')[0].TrimEnd()
 
             # Write verbose info to console
-            Write-Verbose -Message "================"
-            Write-Verbose -Message "No comment line:"
+            Write-Verbose -Message '================'
+            Write-Verbose -Message 'No comment line:'
             Write-Verbose -Message $NoCommentLine
             Write-Verbose -Message "Line length: $($NoCommentLine.Length)"
-            Write-Verbose -Message "================"
+            Write-Verbose -Message '================'
 
             # Check to see if the current contains is a command
             if ($NoCommentLine -like '`$ORIGIN*') {
                 # If it is
 
                 # Remove the origin prefix, any trailing white space, and set the current origin to the computed origin
-                $CurrentOrigin = ($NoCommentLine -replace '^\$origin\s*', "").Trim()
+                $CurrentOrigin = ($NoCommentLine -replace '^\$origin\s*', '').Trim()
 
                 # If the current origin isn't a single dot, add a prefix dot so that other host names are added in properly and won't merge with non dot origins.
-                if ($CurrentOrigin -ne ".") { $CurrentOrigin = "." + $CurrentOrigin }
+                if ($CurrentOrigin -ne '.') { $CurrentOrigin = '.' + $CurrentOrigin }
 
                 # Write verbose info to console
-                Write-Verbose -Message "Changed current origin to:"
+                Write-Verbose -Message 'Changed current origin to:'
                 Write-Verbose -Message $CurrentOrigin
 
                 # Move onto the next line
@@ -318,39 +318,39 @@ process {
                 # If the line is a TTL command
 
                 # Remove the TTL prefix, any trailing white space, and set the current TTL to the computed TTL
-                $CurrentTTL = ($NoCommentLine -replace '^\$TTL\s*', "").Trim()
+                $CurrentTTL = ($NoCommentLine -replace '^\$TTL\s*', '').Trim()
 
                 # Write verbose info to console
-                Write-Verbose -Message "Changed current TTL to:"
+                Write-Verbose -Message 'Changed current TTL to:'
                 Write-Verbose -Message $CurrentTTL
 
                 # Move onto the next line
                 continue
             }
-            elseif ($NoCommentLine -match "^(?<CurrentHost>[\w\-.]+)") {
+            elseif ($NoCommentLine -match '^(?<CurrentHost>[\w\-.]+)') {
                 # Capture the current host value and set the current host value to the current host record
                 $CurrentHost = $Matches.CurrentHost
 
                 # Write verbose info to console
-                Write-Verbose -Message "Changed current host to:"
+                Write-Verbose -Message 'Changed current host to:'
                 Write-Verbose -Message $CurrentHost
             }
 
             # Get the info about the current line being operated so that the matches auto var gets populated on and silence the boolean output
-            $NoCommentLine -match "(?<=(?<Class>IN|CH|HS)?\s+)(?<Type>SOA|A|AAAA|CNAME|CAA|MX|NS|TXT|SRV|PTR)(?=\s+)" | Out-Null
+            $NoCommentLine -match '(?<=(?<Class>IN|CH|HS)?\s+)(?<Type>SOA|A|AAAA|CNAME|CAA|MX|NS|TXT|SRV|PTR)(?=\s+)' | Out-Null
 
             # Set the current class to match the current line's current class. If nothing is defined default to IN as that is the BIND behavior.
-            if ($null -eq $Matches.Class) { [System.String]$CurrentClass = "IN" } else { [System.String]$CurrentClass = $Matches.Class }
+            if ($null -eq $Matches.Class) { [System.String]$CurrentClass = 'IN' } else { [System.String]$CurrentClass = $Matches.Class }
 
             # Check to see if the SOA is in parentheses mode
             if ($InParentheses) {
                 # Check to make sure the data is in the correct format
-                if ($NoCommentLine -match "(?<=\s+|^)(?<SOAValue>[0-9smhdw]+)") {
+                if ($NoCommentLine -match '(?<=\s+|^)(?<SOAValue>[0-9smhdw]+)') {
                     # Capture all matches, not just the first
-                    [System.Text.RegularExpressions.Match[]]$RegexMatchList = [regex]::Matches($NoCommentLine, "(?<=\s+|^)(?<SOAValue>[0-9smhdw]+)", "IgnoreCase")
+                    [System.Text.RegularExpressions.Match[]]$RegexMatchList = [regex]::Matches($NoCommentLine, '(?<=\s+|^)(?<SOAValue>[0-9smhdw]+)', 'IgnoreCase')
 
                     # Write verbose info to console
-                    Write-Verbose -Message "SOA Config Matches:"
+                    Write-Verbose -Message 'SOA Config Matches:'
                     foreach ($Value in $RegexMatchList) { Write-Verbose -Message $Value.Value }
 
                     # Add the current matches to the SOA config
@@ -358,17 +358,17 @@ process {
                 }
 
                 # Check to see if the line in question also is the end of the parentheses set
-                if ($NoCommentLine.Trim() -like "*)*") {
+                if ($NoCommentLine.Trim() -like '*)*') {
                     # Disable parentheses mode
                     $InParentheses = $false
 
                     # Write verbose info to console
-                    Write-Verbose -Message "Changed parentheses mode to:"
+                    Write-Verbose -Message 'Changed parentheses mode to:'
                     Write-Verbose -Message $InParentheses
 
                     # Set the parameters of the new DNS record function in a hashtable for splatting
                     [System.Collections.Hashtable]$ParamSplat = @{
-                        Type              = "SOA"
+                        Type              = 'SOA'
                         Class             = $SoaClass
                         HostName          = "$($CurrentHost + $CurrentOrigin)"
                         TTL               = $CurrentTTL
@@ -385,7 +385,7 @@ process {
                     $RecordList += New-DNSRecord @ParamSplat
 
                     # Write verbose info to console
-                    Write-Verbose -Message "List of Records for the current zone:"
+                    Write-Verbose -Message 'List of Records for the current zone:'
                     foreach ($Record in $RecordList) { Write-Verbose -Message $Record }
                 }
 
@@ -395,9 +395,9 @@ process {
 
             # Check for the type of the resource record being used
             switch ($Matches.Type) {
-                "SOA" {
+                'SOA' {
                     # Get the SOA Server and the SOA Contact info from the SOA record and silently continue
-                    $NoCommentLine -match "^.*(?<=SOA)\s+(?<primaryServer>[\w\.]+)\s+(?<contact>[\w\.]+)(?:\s+\(?\s*)(?<Serial>\d+)?(?:\s+)?(?<Refresh>\d+)?(?:\s+)?(?<Retry>\d+)?(?:\s+)?(?<Expire>\d+)?(?:\s+)?(?<Minimum>\d+)?(?:\s*\)?)?$" | Out-Null
+                    $NoCommentLine -match '^.*(?<=SOA)\s+(?<primaryServer>[\w\.]+)\s+(?<contact>[\w\.]+)(?:\s+\(?\s*)(?<Serial>\d+)?(?:\s+)?(?<Refresh>\d+)?(?:\s+)?(?<Retry>\d+)?(?:\s+)?(?<Expire>\d+)?(?:\s+)?(?<Minimum>\d+)?(?:\s*\)?)?$' | Out-Null
 
                     # Set the SOA settings to be consumed by the DNS record builder for SOA records
                     [System.String]$SoaPrimaryServer = $Matches.primaryServer
@@ -426,7 +426,7 @@ process {
                     if ($SoaConfig.Length -eq 5) {
                         # Set the parameters of the new DNS record function in a hashtable for splatting
                         [System.Collections.Hashtable]$ParamSplat = @{
-                            Type              = "SOA"
+                            Type              = 'SOA'
                             Class             = $SoaClass
                             HostName          = "$($CurrentHost + $CurrentOrigin)"
                             TTL               = $CurrentTTL
@@ -443,32 +443,33 @@ process {
                         $RecordList += New-DNSRecord @ParamSplat
 
                         # Write verbose info to console
-                        Write-Verbose -Message "List of Records for the current zone:"
+                        Write-Verbose -Message 'List of Records for the current zone:'
                         foreach ($Record in $RecordList) { Write-Verbose -Message $Record }
                         
-                    # Check parentheses mode toggling
-                    } elseif ($NoCommentLine -like "*(*") {
+                        # Check parentheses mode toggling
+                    }
+                    elseif ($NoCommentLine -like '*(*') {
                         # if a line triggers a parentheses set
                         # Enable parentheses mode
                         $InParentheses = $true
 
                         # Write verbose info to console
-                        Write-Verbose -Message "Changed parentheses mode to:"
+                        Write-Verbose -Message 'Changed parentheses mode to:'
                         Write-Verbose -Message $InParentheses
 
 
                         # Check to see if the line in question also is the end of the parentheses set
-                        if ($NoCommentLine -like "*)*") {
+                        if ($NoCommentLine -like '*)*') {
                             # Disable parentheses mode
                             $InParentheses = $false
 
                             # Write verbose info to console
-                            Write-Verbose -Message "Changed parentheses mode to:"
+                            Write-Verbose -Message 'Changed parentheses mode to:'
                             Write-Verbose -Message $InParentheses
 
                             # Set the parameters of the new DNS record function in a hashtable for splatting
                             [System.Collections.Hashtable]$ParamSplat = @{
-                                Type              = "SOA"
+                                Type              = 'SOA'
                                 Class             = $SoaClass
                                 HostName          = "$($CurrentHost + $CurrentOrigin)"
                                 TTL               = $CurrentTTL
@@ -485,114 +486,114 @@ process {
                             $RecordList += New-DNSRecord @ParamSplat
 
                             # Write verbose info to console
-                            Write-Verbose -Message "List of Records for the current zone:"
+                            Write-Verbose -Message 'List of Records for the current zone:'
                             foreach ($Record in $RecordList) { Write-Verbose -Message $Record }
                         }
                     }
                 }
-                "A" {
+                'A' {
                     # Run a match on the current line
-                    $NoCommentLine -match "(?<=(?:IN|HS|CH)?\s+A\s+)(?<Value>[\w+\.]+)" | Out-Null
+                    $NoCommentLine -match '(?<=(?:IN|HS|CH)?\s+A\s+)(?<Value>[\w+\.]+)' | Out-Null
 
                     # Write verbose info to console
-                    Write-Verbose -Message "Current A record IP matches:"
+                    Write-Verbose -Message 'Current A record IP matches:'
                     Write-Verbose -Message $Matches.value
 
                     # Create the A record in the record list
-                    $RecordList += New-DNSRecord -Type "A" -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -IP $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'A' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -IP $Matches.Value
                 }
-                "AAAA" {
+                'AAAA' {
                     # Run a match on the current line
-                    $NoCommentLine -match "(?<=(?:IN|HS|CH)?\s+AAAA\s+)(?<Value>[\w+\.]+)" | Out-Null
+                    $NoCommentLine -match '(?<=(?:IN|HS|CH)?\s+AAAA\s+)(?<Value>[\w+\.]+)' | Out-Null
 
                     # Write verbose info to console
-                    Write-Verbose -Message "Current AAAA record IP matches:"
+                    Write-Verbose -Message 'Current AAAA record IP matches:'
                     Write-Verbose -Message $Matches.value
 
                     # Create the AAAA record in the record list
-                    $RecordList += New-DNSRecord -Type "AAAA" -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -IP $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'AAAA' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -IP $Matches.Value
                 }
-                "CNAME" {
+                'CNAME' {
                     # Run a match on the current line
-                    $NoCommentLine -match "(?<=(?:IN|HS|CH)?\s+CNAME\s+)(?<Value>[\w+-\.]+)" | Out-Null
+                    $NoCommentLine -match '(?<=(?:IN|HS|CH)?\s+CNAME\s+)(?<Value>[\w+-\.]+)' | Out-Null
 
                     # Write verbose info to console
-                    Write-Verbose -Message "Current CNAME value matches:"
+                    Write-Verbose -Message 'Current CNAME value matches:'
                     Write-Verbose -Message $Matches.value
 
                     # Create the CNAME record in the record list
-                    $RecordList += New-DNSRecord -Type "CNAME" -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'CNAME' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value
                 }
-                "CAA" {
+                'CAA' {
                     # Get the CAA Resource Record's configs
-                    [System.Text.RegularExpressions.Match[]]$RegexMatchList = [regex]::Matches($NoCommentLine, "(?<=(?:IN|HS|CH)?\s+CAA\s+)(?<Value>[\w+\.]+)(?:\s+)(?<Type>\w+)(?:\s+\`")(?<Target>.+)(?:\`")", "IgnoreCase")
+                    [System.Text.RegularExpressions.Match[]]$RegexMatchList = [regex]::Matches($NoCommentLine, "(?<=(?:IN|HS|CH)?\s+CAA\s+)(?<Value>[\w+\.]+)(?:\s+)(?<Type>\w+)(?:\s+\`")(?<Target>.+)(?:\`")", 'IgnoreCase')
 
                 
                     # Set the SOA settings to be consumed by the DNS record builder for SOA records
-                    [System.String]$CaaValue = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq "Value" }).Value
-                    [System.String]$CaaType = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq "Type" }).Value
-                    [System.String]$CaaTarget = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq "Target" }).Value
+                    [System.String]$CaaValue = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Value' }).Value
+                    [System.String]$CaaType = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Type' }).Value
+                    [System.String]$CaaTarget = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Target' }).Value
 
                     # Create the CAA record in the zone's record list
-                    $RecordList += New-DNSRecord -Type "CAA" -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Flag $CaaValue -Tag $CaaType -Value $CaaTarget
+                    $RecordList += New-DNSRecord -Type 'CAA' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Flag $CaaValue -Tag $CaaType -Value $CaaTarget
                 }
-                "MX" {
+                'MX' {
                     # Get the MX Resource Record's configs
-                    [System.Text.RegularExpressions.Match[]]$RegexMatchList = [regex]::Matches($NoCommentLine, "(?<=(?:IN|HS|CH)?\s+MX\s+)(?<Priority>[\d+]+)(?:\s+)(?<Value>\S+)", "IgnoreCase")
+                    [System.Text.RegularExpressions.Match[]]$RegexMatchList = [regex]::Matches($NoCommentLine, '(?<=(?:IN|HS|CH)?\s+MX\s+)(?<Priority>[\d+]+)(?:\s+)(?<Value>\S+)', 'IgnoreCase')
 
                 
                     # Set the MX settings to be consumed by the DNS record builder for MX records
-                    [System.String]$MxPriority = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq "Priority" }).Value
-                    [System.String]$MxValue = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq "Value" }).Value
+                    [System.String]$MxPriority = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Priority' }).Value
+                    [System.String]$MxValue = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Value' }).Value
                         
                     # Create the MX record in the zone's record list
-                    $RecordList += New-DNSRecord -Type "MX" -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Priority $MxPriority -Value $MxValue
+                    $RecordList += New-DNSRecord -Type 'MX' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Priority $MxPriority -Value $MxValue
                 }
-                "NS" {
+                'NS' {
                     # Run a match on the current line
-                    $NoCommentLine -match "(?<=(?:IN|HS|CH)?\s+NS\s+)(?<Value>[\w+-\.]+)" | Out-Null
+                    $NoCommentLine -match '(?<=(?:IN|HS|CH)?\s+NS\s+)(?<Value>[\w+-\.]+)' | Out-Null
 
                     # Write verbose info to console
-                    Write-Verbose -Message "Current NS value matches:"
+                    Write-Verbose -Message 'Current NS value matches:'
                     Write-Verbose -Message $Matches.value
                                                 
                     # Create the NS record in the record list
-                    $RecordList += New-DNSRecord -Type "NS" -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value 
+                    $RecordList += New-DNSRecord -Type 'NS' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value 
                 }
-                "TXT" {
+                'TXT' {
                     # Run a match on the current line
                     $NoCommentLine -match "(?<=(?:IN|HS|CH)?\s+TXT\s+\`")(?<Value>.+)(?:\`")" | Out-Null
 
                     # Write verbose info to console
-                    Write-Verbose -Message "Current TXT value matches:"
+                    Write-Verbose -Message 'Current TXT value matches:'
                     Write-Verbose -Message $Matches.value
                         
                     # Create the TXT record in the record list
-                    $RecordList += New-DNSRecord -Type "TXT" -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'TXT' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value
                 }
-                "SRV" {
+                'SRV' {
                     # Get the SRV Resource Record's configs
-                    [System.Text.RegularExpressions.Match[]]$RegexMatchList = [regex]::Matches($NoCommentLine, "(?<=(?:IN|HS|CH)?\s+SRV\s+)(?<Priority>[\d+]+)(?:\s+)(?<Weight>\d+)(?:\s+)(?<Port>\d+)(?:\s+)(?<Target>\S+)", "IgnoreCase")
+                    [System.Text.RegularExpressions.Match[]]$RegexMatchList = [regex]::Matches($NoCommentLine, '(?<=(?:IN|HS|CH)?\s+SRV\s+)(?<Priority>[\d+]+)(?:\s+)(?<Weight>\d+)(?:\s+)(?<Port>\d+)(?:\s+)(?<Target>\S+)', 'IgnoreCase')
 
                     # Set the SRV settings to be consumed by the DNS record builder for SRV records
-                    [System.String]$SrvPriority = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq "Priority" }).Value
-                    [System.String]$SrvWeight = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq "Weight" }).Value
-                    [System.String]$SrvPort = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq "Port" }).Value
-                    [System.String]$SrvTarget = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq "Target" }).Value
+                    [System.String]$SrvPriority = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Priority' }).Value
+                    [System.String]$SrvWeight = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Weight' }).Value
+                    [System.String]$SrvPort = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Port' }).Value
+                    [System.String]$SrvTarget = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Target' }).Value
                                                 
                     # Create the SRV record in the zone's record list
-                    $RecordList += New-DNSRecord -Type "SRV" -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Priority $SrvPriority -Weight $SrvWeight -Port $SrvPort -Value $SrvTarget
+                    $RecordList += New-DNSRecord -Type 'SRV' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Priority $SrvPriority -Weight $SrvWeight -Port $SrvPort -Value $SrvTarget
                 }
-                "PTR" {
+                'PTR' {
                     # Run a match on the current line
-                    $NoCommentLine -match "(?<=(?:IN|HS|CH)?\s+PTR\s+)(?<Value>[\w+-\.]+)" | Out-Null
+                    $NoCommentLine -match '(?<=(?:IN|HS|CH)?\s+PTR\s+)(?<Value>[\w+-\.]+)' | Out-Null
 
                     # Write verbose info to console
-                    Write-Verbose -Message "Current PTR value matches:"
+                    Write-Verbose -Message 'Current PTR value matches:'
                     Write-Verbose -Message $Matches.value
                                                                         
                     # Create the PTR record in the record list
-                    $RecordList += New-DNSRecord -Type "PTR" -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value 
+                    $RecordList += New-DNSRecord -Type 'PTR' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value 
                         
                 }
             }
