@@ -329,7 +329,7 @@ process {
             }
             elseif ($NoCommentLine -match '^(?<CurrentHost>[\w\-.]+)') {
                 # Capture the current host value and set the current host value to the current host record
-                $CurrentHost = $Matches.CurrentHost
+                $CurrentHost = ($Matches.CurrentHost).TrimEnd(".")
 
                 # Write verbose info to console
                 Write-Verbose -Message 'Changed current host to:'
@@ -423,6 +423,7 @@ process {
                         }
                     }
 
+                    # Check to ensure the amount of data is present that is needed for an SOA record
                     if ($SoaConfig.Length -eq 5) {
                         # Set the parameters of the new DNS record function in a hashtable for splatting
                         [System.Collections.Hashtable]$ParamSplat = @{
