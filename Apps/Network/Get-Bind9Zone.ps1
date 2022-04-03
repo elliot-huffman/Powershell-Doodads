@@ -258,22 +258,15 @@ process {
     # List all of the zone files in the specified directory
     [System.IO.FileInfo[]]$ConfigList = Get-ChildItem -Path $Path -Filter 'db.*' -File
 
-    # Initialize the dictionary that will contain each config's contents for later use
-    $LoadedFileList = @{}
-
-    # open and read each file to memory
+    # Iterate through each identified file
     foreach ($ConfigFile in $ConfigList) {
-        # Open the file and save its value to the LoadedFileList dictionary
-        $LoadedFileList["$($ConfigFile.FullName)"] = Get-Content -Path $ConfigFile.FullName
-    }
-
-    # Iterate through each loaded file
-    foreach ($LoadedFile in $LoadedFileList.GetEnumerator()) {
+        # Open the current file to memory
+        [System.String[]]$LoadedFile = Get-Content -Path $ConfigFile.FullName
 
         # Write verbose info to console
         Write-Verbose -Message '----------------'
         Write-Verbose -Message 'Operating on file:'
-        Write-Verbose -Message $LoadedFile.Name
+        Write-Verbose -Message $ConfigFile.Name
         Write-Verbose -Message '----------------'
 
         # Initialize parser variables
@@ -286,7 +279,7 @@ process {
         [PSCustomObject[]]$RecordList = @()         # List of records in the specified zone
 
         # Iterate through each line
-        foreach ($Line in $LoadedFile.Value) {
+        foreach ($Line in $LoadedFile) {
             # Remove a comment in a line if it exists and remove any extra whitespace that may be left over because of the comment removal
             [System.String]$NoCommentLine = ($Line -split ';')[0].TrimEnd()
 
