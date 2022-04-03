@@ -249,6 +249,54 @@ begin {
         }
     }
 
+    # Define a function to simplify the TTL extraction process for resource records.
+    function Get-ComputedTTL {
+        <#
+        .SYNOPSIS
+            Extract the TTL from a record or returns the current TTL if no TTL is found.
+        .DESCRIPTION
+            Uses regex to match the BIND DNS resource record if it has a hostname, TTL, class (optional), and type.
+            If a match is found, it extracts the TTL value and returns it as an int64.
+        .PARAMETER Record
+            This parameter expects the string input representation of the resource record with the comments and any trining whitespace removed.
+        .PARAMETER CurrentTTL
+            This parameter holds the value of the current TTL and the value passed here will be returned if no TTL was specified in the resource record.
+        .EXAMPLE
+            PS C:\> Get-ComputedTTL -Record "10.123.123.in-addr.arpa. 500 IN SOA this.name.is.invalid. hostmaster.this.name.is.invalid. 1 10800 3600 604800 60"
+            Returns 500 as the TTL field is the equal to 500
+        .EXAMPLE
+            PS C:\> Get-ComputedTTL -Record "example.com IN SOA ns1.example.com. hostmaster.example.com. ("
+            Returns 0 as the TTL field is not present and since no TTL was specified, it falls back to a 0 TTL.
+        .EXAMPLE
+            PS C:\> Get-ComputedTTL -Record "example.com IN SOA ns1.example.com. hostmaster.example.com. (" -CurrentTTL 123
+            Returns 123 as the TTL field is not present and the current TTL was specified, so it falls back to the current TTL.
+        .INPUTS
+            System.String
+            System.Int64
+        .OUTPUTS
+            System.Int64
+        .NOTES
+            The input is expected to be a Zone record with no comments or training white space.
+        #>
+        param (
+            [System.String]$Record,
+            [System.Int64]$CurrentTTL = 0
+        )
+        
+        # If the TTL is specified in-line, extract it
+        if ($Record -match '(?<=^[\w\-.]+\s+)(?<TTL>\d+)(?=\s+(?:IN|CH|HS)?\s*(?:SOA|A|AAAA|CNAME|CAA|MX|NS|TXT|SRV|PTR))') {
+            # Convert the ttl output from a string to an integer for better object compatibility.
+            [System.int64]$Converted = $Matches.TTL
+
+            # Set the computed TTL to be equal to the in-line TTL
+            return $Converted
+        }
+        else {
+            # If no TTL was specified, set the computed ttl to the TTL Command's value or 0 if no ttl is specified
+            return $CurrentTTL
+        }
+    }
+
     # Initialize an array of zones where the key is the zone name and the value is the array of records in that zone
     [System.Collections.Hashtable]$ZoneList = @{}
 }
@@ -399,6 +447,9 @@ process {
                 continue
             }
 
+            # Compute the TTL for the current line if it is an AIO resource record
+            $ComputedTTL = Get-ComputedTTL -Record $NoCommentLine -CurrentTTL $CurrentTTL
+
             # Check for the type of the resource record being used
             switch ($Matches.Type) {
                 'SOA' {
@@ -431,12 +482,13 @@ process {
 
                     # Check to ensure the amount of data is present that is needed for an SOA record
                     if ($SoaConfig.Length -eq 5) {
+
                         # Set the parameters of the new DNS record function in a hashtable for splatting
                         [System.Collections.Hashtable]$ParamSplat = @{
                             Type              = 'SOA'
                             Class             = $SoaClass
                             HostName          = $CurrentHost
-                            TTL               = $CurrentTTL
+                            TTL               = $ComputedTTL
                             PrimaryNameServer = $SoaPrimaryServer
                             ZoneContact       = $SoaContact
                             Serial            = $SoaConfig[0]
@@ -479,7 +531,7 @@ process {
                                 Type              = 'SOA'
                                 Class             = $SoaClass
                                 HostName          = $CurrentHost
-                                TTL               = $CurrentTTL
+                                TTL               = $ComputedTTL
                                 PrimaryNameServer = $SoaPrimaryServer
                                 ZoneContact       = $SoaContact
                                 Serial            = $SoaConfig[0]
@@ -507,7 +559,7 @@ process {
                     Write-Verbose -Message $Matches.value
 
                     # Create the A record in the record list
-                    $RecordList += New-DNSRecord -Type 'A' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -IP $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'A' -Class $CurrentClass -HostName $CurrentHost -TTL $ComputedTTL -IP $Matches.Value
                 }
                 'AAAA' {
                     # Run a match on the current line
@@ -518,7 +570,7 @@ process {
                     Write-Verbose -Message $Matches.value
 
                     # Create the AAAA record in the record list
-                    $RecordList += New-DNSRecord -Type 'AAAA' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -IP $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'AAAA' -Class $CurrentClass -HostName $CurrentHost -TTL $ComputedTTL -IP $Matches.Value
                 }
                 'CNAME' {
                     # Run a match on the current line
@@ -529,7 +581,7 @@ process {
                     Write-Verbose -Message $Matches.value
 
                     # Create the CNAME record in the record list
-                    $RecordList += New-DNSRecord -Type 'CNAME' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Value $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'CNAME' -Class $CurrentClass -HostName $CurrentHost -TTL $ComputedTTL -Value $Matches.Value
                 }
                 'CAA' {
                     # Get the CAA Resource Record's configs
@@ -542,7 +594,7 @@ process {
                     [System.String]$CaaTarget = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Target' }).Value
 
                     # Create the CAA record in the zone's record list
-                    $RecordList += New-DNSRecord -Type 'CAA' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Flag $CaaValue -Tag $CaaType -Value $CaaTarget
+                    $RecordList += New-DNSRecord -Type 'CAA' -Class $CurrentClass -HostName $CurrentHost -TTL $ComputedTTL -Flag $CaaValue -Tag $CaaType -Value $CaaTarget
                 }
                 'MX' {
                     # Get the MX Resource Record's configs
@@ -554,7 +606,7 @@ process {
                     [System.String]$MxValue = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Value' }).Value
                         
                     # Create the MX record in the zone's record list
-                    $RecordList += New-DNSRecord -Type 'MX' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Priority $MxPriority -Value $MxValue
+                    $RecordList += New-DNSRecord -Type 'MX' -Class $CurrentClass -HostName $CurrentHost -TTL $ComputedTTL -Priority $MxPriority -Value $MxValue
                 }
                 'NS' {
                     # Run a match on the current line
@@ -565,7 +617,7 @@ process {
                     Write-Verbose -Message $Matches.value
                                                 
                     # Create the NS record in the record list
-                    $RecordList += New-DNSRecord -Type 'NS' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Value $Matches.Value 
+                    $RecordList += New-DNSRecord -Type 'NS' -Class $CurrentClass -HostName $CurrentHost -TTL $ComputedTTL -Value $Matches.Value 
                 }
                 'TXT' {
                     # Run a match on the current line
@@ -576,7 +628,7 @@ process {
                     Write-Verbose -Message $Matches.value
                         
                     # Create the TXT record in the record list
-                    $RecordList += New-DNSRecord -Type 'TXT' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Value $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'TXT' -Class $CurrentClass -HostName $CurrentHost -TTL $ComputedTTL -Value $Matches.Value
                 }
                 'SRV' {
                     # Get the SRV Resource Record's configs
@@ -589,7 +641,7 @@ process {
                     [System.String]$SrvTarget = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Target' }).Value
                                                 
                     # Create the SRV record in the zone's record list
-                    $RecordList += New-DNSRecord -Type 'SRV' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Priority $SrvPriority -Weight $SrvWeight -Port $SrvPort -Value $SrvTarget
+                    $RecordList += New-DNSRecord -Type 'SRV' -Class $CurrentClass -HostName $CurrentHost -TTL $ComputedTTL -Priority $SrvPriority -Weight $SrvWeight -Port $SrvPort -Value $SrvTarget
                 }
                 'PTR' {
                     # Run a match on the current line
@@ -600,7 +652,7 @@ process {
                     Write-Verbose -Message $Matches.value
                                                                         
                     # Create the PTR record in the record list
-                    $RecordList += New-DNSRecord -Type 'PTR' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Value $Matches.Value 
+                    $RecordList += New-DNSRecord -Type 'PTR' -Class $CurrentClass -HostName $CurrentHost -TTL $ComputedTTL -Value $Matches.Value 
                         
                 }
             }
