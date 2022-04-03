@@ -322,13 +322,14 @@ process {
             }
             elseif ($NoCommentLine -match '^(?<CurrentHost>[\w\-.]+)') {
                 # If the current host is terminated with a period
-                if ($Matches.CurrentHost[-1] -eq ".") {
+                if ($Matches.CurrentHost[-1] -eq '.') {
                     # Write verbose info to console
                     Write-Verbose -Message 'Current host terminated with a period'
 
                     # Make the current host the the current match without modification
                     $CurrentHost = $Matches.CurrentHost
-                } else {
+                }
+                else {
                     # Write verbose info to console
                     Write-Verbose -Message 'Current host terminated without a period'
 
