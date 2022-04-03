@@ -328,8 +328,20 @@ process {
                 continue
             }
             elseif ($NoCommentLine -match '^(?<CurrentHost>[\w\-.]+)') {
-                # Capture the current host value and set the current host value to the current host record
-                $CurrentHost = ($Matches.CurrentHost).TrimEnd(".")
+                # If the current host is terminated with a period
+                if ($Matches.CurrentHost[-1] -eq ".") {
+                    # Write verbose info to console
+                    Write-Verbose -Message 'Current host terminated with a period'
+
+                    # Make the current host the the current match without modification
+                    $CurrentHost = $Matches.CurrentHost
+                } else {
+                    # Write verbose info to console
+                    Write-Verbose -Message 'Current host terminated without a period'
+
+                    # If the current host is terminated with anything except a period, append the current origin to the match to set the current host
+                    $CurrentHost = $Matches.CurrentHost + $CurrentOrigin
+                }
 
                 # Write verbose info to console
                 Write-Verbose -Message 'Changed current host to:'
@@ -370,7 +382,7 @@ process {
                     [System.Collections.Hashtable]$ParamSplat = @{
                         Type              = 'SOA'
                         Class             = $SoaClass
-                        HostName          = "$($CurrentHost + $CurrentOrigin)"
+                        HostName          = $CurrentHost
                         TTL               = $CurrentTTL
                         PrimaryNameServer = $SoaPrimaryServer
                         ZoneContact       = $SoaContact
@@ -429,7 +441,7 @@ process {
                         [System.Collections.Hashtable]$ParamSplat = @{
                             Type              = 'SOA'
                             Class             = $SoaClass
-                            HostName          = "$($CurrentHost + $CurrentOrigin)"
+                            HostName          = $CurrentHost
                             TTL               = $CurrentTTL
                             PrimaryNameServer = $SoaPrimaryServer
                             ZoneContact       = $SoaContact
@@ -472,7 +484,7 @@ process {
                             [System.Collections.Hashtable]$ParamSplat = @{
                                 Type              = 'SOA'
                                 Class             = $SoaClass
-                                HostName          = "$($CurrentHost + $CurrentOrigin)"
+                                HostName          = $CurrentHost
                                 TTL               = $CurrentTTL
                                 PrimaryNameServer = $SoaPrimaryServer
                                 ZoneContact       = $SoaContact
@@ -501,7 +513,7 @@ process {
                     Write-Verbose -Message $Matches.value
 
                     # Create the A record in the record list
-                    $RecordList += New-DNSRecord -Type 'A' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -IP $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'A' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -IP $Matches.Value
                 }
                 'AAAA' {
                     # Run a match on the current line
@@ -512,7 +524,7 @@ process {
                     Write-Verbose -Message $Matches.value
 
                     # Create the AAAA record in the record list
-                    $RecordList += New-DNSRecord -Type 'AAAA' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -IP $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'AAAA' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -IP $Matches.Value
                 }
                 'CNAME' {
                     # Run a match on the current line
@@ -523,7 +535,7 @@ process {
                     Write-Verbose -Message $Matches.value
 
                     # Create the CNAME record in the record list
-                    $RecordList += New-DNSRecord -Type 'CNAME' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'CNAME' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Value $Matches.Value
                 }
                 'CAA' {
                     # Get the CAA Resource Record's configs
@@ -536,7 +548,7 @@ process {
                     [System.String]$CaaTarget = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Target' }).Value
 
                     # Create the CAA record in the zone's record list
-                    $RecordList += New-DNSRecord -Type 'CAA' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Flag $CaaValue -Tag $CaaType -Value $CaaTarget
+                    $RecordList += New-DNSRecord -Type 'CAA' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Flag $CaaValue -Tag $CaaType -Value $CaaTarget
                 }
                 'MX' {
                     # Get the MX Resource Record's configs
@@ -548,7 +560,7 @@ process {
                     [System.String]$MxValue = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Value' }).Value
                         
                     # Create the MX record in the zone's record list
-                    $RecordList += New-DNSRecord -Type 'MX' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Priority $MxPriority -Value $MxValue
+                    $RecordList += New-DNSRecord -Type 'MX' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Priority $MxPriority -Value $MxValue
                 }
                 'NS' {
                     # Run a match on the current line
@@ -559,7 +571,7 @@ process {
                     Write-Verbose -Message $Matches.value
                                                 
                     # Create the NS record in the record list
-                    $RecordList += New-DNSRecord -Type 'NS' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value 
+                    $RecordList += New-DNSRecord -Type 'NS' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Value $Matches.Value 
                 }
                 'TXT' {
                     # Run a match on the current line
@@ -570,7 +582,7 @@ process {
                     Write-Verbose -Message $Matches.value
                         
                     # Create the TXT record in the record list
-                    $RecordList += New-DNSRecord -Type 'TXT' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value
+                    $RecordList += New-DNSRecord -Type 'TXT' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Value $Matches.Value
                 }
                 'SRV' {
                     # Get the SRV Resource Record's configs
@@ -583,7 +595,7 @@ process {
                     [System.String]$SrvTarget = ($RegexMatchList.Groups | Where-Object -FilterScript { $_.Name -eq 'Target' }).Value
                                                 
                     # Create the SRV record in the zone's record list
-                    $RecordList += New-DNSRecord -Type 'SRV' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Priority $SrvPriority -Weight $SrvWeight -Port $SrvPort -Value $SrvTarget
+                    $RecordList += New-DNSRecord -Type 'SRV' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Priority $SrvPriority -Weight $SrvWeight -Port $SrvPort -Value $SrvTarget
                 }
                 'PTR' {
                     # Run a match on the current line
@@ -594,7 +606,7 @@ process {
                     Write-Verbose -Message $Matches.value
                                                                         
                     # Create the PTR record in the record list
-                    $RecordList += New-DNSRecord -Type 'PTR' -Class $CurrentClass -HostName ($CurrentHost + $CurrentOrigin) -TTL $CurrentTTL -Value $Matches.Value 
+                    $RecordList += New-DNSRecord -Type 'PTR' -Class $CurrentClass -HostName $CurrentHost -TTL $CurrentTTL -Value $Matches.Value 
                         
                 }
             }
