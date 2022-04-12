@@ -11,6 +11,12 @@
 .EXAMPLE
     PS C:\> Remove-DuplicateFile.ps1 -Path C:\Duplicates.txt
     Uses the duplicates.txt file in the root drive directory and deletes all but the originals as specified in the exported file.
+.EXAMPLE
+    PS C:\> Remove-DuplicateFile.ps1 -Path C:\Duplicates.txt -All
+    Uses the duplicates.txt file in the root drive directory and deletes all the CCleaner designated files.
+.EXAMPLE
+    PS C:\> Remove-DuplicateFile.ps1 -All
+    Uses the CCleaner Export.txt file in the same directory and deletes all the CCleaner designated files.
 .PARAMETER Path
     Path to the txt file that CCleaner generates from its duplicate detector tool.
     Relative paths and full paths are supported.
@@ -19,6 +25,9 @@
 
     Another Example:
     .\Duplicates.txt
+.PARAMETER All
+    When this switch parameter is specified, all files are deleted.
+    The originals are also purged.
 .INPUTS
     System.String
 .OUTPUTS
@@ -34,7 +43,8 @@
 
 param(
     [ValidateScript({Test-Path -Path $_ -PathType "Leaf"})]
-    [System.String]$Path=".\CCleaner Export.txt"
+    [System.String]$Path=".\CCleaner Export.txt",
+    [Switch]$All
 )
 
 # Ingest the RAW CCleaner data
@@ -59,7 +69,7 @@ foreach ($Line in $RawDuplicateList) {
         foreach ($ToDelete in $CurrentItemList) {
 
             # Check if the current item should be skipped
-            if ($SkipItem) {
+            if ((-not $All) -and $SkipItem) {
                 # Indicate that the current item should be skipped 
                 $SkipItem = $false
 
