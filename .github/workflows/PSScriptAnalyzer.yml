@@ -1,0 +1,35 @@
+name: PSScriptAnalyzer
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+  schedule:
+    - cron: '44 18 * * 1'
+
+jobs:
+  build:
+    name: PSScriptAnalyzer
+    runs-on: ubuntu-latest
+    steps:
+      # Download a copy of the repository into the runner
+      - uses: actions/checkout@v3
+
+      # Run the script analizer against all scripts in the downlaoded repo
+      - name: Run PSScriptAnalyzer
+        uses: microsoft/psscriptanalyzer-action@v1.0
+        with:
+          # Check https://github.com/microsoft/action-psscriptanalyzer for more info about the options.
+          # The below set up runs PSScriptAnalyzer to your entire repository and runs some basic security rules.
+          path: .\
+          recurse: true
+          ignorePattern: 'Archive'
+          output: results.sarif
+      
+      # Upload the SARIF file generated in the previous step to the security tab
+      - name: Upload SARIF results file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
