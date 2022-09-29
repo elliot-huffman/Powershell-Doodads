@@ -1,14 +1,18 @@
 {
     "cSpell.words": [
+        "Decryptor",
+        "dism",
+        "ehuffman",
         "FQDNs",
+        "Hashtable",
         "HKEY",
         "HKLM",
         "Interop",
+        "Intune",
         "MAPI",
+        "reimage",
         "SMTP",
         "WESL",
-        "Winver",
-        "dism",
-        "ehuffman"
+        "Winver"
     ]
 }
