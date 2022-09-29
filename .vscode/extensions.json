@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "streetsidesoftware.code-spell-checker",
-        "ms-vscode.powershell"
+        "ms-vscode.powershell",
+        "Gruntfuggly.todo-tree"
     ]
 }
