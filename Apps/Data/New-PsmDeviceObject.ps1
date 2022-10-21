@@ -12,7 +12,7 @@
 .PARAMETER Path
     Directory to output the JSON file.
 .LINK
-    https://aka.ms/psm
+    https://mootinc.com
 #>
 
 param(
