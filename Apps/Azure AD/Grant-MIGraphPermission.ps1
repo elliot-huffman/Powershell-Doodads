@@ -26,10 +26,24 @@
     SharePoint Online: 00000003-0000-0ff1-ce00-000000000000
     Yammer: 00000005-0000-0ff1-ce00-000000000000
     Universal Print: da9b70f6-5323-4ce6-ae5c-88dcc5082966
+.PARAMETER AccessToken
+    This parameter is used to pass an access token into this script rather than going through the authentication process via GUI.
+    This is useful for fully automated processes that are able to provide their own access tokens and run this script without human interaction.
+    
+    The audience should be "https://graph.microsoft.com" for the token, otherwise it won't work.
+    There is input validation to help catch access tokens that don't have the correct audience.
+    
+    The access token should minimally have the scopes (permissions) of 'Directory.Read.All', 'AppRoleAssignment.ReadWrite.All', and 'Application.ReadWrite.All'.
+    Scopes that have these basic set of permissions or greater will work (e.g. Global Admin).
+    
+    Example use cases:
+        - CI/CD Pipeline
+        - Dot Sourced Loading this script from another
 .INPUTS
     Switch
     System.GUID
     System.GUID[]
+    System.String
     System.String[]
 .OUTPUTS
     System.Boolean
@@ -78,6 +92,8 @@ param(
     [System.String[]]$PermissionName,
     [ValidateNotNullOrEmpty()]
     [System.GUID]$GraphServicePrincipalID = "00000003-0000-0000-c000-000000000000"
+    [ValidateScript({ ([System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(($_ -split '\.')[1])) | ConvertFrom-Json).aud -eq 'https://graph.microsoft.com' })]
+    [System.String]$AccessToken
 )
 
 # Initialize processing
@@ -88,8 +104,15 @@ begin {
     # Write Verbose info
     Write-Verbose -Message "Logging into Azure AD"
     
-    # Log into Azure AD
-    Connect-MgGraph -Scopes "Directory.Read.All", "AppRoleAssignment.ReadWrite.All", "Application.ReadWrite.All"
+    # Check if an access token has been provided
+    if ($AccessToken -ne '') {
+        # Log into the Graph API using the provided access token
+        Connect-MgGraph -AccessToken $AccessToken
+    }
+    else {
+        # Log into the Graph API using Azure AD authentication
+        Connect-MgGraph -Scopes 'Directory.Read.All', 'AppRoleAssignment.ReadWrite.All', 'Application.ReadWrite.All'
+    }
 
     # Check to see if GUI mode is forced or necessary
     if ($CLIMode) {
