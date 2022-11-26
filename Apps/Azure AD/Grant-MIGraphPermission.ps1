@@ -91,7 +91,7 @@ param(
     [ValidateNotNullOrEmpty()]
     [System.String[]]$PermissionName,
     [ValidateNotNullOrEmpty()]
-    [System.GUID]$GraphServicePrincipalID = "00000003-0000-0000-c000-000000000000"
+    [System.GUID]$GraphServicePrincipalID = '00000003-0000-0000-c000-000000000000',
     [ValidateScript({ ([System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(($_ -split '\.')[1])) | ConvertFrom-Json).aud -eq 'https://graph.microsoft.com' })]
     [System.String]$AccessToken
 )
@@ -99,10 +99,10 @@ param(
 # Initialize processing
 begin {
     # Stop execution on error
-    $ErrorActionPreference = "Stop"
+    $ErrorActionPreference = 'Stop'
 
     # Write Verbose info
-    Write-Verbose -Message "Logging into Azure AD"
+    Write-Verbose -Message 'Logging into Azure AD'
     
     # Check if an access token has been provided
     if ($AccessToken -ne '') {
@@ -132,25 +132,26 @@ begin {
 # Process each object passed on the command line
 process {
     # Write Verbose info
-    Write-Verbose -Message "Getting an instance of the Graph API App Service Principal"
+    Write-Verbose -Message 'Getting an instance of the Graph API App Service Principal'
 
     # Get the GraphAPI instance
     [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphServicePrincipal]$GraphAppSP = Get-MgServicePrincipal -Filter "AppID eq '$GraphServicePrincipalID'"
 
     # Write debug info
-    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Graph API SP Info:"
-    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$GraphAppSP: $GraphAppSP"
+    Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - Graph API SP Info:"
+    Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - `$GraphAppSP: $GraphAppSP"
 
     # If in GUI mode
     if ($GUIMode) {
         # Write Verbose info
-        Write-Verbose -Message "Getting a list of all managed identities and render it in a picker dialog for the end user to select one."
+        Write-Verbose -Message 'Getting a list of all managed identities and render it in a picker dialog for the end user to select one.'
 
         # Get a list of Managed Identities and make the user select one of them
-        [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphServicePrincipal[]]$SelectedPrincipalList = Get-MgServicePrincipal -Filter "ServicePrincipalType eq 'ManagedIdentity'" -All $true | Out-GridView -Title "Select the Managed Identity to Assign Permission" -OutputMode "Multiple"
-    } else {
+        [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphServicePrincipal[]]$SelectedPrincipalList = Get-MgServicePrincipal -Filter "ServicePrincipalType eq 'ManagedIdentity'" -All $true | Out-GridView -Title 'Select the Managed Identity to Assign Permission' -OutputMode 'Multiple'
+    }
+    else {
         # Write Verbose info
-        Write-Verbose -Message "Getting the specified service principal."
+        Write-Verbose -Message 'Getting the specified service principal.'
 
         # Loop through each ID specified and save the results into a new list.
         foreach ($GUID in $ObjectID) {
@@ -160,18 +161,18 @@ process {
     }
 
     # Write debug info
-    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Selected Principal List:"
-    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$SelectedPrincipal: $SelectedPrincipalList"
+    Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - Selected Principal List:"
+    Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - `$SelectedPrincipal: $SelectedPrincipalList"
 
     # Write Verbose info
-    Write-Verbose -Message "Validating principal selection was successful"
+    Write-Verbose -Message 'Validating principal selection was successful'
         
     # Throw an error and end execution if the end user doesn't select an object
     if (($null -eq $SelectedPrincipalList) -or ($SelectedPrincipalList.Count -eq 0)) {
         # Write an error to the console
-        Write-Error -Message "No principals were selected successfully.
+        Write-Error -Message 'No principals were selected successfully.
         If GUI was used, this usually indicates that the end user closed the dialog.
-        If CLI was used, ths was most likely due to an incorrect GUID."
+        If CLI was used, ths was most likely due to an incorrect GUID.'
 
         # Return false to the caller to indicate failure
         return $false
@@ -180,13 +181,14 @@ process {
     # Route execution based on GUI mode
     if ($GUIMode) {
         # Write Verbose info
-        Write-Verbose -Message "Getting a list of all app roles/permissions and render it in a picker dialog for the end user to select one."
+        Write-Verbose -Message 'Getting a list of all app roles/permissions and render it in a picker dialog for the end user to select one.'
 
         # Get the specified permission that needs to be assigned
-        [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphAppRole[]]$AppRoleList = $GraphAppSP.AppRoles | Out-GridView -Title "Select the Permission to Assign" -OutputMode "Multiple"
-    } else {
+        [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphAppRole[]]$AppRoleList = $GraphAppSP.AppRoles | Out-GridView -Title 'Select the Permission to Assign' -OutputMode 'Multiple'
+    }
+    else {
         # Write Verbose info
-        Write-Verbose -Message "Getting the specified app role/permission"
+        Write-Verbose -Message 'Getting the specified app role/permission'
 
         # Loop through each permission requested and enrich the permission provided with system context
         foreach ($RoleName in $PermissionName) {
@@ -196,38 +198,38 @@ process {
     }
 
     # Write debug info
-    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - List of selected app roles/permissions:"
-    Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$AppRoleList: $AppRoleList"
+    Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - List of selected app roles/permissions:"
+    Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - `$AppRoleList: $AppRoleList"
 
 
     # Write Verbose info
-    Write-Verbose -Message "Validating role selection was successful"
+    Write-Verbose -Message 'Validating role selection was successful'
 
     # Throw an error and end execution if the end user doesn't select an object
     if (($null -eq $AppRoleList) -or ($AppRoleList.Count -eq 0)) {
         # Write an error to the console
-        Write-Error -Message "No API roles were selected successfully.
+        Write-Error -Message 'No API roles were selected successfully.
         If GUI was used, this usually indicates that the end user closed the dialog.
-        If CLI was used, ths was most likely due to an incorrect permission name being specified."
+        If CLI was used, ths was most likely due to an incorrect permission name being specified.'
 
         # Return false to the caller to indicate failure
         return $false
     }
 
     # Write Verbose info
-    Write-Verbose -Message "Assigning the specified permission to the specified principal"
+    Write-Verbose -Message 'Assigning the specified permission to the specified principal'
 
     # Loop through each principal specified and perform the specified role assignment
     foreach ($Principal in $SelectedPrincipalList) {
         # Loop through each of the selected app roles and assign the role to the specified principal
         foreach ($Role in $AppRoleList) {
             # Simulate the result if asked to simulate
-            if ($PSCmdlet.ShouldProcess("Selected Service Principal", "Grant $($Role.Value)")) {
+            if ($PSCmdlet.ShouldProcess('Selected Service Principal', "Grant $($Role.Value)")) {
                 # Write debug info
-                Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - Pre-Assignment Variable Dump:"
-                Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$Principal.ObjectId: $($Principal.Id)"
-                Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$GraphAppSP.ObjectId: $($GraphAppSP.Id)"
-                Write-Debug -Message "$(Get-Date -Format "HH:mm:ss") - `$Role.Id: $($Role.Id)"
+                Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - Pre-Assignment Variable Dump:"
+                Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - `$Principal.ObjectId: $($Principal.Id)"
+                Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - `$GraphAppSP.ObjectId: $($GraphAppSP.Id)"
+                Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - `$Role.Id: $($Role.Id)"
 
                 # Assign the Graph API permission to the specified service principal
                 New-MgServicePrincipalAppRoleAssignment -PrincipalId $Principal.Id -ServicePrincipalId $Principal.Id -AppRoleId $Role.Id -ResourceId $GraphAppSP.Id
