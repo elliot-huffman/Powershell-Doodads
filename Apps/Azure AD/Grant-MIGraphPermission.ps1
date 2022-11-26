@@ -6,7 +6,7 @@
     Returns false on failure
 .EXAMPLE
     PS C:\> Grant-MIGraphPermission
-    Explanation of what the example does
+    Launches the GUI to walk the user through picking out the API permissions to grant to a Managed Identity
 .PARAMETER CLIMode
     This switch forces the suppression of GUI elements and forces headless mode.
     This is useful if used in an automation system where a GUI will gum up the works.
@@ -20,12 +20,13 @@
     This is the GUID of the service principal that is the permissions provider.
     By default the service provider is the Microsoft Graph API, however you can grant permissions on other providers too by providing their GUID.
     Common providers are as below:
-    Microsoft Graph API: 00000003-0000-0000-c000-000000000000
-    Defender for Endpoint: fc780465-2017-40d4-a0c5-307022471b92
-    Defender for Cloud Apps: 05a65629-4c1b-48c1-a78b-804c4abdd4af
-    SharePoint Online: 00000003-0000-0ff1-ce00-000000000000
-    Yammer: 00000005-0000-0ff1-ce00-000000000000
-    Universal Print: da9b70f6-5323-4ce6-ae5c-88dcc5082966
+        - Microsoft Graph API: 00000003-0000-0000-c000-000000000000
+        - Defender for Endpoint: fc780465-2017-40d4-a0c5-307022471b92
+        - Defender for Cloud Apps: 05a65629-4c1b-48c1-a78b-804c4abdd4af
+        - Exchange Online: 00000002-0000-0ff1-ce00-000000000000
+        - SharePoint Online: 00000003-0000-0ff1-ce00-000000000000
+        - Yammer: 00000005-0000-0ff1-ce00-000000000000
+        - Universal Print: da9b70f6-5323-4ce6-ae5c-88dcc5082966
 .PARAMETER AccessToken
     This parameter is used to pass an access token into this script rather than going through the authentication process via GUI.
     This is useful for fully automated processes that are able to provide their own access tokens and run this script without human interaction.
