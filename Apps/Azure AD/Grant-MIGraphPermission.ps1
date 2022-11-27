@@ -1,8 +1,44 @@
+<#PSScriptInfo
+
+.VERSION 1.0.3
+
+.GUID 0b801f6d-e4f2-4968-a5d2-d959dc0dd7c5
+
+.AUTHOR Elliot Huffman
+
+.COMPANYNAME
+
+.COPYRIGHT Elliot Huffman 2022
+
+.TAGS Azure AD AAD IAM Identity_And_Access_Management MI Managed_Identity
+
+.LICENSEURI https://github.com/elliot-huffman/Powershell-Doodads/blob/main/LICENSE
+
+.ICONURI
+
+.EXTERNALMODULEDEPENDENCIES Microsoft.Graph.Authentication,Microsoft.Graph.Applications 
+
+.REQUIREDSCRIPTS
+
+.EXTERNALSCRIPTDEPENDENCIES
+
+.RELEASENOTES
+
+
+.PRIVATEDATA
+
+#> 
+
+# Ensure the appropriate pre-requirements for the script
+#Requires -Module Microsoft.Graph.Authentication
+#Requires -Module Microsoft.Graph.Applications
+
+
 <#
 .SYNOPSIS
     Grants Graph API Permissions to Managed Identity Service Principals
 .DESCRIPTION
-    App registration is not supported as it has a really good GUI in the Azure AD Portal.
+    Grants API permissions to managed identities. The default setting is the MS Graph API but other APIs registered in Azure AD are supported. Such as MDE, EXO, etc.
     Returns false on failure
 .EXAMPLE
     PS C:\> Grant-MIGraphPermission
@@ -51,11 +87,13 @@
 .NOTES
     This script requires the Microsoft.Graph.Authentication and Microsoft.Graph.Applications modules to be installed before execution.
     If the GUI mode is to be used, ISE must be installed as some Windows Forms components are included in ISE that this script uses (Out-GridView).
-#>
 
-# Ensure the appropriate pre-requirements for the script
-#Requires -Module Microsoft.Graph.Authentication
-#Requires -Module Microsoft.Graph.Applications
+    This script requires the minimum Azure AD permissions of:
+        - Directory.Read.All
+        - AppRoleAssignment.ReadWrite.All
+        - Application.ReadWrite.All
+    These permission may be granted by a more widely scoped permission such as "Global admin" or "Directory.ReadWrite.All", etc..
+#>
 
 # Cmdlet bind script so that it can perform advanced operations
 [CmdletBinding(
