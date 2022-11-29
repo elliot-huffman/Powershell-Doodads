@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.0.3
+.VERSION 1.0.4
 
 .GUID 0b801f6d-e4f2-4968-a5d2-d959dc0dd7c5
 
@@ -14,6 +14,8 @@
 
 .LICENSEURI https://github.com/elliot-huffman/Powershell-Doodads/blob/main/LICENSE
 
+.PROJECTURI
+
 .ICONURI
 
 .EXTERNALMODULEDEPENDENCIES Microsoft.Graph.Authentication,Microsoft.Graph.Applications 
@@ -23,15 +25,16 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
-
+1.0.4: Fix a bug where the Get-MgServicePrincipal changed requiring the use of a switch type for the 'All' parameter.
 
 .PRIVATEDATA
 
 #> 
 
-# Ensure the appropriate pre-requirements for the script
 #Requires -Module Microsoft.Graph.Authentication
 #Requires -Module Microsoft.Graph.Applications
+
+# Ensure the appropriate pre-requirements for the script
 
 
 <#
