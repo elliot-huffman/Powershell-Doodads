@@ -147,22 +147,22 @@ begin {
     if ($AccessToken -ne '') {
         # Log into the Graph API using the provided access token
         Connect-MgGraph -AccessToken $AccessToken
-    }
-    else {
+    } else {
         # Log into the Graph API using Azure AD authentication
         Connect-MgGraph -Scopes 'Directory.Read.All', 'AppRoleAssignment.ReadWrite.All', 'Application.ReadWrite.All'
     }
+
+    # Write Verbose info
+    Write-Verbose -Message 'Calculating GUI or CLI mode'
 
     # Check to see if GUI mode is forced or necessary
     if ($CLIMode) {
         # If CLI mode is $true, the operator is forcing the execution of no GUI in headless only
         [System.Boolean]$GUIMode = $false
-    }
-    elseif (!$ObjectID -or !$PermissionName) {
+    } elseif (!$ObjectID -or !$PermissionName) {
         # If the ObjectID or PermissionName parameters are not specified and the script is not forced CLI only, GUI is implied.
         [System.Boolean]$GUIMode = $true
-    }
-    else {
+    } else {
         # If the parameters are present as expected, set the GUI mode to be off as no user selection is necessary.
         [System.Boolean]$GUIMode = $false
     }
@@ -186,9 +186,8 @@ process {
         Write-Verbose -Message 'Getting a list of all managed identities and render it in a picker dialog for the end user to select one.'
 
         # Get a list of Managed Identities and make the user select one of them
-        [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphServicePrincipal[]]$SelectedPrincipalList = Get-MgServicePrincipal -Filter "ServicePrincipalType eq 'ManagedIdentity'" -All $true | Out-GridView -Title 'Select the Managed Identity to Assign Permission' -OutputMode 'Multiple'
-    }
-    else {
+        [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphServicePrincipal[]]$SelectedPrincipalList = Get-MgServicePrincipal -Filter "ServicePrincipalType eq 'ManagedIdentity'" -All | Out-GridView -Title 'Select the Managed Identity to Assign Permission' -OutputMode 'Multiple'
+    } else {
         # Write Verbose info
         Write-Verbose -Message 'Getting the specified service principal.'
 
@@ -224,8 +223,7 @@ process {
 
         # Get the specified permission that needs to be assigned
         [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphAppRole[]]$AppRoleList = $GraphAppSP.AppRoles | Out-GridView -Title 'Select the Permission to Assign' -OutputMode 'Multiple'
-    }
-    else {
+    } else {
         # Write Verbose info
         Write-Verbose -Message 'Getting the specified app role/permission'
 
