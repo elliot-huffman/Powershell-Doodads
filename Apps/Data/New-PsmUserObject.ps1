@@ -61,13 +61,12 @@ begin {
         # Create a PSM user object
         $UserObject = @{
             'id'           = [System.Guid]::NewGuid()
-            'DisplayName'  = "$RandomFirst $RandomLast (Privileged)"
+            'DisplayName'  = "$RandomFirst $RandomLast"
             'Upn'          = "$RandomFirst.$RandomLast@example.com"
             'FirstName'    = $RandomFirst
             'LastName'     = $RandomLast
             'CreationDate' = (Get-Date -Year 2021 -Day (Get-Random -Maximum 29 -Minimum 1) -Month (Get-Random -Minimum 1 -Maximum 12)).ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
             'uiEducation'  = Get-Random -InputObject $true, $false
-            'UniqueGroup'  = [System.Guid]::NewGuid()
         }
 
         # If data access mode is specified
@@ -80,7 +79,12 @@ begin {
         }
 
         # If the data access flag is not specified, generate privileged user objects
-        if (!$DataAccess) { $UserObject.Upn = 'priv-' + $UserObject.Upn }
+        if (!$DataAccess) {
+            $UserObject.DisplayName = $UserObject.DisplayName + ' (Privileged)'
+            $UserObject.Upn = 'priv-' + $UserObject.Upn
+            $UserObject.uiEducation = $true
+            $UserObject['UniqueGroup'] = [System.Guid]::NewGuid()
+        }
 
         # Return the computed user object to the caller
         return $UserObject
