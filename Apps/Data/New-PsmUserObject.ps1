@@ -50,7 +50,7 @@ begin {
     $LastName = 'Crawford', 'Butler', 'Hester', 'French', 'Blevins', 'Riggs', 'Hughes', 'Maynard', 'Mercado', 'Fleming', 'Bean', 'Huffman', 'Wu', 'Dyer', 'Berger', 'Bates', 'Moses', 'Cherry', 'Rosales', 'Roman', 'Bender', 'Collier', 'Michael', 'Ferguson', 'Love', 'Dawson', 'Aguilar', 'Oliver', 'Montoya', 'Johns', 'Knapp', 'Ellis', 'Lambert', 'Ward', 'Wilkins', 'Fuentes', 'Romero', 'Estrada', 'Patterson', 'Frey', 'Merritt', 'Medina', 'Vasquez', 'Duarte', 'Massey', 'Fry', 'Schmidt', 'Reeves', 'Pitts', 'Waters'
     
     # Define the list of user types
-    $UserTypeList = 'Privileged', 'Developer', 'Specialized', 'Enterprise', 'Unmanaged'
+    $UserTypeList = 'Privileged', 'Developer', 'Specialized', 'Enterprise'
 
     # Define a function that creates a PSM user object 
     function New-PsmUser {
@@ -60,24 +60,27 @@ begin {
 
         # Create a PSM user object
         $UserObject = @{
-            'id'           = [System.Guid]::NewGuid();
+            'id'           = [System.Guid]::NewGuid()
             'DisplayName'  = "$RandomFirst $RandomLast (Privileged)"
             'Upn'          = "$RandomFirst.$RandomLast@example.com"
             'FirstName'    = $RandomFirst
             'LastName'     = $RandomLast
-            'CreationDate' = (Get-Date -Year 2021 -Day (Get-Random -Maximum 29 -Minimum 1) -Month (Get-Random -Minimum 1 -Maximum 12)).ToString('yyyy-MM-ddTHH:mm:ss.fffZ');
+            'CreationDate' = (Get-Date -Year 2021 -Day (Get-Random -Maximum 29 -Minimum 1) -Month (Get-Random -Minimum 1 -Maximum 12)).ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
+            'uiEducation'  = Get-Random -InputObject $true, $false
+            'UniqueGroup'  = [System.Guid]::NewGuid()
         }
 
         # If data access mode is specified
         if ($DataAccess) {
             # set all user types to unmanaged
             $UserObject['Type'] = 'Unmanaged'
-        }
-        # Otherwise
-        else {
+        } else {
             # Set the user type to a random value
             $UserObject['Type'] = Get-Random -InputObject $UserTypeList
         }
+
+        # If the data access flag is not specified, generate privileged user objects
+        if (!$DataAccess) { $UserObject.Upn = 'priv-' + $UserObject.Upn }
 
         # Return the computed user object to the caller
         return $UserObject

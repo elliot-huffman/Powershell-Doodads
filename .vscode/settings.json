@@ -12,6 +12,7 @@
         "MAPI",
         "reimage",
         "SMTP",
+        "Unmanaged",
         "WESL",
         "Winver"
     ]
