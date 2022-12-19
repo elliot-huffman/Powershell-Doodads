@@ -134,7 +134,7 @@ param(
     [System.String[]]$PermissionName,
     [ValidateNotNullOrEmpty()]
     [System.GUID]$GraphServicePrincipalID = '00000003-0000-0000-c000-000000000000',
-    [ValidateScript({ ([System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(($_ -split '\.')[1])) | ConvertFrom-Json).aud -eq 'https://graph.microsoft.com' })]
+    # [ValidateScript({ ([System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(($_ -split '\.')[1])) | ConvertFrom-Json).aud -eq 'https://graph.microsoft.com' })]
     [System.String]$AccessToken
 )
 
