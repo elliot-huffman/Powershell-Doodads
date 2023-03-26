@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.0.4
+.VERSION 1.0.5
 
 .GUID 0b801f6d-e4f2-4968-a5d2-d959dc0dd7c5
 
@@ -25,6 +25,7 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+1.0.5: Disable access token validation since it is not working with Install-PSM. Will be re-enabled later.
 1.0.4: Fix a bug where the Get-MgServicePrincipal changed requiring the use of a switch type for the 'All' parameter.
 
 .PRIVATEDATA
