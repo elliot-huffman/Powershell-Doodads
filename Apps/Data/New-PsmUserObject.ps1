@@ -1,8 +1,8 @@
 <#
 .SYNOPSIS
-    A script to generate mock user data for the Privileged Security Management (PSM) application.
+    A script to generate mock user data for the Privileged Security Management (MSM) application.
 .DESCRIPTION
-    The data generated is in the format of the PSM User object.
+    The data generated is in the format of the MSM User object.
     The data can be generated in the context of the Data Access API or in the standard user management API context.
 .PARAMETER Count
     Used to specify the number of user objects to be created in the JSON file
@@ -12,19 +12,19 @@
     Used to configure where the JSON file will be created.
     The output file will always be a text file with JSON content.
 .EXAMPLE
-    New-PsmUserObject.ps1
-    Generates 50 user objects in the current working directory in a file named "PsmUserObjectList.json"
+    New-MsmUserObject.ps1
+    Generates 50 user objects in the current working directory in a file named "MsmUserObjectList.json"
 .EXAMPLE
-    New-PsmUserObject.ps1 -Count 123
-    Generates 123 user objects in a file that is located in the current working directory that is named "PsmUserObjectList.json"
+    New-MsmUserObject.ps1 -Count 123
+    Generates 123 user objects in a file that is located in the current working directory that is named "MsmUserObjectList.json"
 .EXAMPLE
-    New-PsmUserObject.ps1 -DataAccess
-    Generates 50 user objects that all have a type of "unmanaged" in a file that is located in the current working directory that is named "PsmUserObjectList.json"
+    New-MsmUserObject.ps1 -DataAccess
+    Generates 50 user objects that all have a type of "unmanaged" in a file that is located in the current working directory that is named "MsmUserObjectList.json"
 .EXAMPLE
-    New-PsmUserObject.ps1 -Path "C:\UserObjectList.json"
+    New-MsmUserObject.ps1 -Path "C:\UserObjectList.json"
     Generates 50 user objects in a file that is located in on the root of the "C:\" drive that is named "UserObjectList.json"
 .EXAMPLE
-    New-PsmUserObject.ps1 -Count 321 -Path "C:\UserObjectList.json" -DataAccess
+    New-MsmUserObject.ps1 -Count 321 -Path "C:\UserObjectList.json" -DataAccess
     Generates 321 user objects with the context of the Data Access API located on the root of the "C:\" drive with the file name of "UserObjectList.json"
 .INPUTS
     System.Int64
@@ -39,8 +39,8 @@
 # Define the parameters of the script
 param(
     [System.Int64]$Count = 50,
-    [switch]$DataAccess,
-    [System.String]$Path = '.\PsmUserObjectList.json'
+    [switch]$Unmanaged,
+    [System.String]$Path = '.\MsmUserObjectList.json'
 )
 
 # Define the part of the script to be executed at the beginning of the pipeline collection
@@ -50,40 +50,41 @@ begin {
     $LastName = 'Crawford', 'Butler', 'Hester', 'French', 'Blevins', 'Riggs', 'Hughes', 'Maynard', 'Mercado', 'Fleming', 'Bean', 'Huffman', 'Wu', 'Dyer', 'Berger', 'Bates', 'Moses', 'Cherry', 'Rosales', 'Roman', 'Bender', 'Collier', 'Michael', 'Ferguson', 'Love', 'Dawson', 'Aguilar', 'Oliver', 'Montoya', 'Johns', 'Knapp', 'Ellis', 'Lambert', 'Ward', 'Wilkins', 'Fuentes', 'Romero', 'Estrada', 'Patterson', 'Frey', 'Merritt', 'Medina', 'Vasquez', 'Duarte', 'Massey', 'Fry', 'Schmidt', 'Reeves', 'Pitts', 'Waters'
     
     # Define the list of user types
-    $UserTypeList = 'Privileged', 'Developer', 'Specialized', 'Enterprise'
+    $UserTypeList = 'Privileged', 'Specialized', 'Enterprise'
 
-    # Define a function that creates a PSM user object 
-    function New-PsmUser {
+    # Define a function that creates a MSM user object 
+    function New-MsmUser {
         # Randomly select a first and last name
         $RandomFirst = Get-Random -InputObject $FirstName
         $RandomLast = Get-Random -InputObject $LastName
 
-        # Create a PSM user object
+        # Create a MSM user object
         $UserObject = @{
-            'id'           = [System.Guid]::NewGuid()
-            'DisplayName'  = "$RandomFirst $RandomLast"
+            'Id'           = (New-Guid).Guid
             'Upn'          = "$RandomFirst.$RandomLast@example.com"
+            'UniqueGroup'  = (New-Guid).Guid
+            'DisplayName'  = "$RandomFirst $RandomLast"
             'FirstName'    = $RandomFirst
             'LastName'     = $RandomLast
-            'CreationDate' = (Get-Date -Year 2021 -Day (Get-Random -Maximum 29 -Minimum 1) -Month (Get-Random -Minimum 1 -Maximum 12)).ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
-            'uiEducation'  = Get-Random -InputObject $true, $false
+            'CreationDate' = (Get-Date -Year 2023 -Day (Get-Random -Maximum 29 -Minimum 1) -Month (Get-Random -Minimum 1 -Maximum 12)).ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
+            'UiEducation'  = Get-Random -InputObject $true, $false
         }
 
         # If data access mode is specified
-        if ($DataAccess) {
+        if ($Unmanaged) {
             # set all user types to unmanaged
             $UserObject['Type'] = 'Unmanaged'
+            $UserObject['UniqueGroup'] = '00000000-0000-0000-0000-000000000000'
+            $UserObject['UiEducation'] = $true
         } else {
             # Set the user type to a random value
             $UserObject['Type'] = Get-Random -InputObject $UserTypeList
         }
 
         # If the data access flag is not specified, generate privileged user objects
-        if (!$DataAccess) {
+        if ($UserObject['Type'] -eq 'Privileged') {
             $UserObject.DisplayName = $UserObject.DisplayName + ' (Privileged)'
             $UserObject.Upn = 'priv-' + $UserObject.Upn
-            $UserObject.uiEducation = $true
-            $UserObject['UniqueGroup'] = [System.Guid]::NewGuid()
         }
 
         # Return the computed user object to the caller
@@ -94,7 +95,7 @@ begin {
 # Define the part of the script to be executed at the end of the pipeline object collection
 end {
     # Generate the user objects and store them in an array
-    [System.Object[]]$UserList = 1..$Count | ForEach-Object -Process { New-PsmUser }
+    [System.Object[]]$UserList = 1..$Count | ForEach-Object -Process { New-MsmUser }
 
     # Save the user objects to disk
     $UserList | ConvertTo-Json | Out-File -FilePath $Path
