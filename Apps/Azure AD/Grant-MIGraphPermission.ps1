@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.0.5
+.VERSION 1.0.6
 
 .GUID 0b801f6d-e4f2-4968-a5d2-d959dc0dd7c5
 
@@ -25,6 +25,7 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+1.0.6: Change to Microsoft.Graph.Beta to support new features.
 1.0.5: Disable access token validation since it is not working with Install-PSM. Will be re-enabled later.
 1.0.4: Fix a bug where the Get-MgServicePrincipal changed requiring the use of a switch type for the 'All' parameter.
 
@@ -33,7 +34,7 @@
 #> 
 
 #Requires -Module Microsoft.Graph.Authentication
-#Requires -Module Microsoft.Graph.Applications
+#Requires -Module Microsoft.Graph.Beta.Applications
 
 # Ensure the appropriate pre-requirements for the script
 
@@ -136,7 +137,7 @@ param(
     [ValidateNotNullOrEmpty()]
     [System.GUID]$GraphServicePrincipalID = '00000003-0000-0000-c000-000000000000',
     # [ValidateScript({ ([System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(($_ -split '\.')[1])) | ConvertFrom-Json).aud -eq 'https://graph.microsoft.com' })]
-    [System.String]$AccessToken
+    [System.Security.SecureString]$AccessToken
 )
 
 # Initialize processing
@@ -148,7 +149,7 @@ begin {
     Write-Verbose -Message 'Logging into Azure AD'
     
     # Check if an access token has been provided
-    if ($AccessToken -ne '') {
+    if ($null -ne $AccessToken) {
         # Log into the Graph API using the provided access token
         Connect-MgGraph -AccessToken $AccessToken
     } else {
@@ -178,7 +179,7 @@ process {
     Write-Verbose -Message 'Getting an instance of the Graph API App Service Principal'
 
     # Get the GraphAPI instance
-    [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphServicePrincipal]$GraphAppSP = Get-MgServicePrincipal -Filter "AppID eq '$GraphServicePrincipalID'"
+    [Microsoft.Graph.Beta.PowerShell.Models.MicrosoftGraphServicePrincipal]$GraphAppSP = Get-MgBetaServicePrincipal -Filter "AppID eq '$GraphServicePrincipalID'"
 
     # Write debug info
     Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - Graph API SP Info:"
@@ -190,7 +191,7 @@ process {
         Write-Verbose -Message 'Getting a list of all managed identities and render it in a picker dialog for the end user to select one.'
 
         # Get a list of Managed Identities and make the user select one of them
-        [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphServicePrincipal[]]$SelectedPrincipalList = Get-MgServicePrincipal -Filter "ServicePrincipalType eq 'ManagedIdentity'" -All | Out-GridView -Title 'Select the Managed Identity to Assign Permission' -OutputMode 'Multiple'
+        [Microsoft.Graph.Beta.PowerShell.Models.MicrosoftGraphServicePrincipal[]]$SelectedPrincipalList = Get-MgBetaServicePrincipal -Filter "ServicePrincipalType eq 'ManagedIdentity'" -All | Out-GridView -Title 'Select the Managed Identity to Assign Permission' -OutputMode 'Multiple'
     } else {
         # Write Verbose info
         Write-Verbose -Message 'Getting the specified service principal.'
@@ -198,7 +199,7 @@ process {
         # Loop through each ID specified and save the results into a new list.
         foreach ($GUID in $ObjectID) {
             # Pull the specified Object ID's graph object
-            [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphServicePrincipal[]]$SelectedPrincipalList += Get-MgServicePrincipal -ServicePrincipalId $GUID
+            [Microsoft.Graph.Beta.PowerShell.Models.MicrosoftGraphServicePrincipal[]]$SelectedPrincipalList += Get-MgBetaServicePrincipal -ServicePrincipalId $GUID
         }
     }
 
@@ -226,7 +227,7 @@ process {
         Write-Verbose -Message 'Getting a list of all app roles/permissions and render it in a picker dialog for the end user to select one.'
 
         # Get the specified permission that needs to be assigned
-        [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphAppRole[]]$AppRoleList = $GraphAppSP.AppRoles | Out-GridView -Title 'Select the Permission to Assign' -OutputMode 'Multiple'
+        [Microsoft.Graph.Beta.PowerShell.Models.MicrosoftGraphAppRole[]]$AppRoleList = $GraphAppSP.AppRoles | Out-GridView -Title 'Select the Permission to Assign' -OutputMode 'Multiple'
     } else {
         # Write Verbose info
         Write-Verbose -Message 'Getting the specified app role/permission'
@@ -234,7 +235,7 @@ process {
         # Loop through each permission requested and enrich the permission provided with system context
         foreach ($RoleName in $PermissionName) {
             # Add each context instance to the app role list
-            [Microsoft.Graph.PowerShell.Models.IMicrosoftGraphAppRole[]]$AppRoleList += $GraphAppSP.AppRoles | Where-Object -FilterScript { $_.Value -eq $RoleName }
+            [Microsoft.Graph.Beta.PowerShell.Models.MicrosoftGraphAppRole[]]$AppRoleList += $GraphAppSP.AppRoles | Where-Object -FilterScript { $_.Value -eq $RoleName }
         }         
     }
 
@@ -273,7 +274,7 @@ process {
                 Write-Debug -Message "$(Get-Date -Format 'HH:mm:ss') - `$Role.Id: $($Role.Id)"
 
                 # Assign the Graph API permission to the specified service principal
-                New-MgServicePrincipalAppRoleAssignment -PrincipalId $Principal.Id -ServicePrincipalId $Principal.Id -AppRoleId $Role.Id -ResourceId $GraphAppSP.Id
+                New-MgBetaServicePrincipalAppRoleAssignment -PrincipalId $Principal.Id -ServicePrincipalId $Principal.Id -AppRoleId $Role.Id -ResourceId $GraphAppSP.Id
             }
         }
     }
